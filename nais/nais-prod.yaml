@@ -1,0 +1,35 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    zone: fss
+  labels:
+    app: dp-arbeidssoker-oppslag
+    team: teamdagpenger
+  name: dp-arbeidssoker-oppslag
+  namespace: default
+spec:
+  image: {{ image }}
+  liveness:
+    path: /isalive
+  readiness:
+    path: /isready
+  port: 8080
+  prometheus:
+    enabled: false
+    path: /metrics
+  replicas:
+    max: 3
+    min: 3
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  vault:
+    enabled: true
+    paths:
+      - kvPath: "serviceuser/data/prod/srvdp-ytelser-oppsla"
+        mountPath: "/var/run/secrets/nais.io/service_user/"
