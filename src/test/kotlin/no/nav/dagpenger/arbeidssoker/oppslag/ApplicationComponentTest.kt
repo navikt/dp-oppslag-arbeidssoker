@@ -37,11 +37,7 @@ import java.util.concurrent.TimeUnit
 
 @KtorExperimentalAPI
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class AppComponentTest {
-
-    companion object {
-        const val FNR = "12345"
-    }
+internal class ApplicationComponentTest {
 
     @Test
     fun `skal motta behov og produsere ReellArbeidssøker-løsning`() {
