@@ -16,7 +16,9 @@ private val localProperties = ConfigurationMap(
                 "password" to "pass",
                 "kafka.reset.policy" to "earliest",
                 "nav.truststore.path" to "bla/bla",
-                "nav.truststore.password" to "foo"
+                "nav.truststore.password" to "foo",
+                "sts.url" to "http://localhost",
+                "veilarbregistrering.url" to "http://localhost"
         )
 )
 private val devProperties = ConfigurationMap(
@@ -24,7 +26,9 @@ private val devProperties = ConfigurationMap(
                 "kafka.bootstrap.servers" to "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
                 "application.profile" to DEV.toString(),
                 "application.httpPort" to "8080",
-                "kafka.topic" to DAGPENGER_BEHOV_TOPIC
+                "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
+                "sts.url" to "http://security-token-service.default.svc.nais.local",
+                "veilarbregistrering.url" to "https://veilarbregistrering-q0.nais.preprod.local"
         )
 )
 private val prodProperties = ConfigurationMap(
@@ -45,6 +49,8 @@ private fun config() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getPro
 data class Configuration(
     val serviceuser: Serviceuser = Serviceuser(),
     val application: Application = Application(),
+    val sts: Sts = Sts(),
+    val veilarbregistrering: Veilarbregistrering = Veilarbregistrering(),
     val kafka: Kafka = Kafka()
 ) {
     data class Application(
@@ -71,6 +77,14 @@ data class Configuration(
     data class Serviceuser(
         val username: String = config()[Key("username", stringType)],
         val password: String = config()[Key("password", stringType)]
+    )
+
+    data class Sts(
+        val url: String = config()[Key("sts.url", stringType)]
+    )
+
+    data class Veilarbregistrering(
+        val url: String = config()[Key("veilarbregistrering.url", stringType)]
     )
 }
 

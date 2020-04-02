@@ -11,6 +11,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.ktor.util.KtorExperimentalAPI
+import io.mockk.mockk
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import no.nav.common.KafkaEnvironment
@@ -39,10 +40,14 @@ import java.util.concurrent.TimeUnit
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ApplicationComponentTest {
 
+    companion object {
+        const val FNR = "12345"
+    }
+
     @Test
     fun `skal motta behov og produsere ReellArbeidssøker-løsning`() {
         val behov =
-                """{"@id": "1", "@behov": ["ReellArbeidssøker"]}"""
+                """{"@id": "1", "fnr":"$FNR",  "@behov": ["ReellArbeidssøker"]}"""
         behovProducer.send(ProducerRecord(testTopic, "123", behov))
 
         assertLøsning(Duration.ofSeconds(10)) { alleSvar ->
@@ -54,9 +59,9 @@ internal class ApplicationComponentTest {
     @Test
     fun `skal kun behandle opprinnelig behov`() {
         val behovAlleredeBesvart =
-                """{"@id": "1", "@behov": ["ReellArbeidssøker"], "@løsning": { "ReellArbeidssøker": { "erReellArbeidssøker": true } } }"""
+                """{"@id": "1", "fnr":"$FNR", "@behov": ["ReellArbeidssøker"], "@løsning": { "ReellArbeidssøker": { "erReellArbeidssøker": true } } }"""
         val behovSomTrengerSvar =
-                """{"@id": "2", "@behov": ["ReellArbeidssøker"]}"""
+                """{"@id": "2", "fnr":"$FNR", "@behov": ["ReellArbeidssøker"]}"""
         behovProducer.send(ProducerRecord(testTopic, "1", behovAlleredeBesvart))
         behovProducer.send(ProducerRecord(testTopic, "2", behovSomTrengerSvar))
 
@@ -76,7 +81,7 @@ internal class ApplicationComponentTest {
     fun `ignorerer hendelser med ugyldig json`() {
         val id = "1"
         val behovSomTrengerSvar =
-                """{"@id": "$id", "@behov": ["ReellArbeidssøker"]}"""
+                """{"@id": "$id", "fnr":"$FNR", "@behov": ["ReellArbeidssøker"]}"""
         behovProducer.send(ProducerRecord(testTopic, UUID.randomUUID().toString(), "THIS IS NOT JSON"))
         behovProducer.send(ProducerRecord(testTopic, id, behovSomTrengerSvar))
 
@@ -179,7 +184,7 @@ internal class ApplicationComponentTest {
                 "HTTP_PORT" to randomPort.toString())
 
         rapidsConnection = RapidApplication.create(rapidConfig).apply {
-            Application(this)
+            Application(this, mockk(relaxed = true))
         }
 
         GlobalScope.launch {

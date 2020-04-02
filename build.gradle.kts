@@ -51,7 +51,6 @@ dependencies {
 
     // json
     implementation(Json.library)
-    implementation("com.google.code.gson:gson:2.8.5")
     implementation(Ulid.ulid)
 
     // ktor
