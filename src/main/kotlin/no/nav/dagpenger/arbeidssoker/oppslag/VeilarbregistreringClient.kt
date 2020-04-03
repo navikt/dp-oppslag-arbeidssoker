@@ -3,6 +3,7 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.moshi.moshiDeserializerOf
+import de.huxhorn.sulky.ulid.ULID
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Accept
 import io.ktor.http.HttpHeaders.XCorrelationId
@@ -19,7 +20,7 @@ class VeilarbregistreringClient(
         val (_, _, result) = "$baseUrl$registreringPath".httpGet(listOf(("fnr" to fnr)))
             .authentication().bearer(stsConsumer.token())
             .header(Accept, ContentType.Application.Json)
-            .header(XCorrelationId, "correlationId")
+            .header(XCorrelationId, ULID().nextValue())
             .responseObject(moshiDeserializerOf(Arbeidssøker::class.java))
 
         return result.fold(
