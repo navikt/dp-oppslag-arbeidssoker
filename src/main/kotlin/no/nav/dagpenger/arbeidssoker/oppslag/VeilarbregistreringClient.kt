@@ -25,7 +25,7 @@ class VeilarbregistreringClient(
         return result.fold(
             { it },
             {
-                throw RuntimeException("Feil i kallet mot hent ytelser", it.exception)
+                throw RuntimeException("Feil i kallet mot veilarbregistrering", it.exception)
             }
         )
     }

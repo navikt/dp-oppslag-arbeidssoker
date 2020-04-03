@@ -28,7 +28,7 @@ private val devProperties = ConfigurationMap(
                 "application.httpPort" to "8080",
                 "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
                 "sts.url" to "http://security-token-service.default.svc.nais.local",
-                "veilarbregistrering.url" to "https://veilarbregistrering-q0.nais.preprod.local"
+                "veilarbregistrering.url" to "https://veilarbregistrering-q1.nais.preprod.local"
         )
 )
 private val prodProperties = ConfigurationMap(
