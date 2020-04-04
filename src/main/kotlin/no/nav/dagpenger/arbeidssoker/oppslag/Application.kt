@@ -13,20 +13,20 @@ fun main() {
     val configuration = Configuration()
 
     val stsConsumer = StsConsumer(
-            baseUrl = configuration.sts.url,
-            username = configuration.serviceuser.username,
-            password = configuration.serviceuser.password
+        baseUrl = configuration.sts.url,
+        username = configuration.serviceuser.username,
+        password = configuration.serviceuser.password
     )
 
     val veilarbregistreringClient = VeilarbregistreringClient(
-            baseUrl = configuration.veilarbregistrering.url,
-            stsConsumer = stsConsumer
+        baseUrl = configuration.veilarbregistrering.url,
+        stsConsumer = stsConsumer
     )
 
     RapidApplication.create(configuration.kafka.rapidApplication).apply {
         Application(
-                this,
-                veilarbregistreringClient
+            this,
+            veilarbregistreringClient
         )
     }.start()
 }
@@ -40,6 +40,7 @@ class Application(
         const val BEHOV = "@behov"
         const val REELL_ARBEIDSSØKER = "ReellArbeidssøker"
         const val FNR = "fnr"
+        const val ID = "@id"
     }
 
     init {
@@ -47,6 +48,7 @@ class Application(
             validate { it.forbid(LØSNING) }
             validate { it.requireKey(FNR) }
             validate { it.requireAll(BEHOV, listOf(REELL_ARBEIDSSØKER)) }
+            validate { it.interestedIn(ID) }
         }.register(this)
     }
 
@@ -59,7 +61,9 @@ class Application(
             val reellArbeidssøker = ReellArbeidssøker(false)
             packet[LØSNING] = mapOf(REELL_ARBEIDSSØKER to reellArbeidssøker.toMap())
 
-            context.send(packet.toJson())
+            context.send(packet.toJson()).also {
+                log.info { "Behandlet: ${packet[ID].textValue()}" }
+            }
         } catch (e: Exception) {
             log.error(e) {
                 "feil ved henting av arbeidssøker-data: ${e.message}"
