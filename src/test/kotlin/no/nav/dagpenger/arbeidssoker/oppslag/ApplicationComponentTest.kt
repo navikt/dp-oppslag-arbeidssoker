@@ -11,10 +11,10 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.ktor.util.KtorExperimentalAPI
-import io.mockk.mockk
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import no.nav.common.KafkaEnvironment
+import no.nav.dagpenger.ytelser.oppslag.sts.StsConsumer
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.apache.kafka.clients.consumer.Consumer
@@ -172,9 +172,24 @@ internal class ApplicationComponentTest {
                 kafka = Configuration.Kafka(
                         brokers = embeddedKafkaEnvironment.brokersURL,
                         topic = testTopic
-                ))
+                ),
+                sts = Configuration.Sts(wireMockServer.baseUrl()),
+                veilarbregistrering = Configuration.Veilarbregistrering(wireMockServer.baseUrl())
+        )
+
+        val stsConsumer = StsConsumer(
+                baseUrl = config.sts.url,
+                username = config.serviceuser.username,
+                password = config.serviceuser.password
+        )
+
+        val veilarbregistreringClient = VeilarbregistreringClient(
+                baseUrl = config.veilarbregistrering.url,
+                stsConsumer = stsConsumer
+        )
 
         wireMockServer.stubFor(Stubs.sts(config.serviceuser))
+        wireMockServer.stubFor(Stubs.stubRegistreringGet())
 
         // kjør opp app
         val rapidConfig = mapOf(
@@ -184,7 +199,7 @@ internal class ApplicationComponentTest {
                 "HTTP_PORT" to randomPort.toString())
 
         rapidsConnection = RapidApplication.create(rapidConfig).apply {
-            Application(this, mockk(relaxed = true))
+            Application(this, veilarbregistreringClient)
         }
 
         GlobalScope.launch {

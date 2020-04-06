@@ -1,13 +1,17 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
-class ReellArbeidssøker(val erReellArbeidssøker: Boolean) {
+import java.time.LocalDateTime
+
+class ReellArbeidssøker(val erReellArbeidssøker: Boolean, val registreringsdato: LocalDateTime?) {
     companion object {
         const val ER_REELL_ARBEIDSSØKER = "erReellArbeidssøker"
+        const val REGISTRERINGSDATO = "registreringsdato"
     }
 
-    fun toMap(): Map<String, Any> {
+    fun toMap(): Map<String, Any?> {
         return mapOf(
-                ER_REELL_ARBEIDSSØKER to erReellArbeidssøker
+                ER_REELL_ARBEIDSSØKER to erReellArbeidssøker,
+                REGISTRERINGSDATO to registreringsdato
         )
     }
 }

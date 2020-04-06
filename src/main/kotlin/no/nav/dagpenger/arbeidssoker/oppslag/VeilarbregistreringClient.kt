@@ -2,12 +2,13 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.fuel.moshi.moshiDeserializerOf
 import de.huxhorn.sulky.ulid.ULID
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Accept
 import io.ktor.http.HttpHeaders.XCorrelationId
 import no.nav.dagpenger.ytelser.oppslag.sts.StsConsumer
+import org.json.JSONObject
+import java.time.LocalDateTime
 
 val registreringPath = "/veilarbregistrering/api/registrering"
 
@@ -21,17 +22,27 @@ class VeilarbregistreringClient(
             .authentication().bearer(stsConsumer.token())
             .header(Accept, ContentType.Application.Json)
             .header(XCorrelationId, ULID().nextValue())
-            .responseObject(moshiDeserializerOf(Arbeidssøker::class.java))
+            .responseString()
 
         return result.fold(
-            { it },
+            { konverterJsonTilArbeidssøker(it) },
             {
                 throw RuntimeException("Feil i kallet mot veilarbregistrering", it.exception)
             }
         )
     }
 
+    fun konverterJsonTilArbeidssøker(arbeidssøkerJson: String): Arbeidssøker {
+        val type = "type"
+        val opprettetDato = "opprettetDato"
+        val json = JSONObject(arbeidssøkerJson)
+        val opprettetDato2 = LocalDateTime.parse(json.getJSONObject("registrering").getString(opprettetDato))
+
+        return Arbeidssøker(json.getString(type), opprettetDato2)
+    }
+
     data class Arbeidssøker(
-        val type: String
+        val type: String,
+        val opprettetDato: LocalDateTime
     )
 }

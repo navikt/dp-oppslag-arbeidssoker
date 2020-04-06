@@ -1,6 +1,9 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
+import com.github.tomakehurst.wiremock.client.MappingBuilder
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import io.ktor.http.HttpHeaders
 import no.nav.dagpenger.arbeidssoker.oppslag.Configuration.Serviceuser
 
 class Stubs {
@@ -22,5 +25,20 @@ class Stubs {
                 .withQueryParam("grant_type", equalTo("client_credentials"))
                 .withQueryParam("scope", equalTo("openid"))
                 .willReturn(okJson(stsTokenJson))
+
+        fun stubRegistreringGet(): MappingBuilder =
+                WireMock.get(urlPathEqualTo(registreringPath))
+                        .withQueryParam("fnr", equalTo(FNR))
+                        .withHeader(HttpHeaders.Authorization, equalTo("Bearer $stsToken"))
+                        .willReturn(
+                                WireMock.okJson("""
+                                {
+                                    "type": "ORDINAER",
+                                     "registrering" : {
+                                        "opprettetDato" : "2020-03-28T12:35:53.08295"
+                                     }
+                                }
+                            """.trimIndent())
+                        )
     }
 }

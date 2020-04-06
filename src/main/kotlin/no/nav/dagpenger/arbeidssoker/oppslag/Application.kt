@@ -54,9 +54,10 @@ class Application(
         try {
             val fnr = packet[FNR].asText()
 
-            veilarbregistreringClient.hentArbeidssøker(fnr)
+            val arbeidssøker = veilarbregistreringClient.hentArbeidssøker(fnr)
 
-            val reellArbeidssøker = ReellArbeidssøker(false)
+            val reellArbeidssøker = mapToReelArbeidssøker(arbeidssøker)
+
             packet[LØSNING] = mapOf(REELL_ARBEIDSSØKER to reellArbeidssøker.toMap())
 
             context.send(packet.toJson())
@@ -65,5 +66,11 @@ class Application(
                 "feil ved henting av arbeidssøker-data: ${e.message}"
             }
         }
+    }
+
+    fun mapToReelArbeidssøker(arbeidssøker: VeilarbregistreringClient.Arbeidssøker): ReellArbeidssøker {
+        return if (arbeidssøker.type.equals("ORDINAER")) {
+            ReellArbeidssøker(true, arbeidssøker.opprettetDato)
+        } else ReellArbeidssøker(false, null)
     }
 }
