@@ -9,6 +9,7 @@ import io.ktor.http.HttpHeaders.XCorrelationId
 import no.nav.dagpenger.ytelser.oppslag.sts.StsConsumer
 import org.json.JSONObject
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 val registreringPath = "/veilarbregistrering/api/registrering"
 
@@ -36,9 +37,11 @@ class VeilarbregistreringClient(
         val type = "type"
         val opprettetDato = "opprettetDato"
         val json = JSONObject(arbeidssøkerJson)
-        val opprettetDato2 = LocalDateTime.parse(json.getJSONObject("registrering").getString(opprettetDato))
 
-        return Arbeidssøker(json.getString(type), opprettetDato2)
+        val opprettetDato2 = ZonedDateTime.parse(
+                json.getJSONObject("registrering").getString(opprettetDato))
+
+        return Arbeidssøker(json.getString(type), opprettetDato2.toLocalDateTime())
     }
 
     data class Arbeidssøker(

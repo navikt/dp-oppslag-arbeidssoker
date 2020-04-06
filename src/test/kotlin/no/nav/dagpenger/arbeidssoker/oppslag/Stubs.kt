@@ -35,7 +35,7 @@ class Stubs {
                                 {
                                     "type": "ORDINAER",
                                      "registrering" : {
-                                        "opprettetDato" : "2020-03-28T12:35:53.08295"
+                                        "opprettetDato" : "2020-04-03T14:33:08.606505+02:00"
                                      }
                                 }
                             """.trimIndent())
