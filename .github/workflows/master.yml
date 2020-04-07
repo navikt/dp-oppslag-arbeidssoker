@@ -57,15 +57,15 @@ jobs:
                CLUSTER: dev-fss
                RESOURCE: nais/nais-dev.yaml
 
-#   deploy_to_prod:
-#      name: Deploy to prod
-#      needs: build
-#      if: github.ref == 'refs/heads/master'
-#      runs-on: ubuntu-latest
-#      steps:
-#         -  uses: actions/checkout@v1
-#         -  uses: nais/deploy/actions/deploy@v1
-#            env:
-#               APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-#               CLUSTER: prod-fss
-#               RESOURCE: nais/nais-prod.yaml
+   deploy_to_prod:
+      name: Deploy to prod
+      needs: build
+      if: github.ref == 'refs/heads/master'
+      runs-on: ubuntu-latest
+      steps:
+         -  uses: actions/checkout@v1
+         -  uses: nais/deploy/actions/deploy@v1
+            env:
+               APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+               CLUSTER: prod-fss
+               RESOURCE: nais/nais-prod.yaml
