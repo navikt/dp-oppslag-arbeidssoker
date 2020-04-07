@@ -6,9 +6,9 @@ import de.huxhorn.sulky.ulid.ULID
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Accept
 import io.ktor.http.HttpHeaders.XCorrelationId
+import io.ktor.http.HttpStatusCode
 import no.nav.dagpenger.ytelser.oppslag.sts.StsConsumer
 import org.json.JSONObject
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 val registreringPath = "/veilarbregistrering/api/registrering"
@@ -18,34 +18,34 @@ class VeilarbregistreringClient(
     private val stsConsumer: StsConsumer
 ) {
 
-    fun hentArbeidssøker(fnr: String): Arbeidssøker {
-        val (_, _, result) = "$baseUrl$registreringPath".httpGet(listOf(("fnr" to fnr)))
+    fun hentArbeidssøker(fnr: String): Arbeidssøker? {
+        val (_, response, result) = "$baseUrl$registreringPath".httpGet(listOf(("fnr" to fnr)))
             .authentication().bearer(stsConsumer.token())
             .header(Accept, ContentType.Application.Json)
             .header(XCorrelationId, ULID().nextValue())
             .responseString()
 
         return result.fold(
-            { konverterJsonTilArbeidssøker(it) },
+            {
+                if (response.statusCode == HttpStatusCode.NoContent.value) {
+                    return null
+                }
+                konverterJsonTilArbeidssøker(it)
+            },
             {
                 throw RuntimeException("Feil i kallet mot veilarbregistrering", it.exception)
             }
         )
     }
 
-    fun konverterJsonTilArbeidssøker(arbeidssøkerJson: String): Arbeidssøker {
-        val type = "type"
-        val opprettetDato = "opprettetDato"
+    private fun konverterJsonTilArbeidssøker(arbeidssøkerJson: String): Arbeidssøker {
+        val typeField = "type"
+        val opprettetDatoField = "opprettetDato"
         val json = JSONObject(arbeidssøkerJson)
 
-        val opprettetDato2 = ZonedDateTime.parse(
-                json.getJSONObject("registrering").getString(opprettetDato))
+        val opprettetDato = ZonedDateTime.parse(
+                json.getJSONObject("registrering").getString(opprettetDatoField))
 
-        return Arbeidssøker(json.getString(type), opprettetDato2.toLocalDateTime())
+        return Arbeidssøker(ArbeidssøkerType.valueOf(json.getString(typeField)), opprettetDato.toLocalDateTime())
     }
-
-    data class Arbeidssøker(
-        val type: String,
-        val opprettetDato: LocalDateTime
-    )
 }

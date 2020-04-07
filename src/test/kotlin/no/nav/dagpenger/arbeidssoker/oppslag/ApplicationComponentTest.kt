@@ -199,7 +199,7 @@ internal class ApplicationComponentTest {
                 "HTTP_PORT" to randomPort.toString())
 
         rapidsConnection = RapidApplication.create(rapidConfig).apply {
-            Application(this, veilarbregistreringClient)
+            Application(this, Arbeidssøkeroppslag(veilarbregistreringClient))
         }
 
         GlobalScope.launch {

@@ -26,14 +26,14 @@ fun main() {
     RapidApplication.create(configuration.kafka.rapidApplication).apply {
         Application(
             this,
-            veilarbregistreringClient
+            Arbeidssøkeroppslag(veilarbregistreringClient)
         )
     }.start()
 }
 
 class Application(
     rapidsConnection: RapidsConnection,
-    private val veilarbregistreringClient: VeilarbregistreringClient
+    private val arbeidssøkeroppslag: Arbeidssøkeroppslag
 ) : River.PacketListener {
     companion object {
         const val LØSNING = "@løsning"
@@ -56,11 +56,7 @@ class Application(
         try {
             val fnr = packet[FNR].asText()
 
-            val arbeidssøker = veilarbregistreringClient.hentArbeidssøker(fnr)
-
-            val reellArbeidssøker = mapToReelArbeidssøker(arbeidssøker)
-
-            packet[LØSNING] = mapOf(REELL_ARBEIDSSØKER to reellArbeidssøker.toMap())
+            packet[LØSNING] = mapOf(REELL_ARBEIDSSØKER to arbeidssøkeroppslag.bestemReellArbeidssøker(fnr).toMap())
 
             context.send(packet.toJson()).also {
                 log.info { "Behandlet: ${packet[ID].textValue()}" }
@@ -70,11 +66,5 @@ class Application(
                 "feil ved henting av arbeidssøker-data: ${e.message}"
             }
         }
-    }
-
-    fun mapToReelArbeidssøker(arbeidssøker: VeilarbregistreringClient.Arbeidssøker): ReellArbeidssøker {
-        return if (arbeidssøker.type.equals("ORDINAER")) {
-            ReellArbeidssøker(true, arbeidssøker.opprettetDato)
-        } else ReellArbeidssøker(false, null)
     }
 }
