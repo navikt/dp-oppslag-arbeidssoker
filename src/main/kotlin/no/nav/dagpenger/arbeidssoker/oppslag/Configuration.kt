@@ -36,7 +36,9 @@ private val prodProperties = ConfigurationMap(
                 "kafka.bootstrap.servers" to "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
                 "application.profile" to PROD.toString(),
                 "application.httpPort" to "8080",
-                "kafka.topic" to DAGPENGER_BEHOV_TOPIC
+                "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
+                "sts.url" to "https://security-token-service.nais.adeo.no",
+                "veilarbregistrering.url" to "https://veilarbregistrering.nais.adeo.no"
         )
 )
 
