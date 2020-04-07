@@ -56,7 +56,10 @@ class Application(
         try {
             val fnr = packet[FNR].asText()
 
-            packet[LØSNING] = mapOf(REELL_ARBEIDSSØKER to arbeidssøkeroppslag.bestemReellArbeidssøker(fnr).toMap())
+            val reellArbeidssøker = arbeidssøkeroppslag.bestemReellArbeidssøker(fnr)
+            packet[LØSNING] = mapOf(REELL_ARBEIDSSØKER to reellArbeidssøker.toMap())
+
+            log.info { "Reell arbeidssøker: ${reellArbeidssøker.erReellArbeidssøker}" }
 
             context.send(packet.toJson()).also {
                 log.info { "Behandlet: ${packet[ID].textValue()}" }
