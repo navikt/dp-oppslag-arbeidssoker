@@ -1,10 +1,10 @@
-package no.nav.dagpenger.ytelser.oppslag.sts
+package no.nav.dagpenger.arbeidssoker.oppslag
 
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.httpGet
 import io.ktor.http.ContentType.Application.Json
 import io.ktor.http.HttpHeaders.Accept
-import no.nav.dagpenger.ytelser.oppslag.sts.StsToken.Companion.isValid
+import no.nav.dagpenger.arbeidssoker.oppslag.StsToken.Companion.isValid
 import org.json.JSONObject
 import java.time.LocalDateTime
 

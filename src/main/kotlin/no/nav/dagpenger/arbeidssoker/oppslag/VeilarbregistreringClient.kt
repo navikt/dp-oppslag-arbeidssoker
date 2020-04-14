@@ -7,7 +7,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Accept
 import io.ktor.http.HttpHeaders.XCorrelationId
 import io.ktor.http.HttpStatusCode
-import no.nav.dagpenger.ytelser.oppslag.sts.StsConsumer
 import org.json.JSONObject
 import java.time.ZonedDateTime
 

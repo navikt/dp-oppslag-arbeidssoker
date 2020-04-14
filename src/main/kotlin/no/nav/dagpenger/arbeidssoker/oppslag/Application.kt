@@ -7,7 +7,6 @@ import no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.SoapPort
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.arena.SoapArenaClient
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.configureFor
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.stsClient
-import no.nav.dagpenger.ytelser.oppslag.sts.StsConsumer
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -29,19 +28,19 @@ fun main() {
             stsConsumer = stsConsumer
     )
 
-    val ytelseskontraktV3 = SoapPort.ytelseskontraktV3(configuration.oppfoelgingsstatus.endpoint)
+    val oppfoelgingsstatusV2 = SoapPort.oppfoelgingsstatusV2(configuration.oppfoelgingsstatus.endpoint)
 
     val soapStsClient = stsClient(
             stsUrl = configuration.soapSTSClient.endpoint,
             credentials = configuration.soapSTSClient.username to configuration.soapSTSClient.password
     )
     if (configuration.soapSTSClient.allowInsecureSoapRequests) {
-        soapStsClient.configureFor(ytelseskontraktV3, STS_SAML_POLICY_NO_TRANSPORT_BINDING)
+        soapStsClient.configureFor(oppfoelgingsstatusV2, STS_SAML_POLICY_NO_TRANSPORT_BINDING)
     } else {
-        soapStsClient.configureFor(ytelseskontraktV3)
+        soapStsClient.configureFor(oppfoelgingsstatusV2)
     }
 
-    val arenaClient = SoapArenaClient(ytelseskontraktV3)
+    val arenaClient = SoapArenaClient(oppfoelgingsstatusV2)
 
     RapidApplication.create(configuration.kafka.rapidApplication).apply {
         Application(

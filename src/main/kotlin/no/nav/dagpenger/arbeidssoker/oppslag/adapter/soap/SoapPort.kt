@@ -8,14 +8,14 @@ import javax.xml.namespace.QName
 
 object SoapPort {
 
-    fun ytelseskontraktV3(serviceUrl: String): OppfoelgingsstatusV2 {
+    fun oppfoelgingsstatusV2(serviceUrl: String): OppfoelgingsstatusV2 {
         return createServicePort(
                 serviceUrl = serviceUrl,
                 serviceClazz = OppfoelgingsstatusV2::class.java,
-                wsdl = "wsdl/tjenestespesifikasjon/no/nav/tjeneste/virksomhet/ytelseskontrakt/v3/Binding.wsdl",
-                namespace = "http://nav.no/tjeneste/virksomhet/ytelseskontrakt/v3/Binding",
-                svcName = "Ytelseskontrakt_v3",
-                portName = "Ytelseskontrakt_v3Port"
+                wsdl = "wsdl/tjenestespesifikasjon/no/nav/tjeneste/virksomhet/oppfoelgingsstatus/v2/Binding.wsdl",
+                namespace = "http://nav.no/tjeneste/virksomhet/oppfoelgingsstatus/v2/Binding",
+                svcName = "Oppfoelgingsstatus_v2",
+                portName = "Oppfoelgingsstatus_v2Port"
         )
     }
 
