@@ -17,6 +17,9 @@ private val localProperties = ConfigurationMap(
                 "kafka.reset.policy" to "earliest",
                 "nav.truststore.path" to "bla/bla",
                 "nav.truststore.password" to "foo",
+                "oppfoelgingsstatus.v2.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
+                "soapsecuritytokenservice.url" to "http://localhost",
+                "allow.insecure.soap.requests" to true.toString(),
                 "sts.url" to "http://localhost",
                 "veilarbregistrering.url" to "http://localhost"
         )
@@ -28,6 +31,9 @@ private val devProperties = ConfigurationMap(
                 "application.httpPort" to "8080",
                 "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
                 "sts.url" to "http://security-token-service.default.svc.nais.local",
+                "ytelseskontrakt.v3.url" to "https://arena-q1.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
+                "soapsecuritytokenservice.url" to "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
+                "allow.insecure.soap.requests" to true.toString(),
                 "veilarbregistrering.url" to "https://veilarbregistrering-q1.nais.preprod.local"
         )
 )
@@ -38,6 +44,9 @@ private val prodProperties = ConfigurationMap(
                 "application.httpPort" to "8080",
                 "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
                 "sts.url" to "https://security-token-service.nais.adeo.no",
+                "ytelseskontrakt.v3.url" to "https://arena.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
+                "soapsecuritytokenservice.url" to "https://sts.adeo.no/SecurityTokenServiceProvider/",
+                "allow.insecure.soap.requests" to true.toString(),
                 "veilarbregistrering.url" to "https://veilarbregistrering.nais.adeo.no"
         )
 )
@@ -53,6 +62,8 @@ data class Configuration(
     val application: Application = Application(),
     val sts: Sts = Sts(),
     val veilarbregistrering: Veilarbregistrering = Veilarbregistrering(),
+    val oppfoelgingsstatus: OppfoelginsstatusConfig = OppfoelginsstatusConfig(),
+    val soapSTSClient: SoapSTSClient = SoapSTSClient(),
     val kafka: Kafka = Kafka()
 ) {
     data class Application(
@@ -87,6 +98,17 @@ data class Configuration(
 
     data class Veilarbregistrering(
         val url: String = config()[Key("veilarbregistrering.url", stringType)]
+    )
+
+    data class OppfoelginsstatusConfig(
+        val endpoint: String = config()[Key("oppfoelgingsstatus.v2.url", stringType)]
+    )
+
+    data class SoapSTSClient(
+        val endpoint: String = config()[Key("soapsecuritytokenservice.url", stringType)],
+        val username: String = config()[Key("username", stringType)],
+        val password: String = config()[Key("password", stringType)],
+        val allowInsecureSoapRequests: Boolean = config()[Key("allow.insecure.soap.requests", booleanType)]
     )
 }
 

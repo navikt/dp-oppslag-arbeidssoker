@@ -35,6 +35,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_12
 }
 
+val tjenestespesifikasjonerVersion = "1.2019.09.25-00.21-49b69f0625e0"
+fun tjenestespesifikasjon(name: String) = "no.nav.tjenestespesifikasjoner:$name:$tjenestespesifikasjonerVersion"
+val cxfVersion = "3.3.4"
+
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
@@ -75,6 +79,22 @@ dependencies {
     testImplementation("no.nav:kafka-embedded-env:2.3.0")
     testImplementation(Mockk.mockk)
     testImplementation(Wiremock.standalone)
+
+    // Soap stuff
+    implementation("javax.xml.ws:jaxws-api:2.3.1")
+    implementation("com.sun.xml.ws:jaxws-tools:2.3.0.2")
+
+    implementation(tjenestespesifikasjon("nav-oppfoelgingsstatus-v2-tjenestespesifikasjon"))
+
+    implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-ws-policy:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
+    implementation("javax.activation:activation:1.1.1")
+    implementation("no.nav.helse:cxf-prometheus-metrics:dd7d125")
+    testImplementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
+    // Soap stuff end
 }
 
 spotless {

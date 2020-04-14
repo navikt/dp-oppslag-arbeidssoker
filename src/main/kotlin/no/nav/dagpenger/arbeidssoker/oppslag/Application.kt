@@ -1,6 +1,12 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
 import mu.KotlinLogging
+import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
+import no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.STS_SAML_POLICY_NO_TRANSPORT_BINDING
+import no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.SoapPort
+import no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.arena.SoapArenaClient
+import no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.configureFor
+import no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.stsClient
 import no.nav.dagpenger.ytelser.oppslag.sts.StsConsumer
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -13,27 +19,43 @@ fun main() {
     val configuration = Configuration()
 
     val stsConsumer = StsConsumer(
-        baseUrl = configuration.sts.url,
-        username = configuration.serviceuser.username,
-        password = configuration.serviceuser.password
+            baseUrl = configuration.sts.url,
+            username = configuration.serviceuser.username,
+            password = configuration.serviceuser.password
     )
 
     val veilarbregistreringClient = VeilarbregistreringClient(
-        baseUrl = configuration.veilarbregistrering.url,
-        stsConsumer = stsConsumer
+            baseUrl = configuration.veilarbregistrering.url,
+            stsConsumer = stsConsumer
     )
+
+    val ytelseskontraktV3 = SoapPort.ytelseskontraktV3(configuration.oppfoelgingsstatus.endpoint)
+
+    val soapStsClient = stsClient(
+            stsUrl = configuration.soapSTSClient.endpoint,
+            credentials = configuration.soapSTSClient.username to configuration.soapSTSClient.password
+    )
+    if (configuration.soapSTSClient.allowInsecureSoapRequests) {
+        soapStsClient.configureFor(ytelseskontraktV3, STS_SAML_POLICY_NO_TRANSPORT_BINDING)
+    } else {
+        soapStsClient.configureFor(ytelseskontraktV3)
+    }
+
+    val arenaClient = SoapArenaClient(ytelseskontraktV3)
 
     RapidApplication.create(configuration.kafka.rapidApplication).apply {
         Application(
-            this,
-            Arbeidssøkeroppslag(veilarbregistreringClient)
+                this,
+                Arbeidssøkeroppslag(veilarbregistreringClient),
+                arenaClient
         )
     }.start()
 }
 
 class Application(
     rapidsConnection: RapidsConnection,
-    private val arbeidssøkeroppslag: Arbeidssøkeroppslag
+    private val arbeidssøkeroppslag: Arbeidssøkeroppslag,
+    private val oppfølgingsstatusClient: OppfølgingsstatusClient
 ) : River.PacketListener {
     companion object {
         const val LØSNING = "@løsning"
@@ -56,6 +78,9 @@ class Application(
         try {
             val fnr = packet[FNR].asText()
 
+            oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr)
+
+            /*
             val reellArbeidssøker = arbeidssøkeroppslag.bestemReellArbeidssøker(fnr)
             packet[LØSNING] = mapOf(REELL_ARBEIDSSØKER to reellArbeidssøker.toMap())
 
@@ -64,6 +89,7 @@ class Application(
             context.send(packet.toJson()).also {
                 log.info { "Behandlet: ${packet[ID].textValue()}" }
             }
+             */
         } catch (e: Exception) {
             log.error(e) {
                 "feil ved henting av arbeidssøker-data: ${e.message}"
