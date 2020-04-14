@@ -4,9 +4,9 @@ metadata:
   annotations:
     zone: fss
   labels:
-    app: dp-arbeidssoker-oppslag
+    app: dp-oppslag-arbeidssoker
     team: teamdagpenger
-  name: dp-arbeidssoker-oppslag
+  name: dp-oppslag-arbeidssoker
   namespace: default
 spec:
   image: {{ image }}

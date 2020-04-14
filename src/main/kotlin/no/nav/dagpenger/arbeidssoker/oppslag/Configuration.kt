@@ -1,54 +1,62 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
-import com.natpryce.konfig.*
+import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties.Companion.systemProperties
-import no.nav.dagpenger.arbeidssoker.oppslag.Profile.*
+import com.natpryce.konfig.EnvironmentVariables
+import com.natpryce.konfig.Key
+import com.natpryce.konfig.intType
+import com.natpryce.konfig.overriding
+import com.natpryce.konfig.stringType
+import no.nav.dagpenger.arbeidssoker.oppslag.Profile.DEV
+import no.nav.dagpenger.arbeidssoker.oppslag.Profile.LOCAL
+import no.nav.dagpenger.arbeidssoker.oppslag.Profile.PROD
+import no.nav.dagpenger.arbeidssoker.oppslag.Profile.valueOf
 
-val DAGPENGER_BEHOV_TOPIC = "privat-dagpenger-behov-v2"
+const val DAGPENGER_BEHOV_TOPIC = "privat-dagpenger-behov-v2"
 
 private val localProperties = ConfigurationMap(
-        mapOf(
-                "kafka.bootstrap.servers" to "localhost:9092",
-                "application.profile" to LOCAL.toString(),
-                "application.httpPort" to "8080",
-                "kafka.topic" to "topic",
-                "username" to "username",
-                "password" to "pass",
-                "kafka.reset.policy" to "earliest",
-                "nav.truststore.path" to "bla/bla",
-                "nav.truststore.password" to "foo",
-                "oppfoelgingsstatus.v2.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
-                "soapsecuritytokenservice.url" to "http://localhost",
-                "allow.insecure.soap.requests" to true.toString(),
-                "sts.url" to "http://localhost",
-                "veilarbregistrering.url" to "http://localhost"
-        )
+    mapOf(
+        "kafka.bootstrap.servers" to "localhost:9092",
+        "application.profile" to LOCAL.toString(),
+        "application.httpPort" to "8080",
+        "kafka.topic" to "topic",
+        "username" to "username",
+        "password" to "pass",
+        "kafka.reset.policy" to "earliest",
+        "nav.truststore.path" to "bla/bla",
+        "nav.truststore.password" to "foo",
+        "oppfoelgingsstatus.v2.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
+        "soapsecuritytokenservice.url" to "http://localhost",
+        "allow.insecure.soap.requests" to true.toString(),
+        "sts.url" to "http://localhost",
+        "veilarbregistrering.url" to "http://localhost"
+    )
 )
 private val devProperties = ConfigurationMap(
-        mapOf(
-                "kafka.bootstrap.servers" to "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
-                "application.profile" to DEV.toString(),
-                "application.httpPort" to "8080",
-                "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
-                "sts.url" to "http://security-token-service.default.svc.nais.local",
-                "ytelseskontrakt.v3.url" to "https://arena-q1.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
-                "soapsecuritytokenservice.url" to "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
-                "allow.insecure.soap.requests" to true.toString(),
-                "veilarbregistrering.url" to "https://veilarbregistrering-q1.nais.preprod.local"
-        )
+    mapOf(
+        "kafka.bootstrap.servers" to "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
+        "application.profile" to DEV.toString(),
+        "application.httpPort" to "8080",
+        "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
+        "sts.url" to "http://security-token-service.default.svc.nais.local",
+        "ytelseskontrakt.v3.url" to "https://arena-q1.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
+        "soapsecuritytokenservice.url" to "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
+        "allow.insecure.soap.requests" to true.toString(),
+        "veilarbregistrering.url" to "https://veilarbregistrering-q1.nais.preprod.local"
+    )
 )
 private val prodProperties = ConfigurationMap(
-        mapOf(
-                "kafka.bootstrap.servers" to "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
-                "application.profile" to PROD.toString(),
-                "application.httpPort" to "8080",
-                "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
-                "sts.url" to "https://security-token-service.nais.adeo.no",
-                "ytelseskontrakt.v3.url" to "https://arena.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
-                "soapsecuritytokenservice.url" to "https://sts.adeo.no/SecurityTokenServiceProvider/",
-                "allow.insecure.soap.requests" to true.toString(),
-                "veilarbregistrering.url" to "https://veilarbregistrering.nais.adeo.no"
-        )
+    mapOf(
+        "kafka.bootstrap.servers" to "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
+        "application.profile" to PROD.toString(),
+        "application.httpPort" to "8080",
+        "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
+        "sts.url" to "https://security-token-service.nais.adeo.no",
+        "ytelseskontrakt.v3.url" to "https://arena.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
+        "soapsecuritytokenservice.url" to "https://sts.adeo.no/SecurityTokenServiceProvider/",
+        "allow.insecure.soap.requests" to true.toString(),
+        "veilarbregistrering.url" to "https://veilarbregistrering.nais.adeo.no"
+    )
 )
 
 private fun config() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
@@ -67,7 +75,7 @@ data class Configuration(
     val kafka: Kafka = Kafka()
 ) {
     data class Application(
-        val id: String = config().getOrElse(Key("application.id", stringType), "dp-arbeidssoker-oppslag-alfa-1"),
+        val id: String = config().getOrElse(Key("application.id", stringType), "dp-oppslag-arbeidssoker-alfa-1"),
         val profile: Profile = config()[Key("application.profile", stringType)].let { valueOf(it) },
         val httpPort: Int = config()[Key("application.httpPort", intType)]
     )
@@ -75,7 +83,10 @@ data class Configuration(
     data class Kafka(
         val brokers: String = config()[Key("kafka.bootstrap.servers", stringType)],
         val topic: String = config()[Key("kafka.topic", stringType)],
-        val consumerGroupId: String = config().getOrElse(Key("application.id", stringType), "dp-arbeidssoker-oppslag-alfa-1"),
+        val consumerGroupId: String = config().getOrElse(
+            Key("application.id", stringType),
+            "dp-oppslag-arbeidssoker-alfa-1"
+        ),
         val trustStorePath: String = config()[Key("nav.truststore.path", stringType)],
         val trustStorePassword: String = config()[Key("nav.truststore.password", stringType)],
         val rapidApplication: Map<String, String> = mapOf(
@@ -84,7 +95,8 @@ data class Configuration(
             "KAFKA_RAPID_TOPIC" to topic,
             "KAFKA_CONSUMER_GROUP_ID" to consumerGroupId,
             "NAV_TRUSTSTORE_PATH" to trustStorePath,
-            "NAV_TRUSTSTORE_PASSWORD" to trustStorePassword)
+            "NAV_TRUSTSTORE_PASSWORD" to trustStorePassword
+        )
     )
 
     data class Serviceuser(

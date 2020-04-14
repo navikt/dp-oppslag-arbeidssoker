@@ -26,7 +26,7 @@ repositories {
 }
 
 application {
-    applicationName = "dp-arbeidssoker-oppslag"
+    applicationName = "dp-oppslag-arbeidssoker"
     mainClassName = "no.nav.dagpenger.arbeidssoker.oppslag.ApplicationKt"
 }
 
