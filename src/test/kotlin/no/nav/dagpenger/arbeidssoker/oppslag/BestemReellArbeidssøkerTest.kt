@@ -3,62 +3,33 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 import io.kotlintest.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 
 class BestemReellArbeidssøkerTest {
 
+    val ARBEIDSSØKER = "ARBS"
+    val IKKE_ARBEIDSSØKER = "IARBS"
+
     @Test
-    fun `Skjekk at ordinær arbeidssøker er en reell arbeidssøker`() {
-        val veilarbregistreringClient: VeilarbregistreringClient = mockk()
+    fun `Hvis arbs, så reellarbeidssøker`() {
+        val oppfølgingsstatusClient: OppfølgingsstatusClient = mockk()
+        val arbeidssøkeroppslag = Arbeidssøkeroppslag(oppfølgingsstatusClient)
+        val fnr = "12345"
 
-        val fnr = "123456"
-        val registreringsdato = LocalDateTime.of(2020, 4, 1, 0, 0, 0)
+        every { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns ARBEIDSSØKER
 
-        val arbeidssøker = Arbeidssøker(ArbeidssøkerType.ORDINAER, registreringsdato)
-
-        every { veilarbregistreringClient.hentArbeidssøker(fnr) }.returns(arbeidssøker)
-
-        val arbeidssøkeroppslag = Arbeidssøkeroppslag(veilarbregistreringClient)
-
-        val reellArbeidssøker = arbeidssøkeroppslag.bestemReellArbeidssøker(fnr)
-
-        reellArbeidssøker.erReellArbeidssøker shouldBe true
-        reellArbeidssøker.registreringsdato shouldBe registreringsdato
+        arbeidssøkeroppslag.bestemReellArbeidssøker(fnr).erReellArbeidssøker shouldBe true
     }
 
     @Test
-    fun `Skjekk at sykmeldt arbeidssøker ikke er en reell arbeidssøker`() {
-        val veilarbregistreringClient: VeilarbregistreringClient = mockk()
+    fun `Hvis ikke arbs, så ikke reellarbeidssøker`() {
+        val oppfølgingsstatusClient: OppfølgingsstatusClient = mockk()
+        val arbeidssøkeroppslag = Arbeidssøkeroppslag(oppfølgingsstatusClient)
+        val fnr = "12345"
 
-        val fnr = "123456"
-        val registreringsdato = LocalDateTime.of(2020, 4, 1, 0, 0, 0)
+        every { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns IKKE_ARBEIDSSØKER
 
-        val arbeidssøker = Arbeidssøker(ArbeidssøkerType.SYKMELDT, registreringsdato)
-
-        every { veilarbregistreringClient.hentArbeidssøker(fnr) }.returns(arbeidssøker)
-
-        val arbeidssøkeroppslag = Arbeidssøkeroppslag(veilarbregistreringClient)
-
-        val reellArbeidssøker = arbeidssøkeroppslag.bestemReellArbeidssøker(fnr)
-
-        reellArbeidssøker.erReellArbeidssøker shouldBe false
-        reellArbeidssøker.registreringsdato shouldBe null
-    }
-
-    @Test
-    fun `Skjekk at ikke-registret arbeidssøker ikke er en reell arbeidssøker`() {
-        val veilarbregistreringClient: VeilarbregistreringClient = mockk()
-
-        val fnr = "123456"
-
-        every { veilarbregistreringClient.hentArbeidssøker(fnr) }.returns(null)
-
-        val arbeidssøkeroppslag = Arbeidssøkeroppslag(veilarbregistreringClient)
-
-        val reellArbeidssøker = arbeidssøkeroppslag.bestemReellArbeidssøker(fnr)
-
-        reellArbeidssøker.erReellArbeidssøker shouldBe false
-        reellArbeidssøker.registreringsdato shouldBe null
+        arbeidssøkeroppslag.bestemReellArbeidssøker(fnr).erReellArbeidssøker shouldBe false
     }
 }
