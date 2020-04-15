@@ -12,7 +12,7 @@ object SoapPort {
         return createServicePort(
                 serviceUrl = serviceUrl,
                 serviceClazz = OppfoelgingsstatusV2::class.java,
-                wsdl = "wsdl/tjenestespesifikasjon/no/nav/tjeneste/virksomhet/oppfoelgingsstatus/v2/Binding.wsdl",
+                wsdl = "src/main/wsdl/tjenestespesifikasjon/no/nav/tjeneste/virksomhet/oppfoelgingsstatus/v2/Binding.wsdl",
                 namespace = "http://nav.no/tjeneste/virksomhet/oppfoelgingsstatus/v2/Binding",
                 svcName = "Oppfoelgingsstatus_v2",
                 portName = "Oppfoelgingsstatus_v2Port"
