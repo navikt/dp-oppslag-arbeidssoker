@@ -136,3 +136,15 @@ tasks.named("jar") {
 tasks.named("compileKotlin") {
     dependsOn("spotlessCheck")
 }
+
+
+tasks.withType<ShadowJar> {
+    mergeServiceFiles()
+
+    // Make sure the cxf service files are handled correctly so that the SOAP services work.
+    // Ref https://stackoverflow.com/questions/45005287/serviceconstructionexception-when-creating-a-cxf-web-service-client-scalajava
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer::class.java) {
+        setPath("META-INF/cxf")
+        include("bus-extensions.txt")
+    }
+}
