@@ -18,7 +18,7 @@ class SoapArenaClient(
         }
         val response = oppfoelgingsstatusV2.hentOppfoelgingsstatus(request)
 
-        log.info { "Formidlingsgruppekode: ${response.formidlingsgruppeKode}" }
+        log.info { "Formidlingsgruppekode: ${response.formidlingsgruppeKode.kodeverksRef}, ${response.formidlingsgruppeKode.kodeRef}, ${response.formidlingsgruppeKode.termnavn}, ${response.formidlingsgruppeKode.value}" }
 
         return response.formidlingsgruppeKode.toString()
     }
