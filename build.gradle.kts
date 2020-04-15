@@ -1,5 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
 plugins {
     application
@@ -136,7 +138,6 @@ tasks.named("jar") {
 tasks.named("compileKotlin") {
     dependsOn("spotlessCheck")
 }
-
 
 tasks.withType<ShadowJar> {
     mergeServiceFiles()
