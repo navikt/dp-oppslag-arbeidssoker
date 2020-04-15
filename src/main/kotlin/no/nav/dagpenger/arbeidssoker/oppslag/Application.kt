@@ -16,23 +16,13 @@ private val log = KotlinLogging.logger {}
 fun main() {
     val configuration = Configuration()
 
-    val stsConsumer = StsConsumer(
-            baseUrl = configuration.sts.url,
-            username = configuration.serviceuser.username,
-            password = configuration.serviceuser.password
-    )
-
-    val veilarbregistreringClient = VeilarbregistreringClient(
-            baseUrl = configuration.veilarbregistrering.url,
-            stsConsumer = stsConsumer
-    )
-
     val oppfoelgingsstatusV2 = SoapPort.oppfoelgingsstatusV2(configuration.oppfoelgingsstatus.endpoint)
 
     val soapStsClient = stsClient(
             stsUrl = configuration.soapSTSClient.endpoint,
             credentials = configuration.soapSTSClient.username to configuration.soapSTSClient.password
     )
+
     if (configuration.soapSTSClient.allowInsecureSoapRequests) {
         soapStsClient.configureFor(oppfoelgingsstatusV2, STS_SAML_POLICY_NO_TRANSPORT_BINDING)
     } else {

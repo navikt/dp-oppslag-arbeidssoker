@@ -48,13 +48,6 @@ dependencies {
     implementation(Kafka.clients)
     implementation(Kafka.streams)
 
-    // http
-    implementation(Fuel.fuel)
-    implementation(Fuel.library("moshi"))
-    implementation(Moshi.moshi)
-    implementation(Moshi.moshiKotlin)
-    implementation(Moshi.moshiAdapters)
-
     // json
     implementation(Json.library)
     implementation(Ulid.ulid)
@@ -80,7 +73,6 @@ dependencies {
     testImplementation("org.awaitility:awaitility:4.0.1")
     testImplementation("no.nav:kafka-embedded-env:2.3.0")
     testImplementation(Mockk.mockk)
-    testImplementation(Wiremock.standalone)
 
     // Soap stuff
     implementation("javax.xml.ws:jaxws-api:2.3.1")

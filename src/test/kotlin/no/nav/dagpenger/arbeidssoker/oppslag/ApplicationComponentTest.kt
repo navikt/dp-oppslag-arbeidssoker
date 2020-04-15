@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.ktor.util.KtorExperimentalAPI
@@ -111,7 +109,7 @@ internal class ApplicationComponentTest {
                         }
             }
 
-    internal val objectMapper: ObjectMapper = jacksonObjectMapper()
+    private val objectMapper: ObjectMapper = jacksonObjectMapper()
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .registerModule(JavaTimeModule())
 
@@ -133,10 +131,7 @@ internal class ApplicationComponentTest {
             withSecurity = false
     )
 
-    private val wireMockServer = WireMockServer(WireMockConfiguration.options().dynamicPort())
-
     private lateinit var appUrl: String
-
     private lateinit var rapidsConnection: RapidsConnection
     private lateinit var behovProducer: Producer<String, String>
     private lateinit var behovConsumer: Consumer<String, String>
@@ -144,8 +139,6 @@ internal class ApplicationComponentTest {
     @BeforeAll
     fun setup() {
         embeddedKafkaEnvironment.start()
-
-        wireMockServer.start()
 
         behovProducer = KafkaProducer<String, String>(Properties().apply {
             this[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = embeddedKafkaEnvironment.brokersURL
@@ -172,24 +165,8 @@ internal class ApplicationComponentTest {
                 kafka = Configuration.Kafka(
                         brokers = embeddedKafkaEnvironment.brokersURL,
                         topic = testTopic
-                ),
-                sts = Configuration.Sts(wireMockServer.baseUrl()),
-                veilarbregistrering = Configuration.Veilarbregistrering(wireMockServer.baseUrl())
+                )
         )
-
-        val stsConsumer = StsConsumer(
-                baseUrl = config.sts.url,
-                username = config.serviceuser.username,
-                password = config.serviceuser.password
-        )
-
-        val veilarbregistreringClient = VeilarbregistreringClient(
-                baseUrl = config.veilarbregistrering.url,
-                stsConsumer = stsConsumer
-        )
-
-        wireMockServer.stubFor(Stubs.sts(config.serviceuser))
-        wireMockServer.stubFor(Stubs.stubRegistreringGet())
 
         // kjør opp app
         val rapidConfig = mapOf(
@@ -226,7 +203,6 @@ internal class ApplicationComponentTest {
         @AfterAll
         fun teardown() {
             rapidsConnection.stop()
-            wireMockServer.stop()
             embeddedKafkaEnvironment.close()
         }
     }

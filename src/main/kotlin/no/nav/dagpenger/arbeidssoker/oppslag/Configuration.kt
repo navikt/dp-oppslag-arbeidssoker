@@ -28,9 +28,7 @@ private val localProperties = ConfigurationMap(
         "nav.truststore.password" to "foo",
         "oppfoelgingsstatus.v2.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
         "soapsecuritytokenservice.url" to "http://localhost",
-        "allow.insecure.soap.requests" to true.toString(),
-        "sts.url" to "http://localhost",
-        "veilarbregistrering.url" to "http://localhost"
+        "allow.insecure.soap.requests" to true.toString()
     )
 )
 private val devProperties = ConfigurationMap(
@@ -39,11 +37,9 @@ private val devProperties = ConfigurationMap(
         "application.profile" to DEV.toString(),
         "application.httpPort" to "8080",
         "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
-        "sts.url" to "http://security-token-service.default.svc.nais.local",
         "oppfoelgingsstatus.v2.url" to "https://arena-q1.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
         "soapsecuritytokenservice.url" to "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
-        "allow.insecure.soap.requests" to true.toString(),
-        "veilarbregistrering.url" to "https://veilarbregistrering-q1.nais.preprod.local"
+        "allow.insecure.soap.requests" to true.toString()
     )
 )
 private val prodProperties = ConfigurationMap(
@@ -52,11 +48,9 @@ private val prodProperties = ConfigurationMap(
         "application.profile" to PROD.toString(),
         "application.httpPort" to "8080",
         "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
-        "sts.url" to "https://security-token-service.nais.adeo.no",
         "oppfoelgingsstatus.v2.url" to "https://arena.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
         "soapsecuritytokenservice.url" to "https://sts.adeo.no/SecurityTokenServiceProvider/",
-        "allow.insecure.soap.requests" to true.toString(),
-        "veilarbregistrering.url" to "https://veilarbregistrering.nais.adeo.no"
+        "allow.insecure.soap.requests" to true.toString()
     )
 )
 
@@ -69,8 +63,6 @@ private fun config() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getPro
 data class Configuration(
     val serviceuser: Serviceuser = Serviceuser(),
     val application: Application = Application(),
-    val sts: Sts = Sts(),
-    val veilarbregistrering: Veilarbregistrering = Veilarbregistrering(),
     val oppfoelgingsstatus: OppfoelginsstatusConfig = OppfoelginsstatusConfig(),
     val soapSTSClient: SoapSTSClient = SoapSTSClient(),
     val kafka: Kafka = Kafka()
@@ -103,14 +95,6 @@ data class Configuration(
     data class Serviceuser(
         val username: String = config()[Key("username", stringType)],
         val password: String = config()[Key("password", stringType)]
-    )
-
-    data class Sts(
-        val url: String = config()[Key("sts.url", stringType)]
-    )
-
-    data class Veilarbregistrering(
-        val url: String = config()[Key("veilarbregistrering.url", stringType)]
     )
 
     data class OppfoelginsstatusConfig(
