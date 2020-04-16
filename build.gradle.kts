@@ -1,7 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
 plugins {
     application
@@ -96,7 +95,7 @@ spotless {
         ktlint(Klint.version)
     }
     kotlinGradle {
-        target("*.gradle.kts", "additionalScripts/*.gradle.kts")
+        target("*.gradle.kts", "buildSrc/**/*.kt*")
         ktlint(Klint.version)
     }
 }
