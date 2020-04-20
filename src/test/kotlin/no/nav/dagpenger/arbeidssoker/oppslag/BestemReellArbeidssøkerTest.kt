@@ -1,6 +1,6 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
-import io.kotlintest.shouldBe
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient

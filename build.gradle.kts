@@ -66,7 +66,7 @@ dependencies {
     // test
     testRuntimeOnly(Junit5.engine)
     testImplementation(Junit5.api)
-    testImplementation(Junit5.kotlinRunner)
+    testImplementation(KoTest.runner)
 
     testImplementation(Kafka.streamTestUtils)
     testImplementation("org.awaitility:awaitility:4.0.1")
