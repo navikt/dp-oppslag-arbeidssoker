@@ -10,6 +10,14 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.ktor.util.KtorExperimentalAPI
 import io.mockk.mockk
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.ServerSocket
+import java.net.URL
+import java.time.Duration
+import java.util.Properties
+import java.util.UUID
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import no.nav.common.KafkaEnvironment
@@ -25,14 +33,11 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.awaitility.Awaitility.await
-import org.junit.jupiter.api.*
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.ServerSocket
-import java.net.URL
-import java.time.Duration
-import java.util.*
-import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
 @KtorExperimentalAPI
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -45,7 +50,7 @@ internal class ApplicationComponentTest {
     @Test
     fun `skal motta behov og produsere ReellArbeidssøker-løsning`() {
         val behov =
-                """{"@id": "1", "fnr":"$FNR",  "@behov": ["ReellArbeidssøker"]}"""
+            """{"@id": "1", "fnr":"$FNR",  "@behov": ["ReellArbeidssøker"]}"""
         behovProducer.send(ProducerRecord(testTopic, "123", behov))
 
         assertLøsning(Duration.ofSeconds(10)) { alleSvar ->
@@ -57,9 +62,9 @@ internal class ApplicationComponentTest {
     @Test
     fun `skal kun behandle opprinnelig behov`() {
         val behovAlleredeBesvart =
-                """{"@id": "1", "fnr":"$FNR", "@behov": ["ReellArbeidssøker"], "@løsning": { "ReellArbeidssøker": { "erReellArbeidssøker": true } } }"""
+            """{"@id": "1", "fnr":"$FNR", "@behov": ["ReellArbeidssøker"], "@løsning": { "ReellArbeidssøker": { "erReellArbeidssøker": true } } }"""
         val behovSomTrengerSvar =
-                """{"@id": "2", "fnr":"$FNR", "@behov": ["ReellArbeidssøker"]}"""
+            """{"@id": "2", "fnr":"$FNR", "@behov": ["ReellArbeidssøker"]}"""
         behovProducer.send(ProducerRecord(testTopic, "1", behovAlleredeBesvart))
         behovProducer.send(ProducerRecord(testTopic, "2", behovSomTrengerSvar))
 
@@ -79,7 +84,7 @@ internal class ApplicationComponentTest {
     fun `ignorerer hendelser med ugyldig json`() {
         val id = "1"
         val behovSomTrengerSvar =
-                """{"@id": "$id", "fnr":"$FNR", "@behov": ["ReellArbeidssøker"]}"""
+            """{"@id": "$id", "fnr":"$FNR", "@behov": ["ReellArbeidssøker"]}"""
         behovProducer.send(ProducerRecord(testTopic, UUID.randomUUID().toString(), "THIS IS NOT JSON"))
         behovProducer.send(ProducerRecord(testTopic, id, behovSomTrengerSvar))
 
@@ -92,43 +97,43 @@ internal class ApplicationComponentTest {
     }
 
     private fun assertLøsning(duration: Duration, assertion: (List<JsonNode>) -> Unit) =
-            mutableListOf<JsonNode>().apply {
-                await()
-                        .atMost(duration)
-                        .untilAsserted {
-                            this.addAll(behovConsumer.poll(Duration.ofMillis(100)).mapNotNull {
-                                try {
-                                    println(it.value())
-                                    objectMapper.readTree(it.value())
-                                } catch (err: JsonParseException) {
-                                    null
-                                }
-                            }.filter { it.hasNonNull("@løsning") })
-
-                            assertion(this)
+        mutableListOf<JsonNode>().apply {
+            await()
+                .atMost(duration)
+                .untilAsserted {
+                    this.addAll(behovConsumer.poll(Duration.ofMillis(100)).mapNotNull {
+                        try {
+                            println(it.value())
+                            objectMapper.readTree(it.value())
+                        } catch (err: JsonParseException) {
+                            null
                         }
-            }
+                    }.filter { it.hasNonNull("@løsning") })
+
+                    assertion(this)
+                }
+        }
 
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .registerModule(JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .registerModule(JavaTimeModule())
 
     private fun isOkResponse(path: String) =
-            try {
-                (URL("$appUrl$path")
-                        .openConnection() as HttpURLConnection)
-                        .responseCode in 200..299
-            } catch (err: IOException) {
-                false
-            }
+        try {
+            (URL("$appUrl$path")
+                .openConnection() as HttpURLConnection)
+                .responseCode in 200..299
+        } catch (err: IOException) {
+            false
+        }
 
     private val testTopic = "test-topic-v1"
     private val embeddedKafkaEnvironment = KafkaEnvironment(
-            autoStart = false,
-            noOfBrokers = 1,
-            topicInfos = listOf(KafkaEnvironment.TopicInfo(name = testTopic, partitions = 1)),
-            withSchemaRegistry = false,
-            withSecurity = false
+        autoStart = false,
+        noOfBrokers = 1,
+        topicInfos = listOf(KafkaEnvironment.TopicInfo(name = testTopic, partitions = 1)),
+        withSchemaRegistry = false,
+        withSecurity = false
     )
 
     private lateinit var appUrl: String
@@ -161,19 +166,19 @@ internal class ApplicationComponentTest {
         appUrl = "http://localhost:$randomPort"
 
         val config = Configuration(
-                application = Configuration.Application(httpPort = randomPort),
-                kafka = Configuration.Kafka(
-                        brokers = embeddedKafkaEnvironment.brokersURL,
-                        topic = testTopic
-                )
+            application = Configuration.Application(httpPort = randomPort),
+            kafka = Configuration.Kafka(
+                brokers = embeddedKafkaEnvironment.brokersURL,
+                topic = testTopic
+            )
         )
 
         // kjør opp app
         val rapidConfig = mapOf(
-                "KAFKA_BOOTSTRAP_SERVERS" to config.kafka.brokers,
-                "KAFKA_RAPID_TOPIC" to config.kafka.topic,
-                "KAFKA_CONSUMER_GROUP_ID" to config.kafka.consumerGroupId,
-                "HTTP_PORT" to randomPort.toString())
+            "KAFKA_BOOTSTRAP_SERVERS" to config.kafka.brokers,
+            "KAFKA_RAPID_TOPIC" to config.kafka.topic,
+            "KAFKA_CONSUMER_GROUP_ID" to config.kafka.consumerGroupId,
+            "HTTP_PORT" to randomPort.toString())
 
         rapidsConnection = RapidApplication.create(rapidConfig).apply {
             Application(this, Arbeidssøkeroppslag(mockk(relaxed = true)))
@@ -184,21 +189,21 @@ internal class ApplicationComponentTest {
         }
 
         await("wait until the rapid has started")
-                .atMost(10, TimeUnit.SECONDS)
-                .until { isOkResponse("/isalive") }
+            .atMost(10, TimeUnit.SECONDS)
+            .until { isOkResponse("/isalive") }
 
         val adminClient = embeddedKafkaEnvironment.adminClient
         await("wait until the rapid consumer is assigned the topic")
-                .atMost(10, TimeUnit.SECONDS)
-                .until {
-                    adminClient?.describeConsumerGroups(listOf(config.kafka.consumerGroupId))
-                            ?.describedGroups()
-                            ?.get(config.kafka.consumerGroupId)
-                            ?.get()
-                            ?.members()
-                            ?.any { it.assignment().topicPartitions().any { it.topic() == testTopic } }
-                            ?: false
-                }
+            .atMost(10, TimeUnit.SECONDS)
+            .until {
+                adminClient?.describeConsumerGroups(listOf(config.kafka.consumerGroupId))
+                    ?.describedGroups()
+                    ?.get(config.kafka.consumerGroupId)
+                    ?.get()
+                    ?.members()
+                    ?.any { it.assignment().topicPartitions().any { it.topic() == testTopic } }
+                    ?: false
+            }
 
         @AfterAll
         fun teardown() {

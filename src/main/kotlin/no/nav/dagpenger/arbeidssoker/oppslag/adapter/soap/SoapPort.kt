@@ -1,10 +1,10 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap
 
+import javax.xml.namespace.QName
 import no.nav.cxf.metrics.MetricFeature
 import no.nav.tjeneste.virksomhet.oppfoelgingsstatus.v2.binding.OppfoelgingsstatusV2
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean
 import org.apache.cxf.ws.addressing.WSAddressingFeature
-import javax.xml.namespace.QName
 
 object SoapPort {
 
