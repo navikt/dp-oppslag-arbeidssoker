@@ -61,7 +61,7 @@ dependencies {
     implementation(Konfig.konfig)
 
     // rapid rivers
-    implementation("com.github.navikt:rapids-and-rivers:master-SNAPSHOT")
+    implementation(RapidAndRivers)
 
     // test
     testRuntimeOnly(Junit5.engine)
