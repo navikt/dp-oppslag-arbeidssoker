@@ -67,6 +67,7 @@ dependencies {
     testRuntimeOnly(Junit5.engine)
     testImplementation(Junit5.api)
     testImplementation(KoTest.runner)
+    testImplementation(KoTest.assertions)
 
     testImplementation(Kafka.streamTestUtils)
     testImplementation("org.awaitility:awaitility:4.0.1")

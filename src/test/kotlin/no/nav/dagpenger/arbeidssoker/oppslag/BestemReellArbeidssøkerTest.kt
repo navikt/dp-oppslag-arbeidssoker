@@ -19,7 +19,7 @@ class BestemReellArbeidssøkerTest {
 
         every { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns ARBEIDSSØKER
 
-        arbeidssøkeroppslag.bestemReellArbeidssøker(fnr).erReellArbeidssøker shouldBe true
+        arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erReellArbeidssøker shouldBe true
     }
 
     @Test
@@ -30,6 +30,6 @@ class BestemReellArbeidssøkerTest {
 
         every { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns IKKE_ARBEIDSSØKER
 
-        arbeidssøkeroppslag.bestemReellArbeidssøker(fnr).erReellArbeidssøker shouldBe false
+        arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erReellArbeidssøker shouldBe false
     }
 }

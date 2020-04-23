@@ -3,10 +3,10 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
 
 class Arbeidssøkeroppslag(private val oppfølgingsstatusClient: OppfølgingsstatusClient) {
-    fun bestemReellArbeidssøker(fnr: String): ReellArbeidssøker {
+    fun bestemRegistrertArbeidssøker(fnr: String): RegistrertArbeidssøker {
         val formidlingsgruppeKode = oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr)
         val arbeidssøker = "ARBS"
 
-        return ReellArbeidssøker(formidlingsgruppeKode == arbeidssøker)
+        return RegistrertArbeidssøker(formidlingsgruppeKode == arbeidssøker)
     }
 }

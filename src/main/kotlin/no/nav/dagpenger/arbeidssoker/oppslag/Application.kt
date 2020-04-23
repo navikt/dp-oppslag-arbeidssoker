@@ -46,7 +46,7 @@ class Application(
     companion object {
         const val LØSNING = "@løsning"
         const val BEHOV = "@behov"
-        const val REELL_ARBEIDSSØKER = "ReellArbeidssøker"
+        const val REGISTRERT_ARBEIDSSØKER = "RegistrertArbeidssøker"
         const val FNR = "fnr"
         const val ID = "@id"
     }
@@ -55,7 +55,7 @@ class Application(
         River(rapidsConnection).apply {
             validate { it.forbid(LØSNING) }
             validate { it.requireKey(FNR) }
-            validate { it.requireAll(BEHOV, listOf(REELL_ARBEIDSSØKER)) }
+            validate { it.requireAll(BEHOV, listOf(REGISTRERT_ARBEIDSSØKER)) }
             validate { it.interestedIn(ID) }
         }.register(this)
     }
@@ -63,11 +63,11 @@ class Application(
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         try {
             val fnr = packet[FNR].asText()
-            val reellArbeidssøker = arbeidssøkeroppslag.bestemReellArbeidssøker(fnr)
-            packet[LØSNING] = mapOf(REELL_ARBEIDSSØKER to reellArbeidssøker.toMap())
+            val registrertArbeidssøker = arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr)
+            packet[LØSNING] = mapOf(REGISTRERT_ARBEIDSSØKER to registrertArbeidssøker.toMap())
 
             log.info {
-                "Reell arbeidssøker: ${reellArbeidssøker.erReellArbeidssøker}"
+                "Registrert arbeidssøker: ${registrertArbeidssøker.erReellArbeidssøker}"
             }
 
             context.send(packet.toJson()).also {
