@@ -2,15 +2,17 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.date.shouldBeToday
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import io.ktor.util.KtorExperimentalAPI
 import io.mockk.every
 import io.mockk.mockk
+import java.time.LocalDate
+import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import java.time.LocalDate
 
 @KtorExperimentalAPI
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -42,8 +44,11 @@ internal class ApplicationComponentTest {
             size shouldBeExactly 1
 
             field(0, "@behov").map(JsonNode::asText).shouldContain("RegistrertArbeidssøker")
-            field(0, "@løsning").hasNonNull("RegistrertArbeidssøker")
-            field(0, "@løsning")["RegistrertArbeidssøker"]["erReellArbeidssøker"].asBoolean() shouldBe true
+            with(field(0, "@løsning")["RegistrertArbeidssøker"]) {
+                this["erRegistrert"].asBoolean() shouldBe true
+                this["formidlingsgruppe"].asText() shouldBe "ARBS"
+                this["registreringsdato"].asLocalDate().shouldBeToday()
+            }
         }
     }
 }
