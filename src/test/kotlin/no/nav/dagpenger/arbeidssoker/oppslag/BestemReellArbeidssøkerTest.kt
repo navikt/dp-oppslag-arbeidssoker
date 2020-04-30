@@ -7,8 +7,8 @@ import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
 import org.junit.jupiter.api.Test
 
 class BestemReellArbeidssøkerTest {
-    val ARBEIDSSØKER = "ARBS"
-    val IKKE_ARBEIDSSØKER = "IARBS"
+    private val ARBEIDSSØKER = "ARBS"
+    private val IKKE_ARBEIDSSØKER = "IARBS"
 
     @Test
     fun `Hvis arbs, så reellarbeidssøker`() {
