@@ -1,5 +1,6 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -7,6 +8,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
 private val log = KotlinLogging.logger {}
+private val sikkerLogg = KotlinLogging.logger("tjenestekall")
 
 class LøsningService(
     rapidsConnection: RapidsConnection,
@@ -28,13 +30,14 @@ class LøsningService(
             val fnr = packet["fødselsnummer"].asText()
 
             try {
-                val registrertArbeidssøker = arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr)
-                packet["@løsning"] = mapOf(
-                    "RegistrertArbeidssøker" to registrertArbeidssøker.toMap()
-                )
+                runBlocking { arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr) }.also {
+                    packet["@løsning"] = mapOf(
+                        "RegistrertArbeidssøker" to it
+                    )
 
-                log.info {
-                    "Registrert arbeidssøker: ${registrertArbeidssøker.erReellArbeidssøker}"
+                    sikkerLogg.info {
+                        "Registrert arbeidssøker: $it"
+                    }
                 }
 
                 log.info { "løser behov for ${packet["@id"].asText()}" }

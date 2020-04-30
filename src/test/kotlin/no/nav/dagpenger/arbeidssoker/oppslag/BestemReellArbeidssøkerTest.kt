@@ -7,7 +7,6 @@ import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
 import org.junit.jupiter.api.Test
 
 class BestemReellArbeidssøkerTest {
-
     val ARBEIDSSØKER = "ARBS"
     val IKKE_ARBEIDSSØKER = "IARBS"
 
@@ -19,7 +18,7 @@ class BestemReellArbeidssøkerTest {
 
         every { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns ARBEIDSSØKER
 
-        arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erReellArbeidssøker shouldBe true
+        arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erRegistrert shouldBe true
     }
 
     @Test
@@ -30,6 +29,6 @@ class BestemReellArbeidssøkerTest {
 
         every { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns IKKE_ARBEIDSSØKER
 
-        arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erReellArbeidssøker shouldBe false
+        arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erRegistrert shouldBe false
     }
 }

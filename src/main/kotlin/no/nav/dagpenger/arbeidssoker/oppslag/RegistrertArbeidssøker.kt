@@ -1,13 +1,9 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
-class RegistrertArbeidssøker(val erReellArbeidssøker: Boolean) {
-    companion object {
-        const val ER_REELL_ARBEIDSSØKER = "erReellArbeidssøker"
-    }
+import java.time.LocalDate
 
-    fun toMap(): Map<String, Any?> {
-        return mapOf(
-                ER_REELL_ARBEIDSSØKER to erReellArbeidssøker
-        )
-    }
-}
+data class RegistrertArbeidssøker(
+    val erRegistrert: Boolean,
+    val formidlingsgruppe: String,
+    val registreringsdato: LocalDate
+)

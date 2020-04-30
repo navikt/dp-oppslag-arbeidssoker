@@ -10,6 +10,7 @@ import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.time.LocalDate
 
 @KtorExperimentalAPI
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -17,7 +18,11 @@ internal class ApplicationComponentTest {
     private val arbeidssøkeroppslag: Arbeidssøkeroppslag = mockk<Arbeidssøkeroppslag>().also {
         every {
             it.bestemRegistrertArbeidssøker("12345")
-        } returns RegistrertArbeidssøker(erReellArbeidssøker = true)
+        } returns RegistrertArbeidssøker(
+            erRegistrert = true,
+            formidlingsgruppe = "ARBS",
+            registreringsdato = LocalDate.now()
+        )
     }
     private val rapid = TestRapid().apply {
         LøsningService(this, arbeidssøkeroppslag)
