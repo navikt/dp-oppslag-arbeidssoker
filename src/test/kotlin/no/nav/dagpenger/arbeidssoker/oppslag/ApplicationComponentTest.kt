@@ -14,31 +14,31 @@ import org.junit.jupiter.api.TestInstance
 @KtorExperimentalAPI
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ApplicationComponentTest {
-
-    val arbeidssøkeroppslag: Arbeidssøkeroppslag = mockk<Arbeidssøkeroppslag>().also {
+    private val arbeidssøkeroppslag: Arbeidssøkeroppslag = mockk<Arbeidssøkeroppslag>().also {
         every {
             it.bestemRegistrertArbeidssøker("12345")
         } returns RegistrertArbeidssøker(erReellArbeidssøker = true)
     }
-
-    private val rapid = TestRapid().apply { Application(this, arbeidssøkeroppslag) }
+    private val rapid = TestRapid().apply {
+        LøsningService(this, arbeidssøkeroppslag)
+    }
 
     @Test
     fun `skal motta behov og produsere RegistrertArbeidssøker-løsning`() {
-
         rapid.sendTestMessage(
-                """{
+            """{
                     "@id": "1", 
                     "@behov": ["RegistrertArbeidssøker"], 
-                    "fnr":"12345"
+                    "fødselsnummer":"12345"
                 }""".trimIndent()
         )
 
-        val inspektør = rapid.inspektør
-        inspektør.size shouldBeExactly 1
-        val message = inspektør.message(0)
-        message["@behov"].map(JsonNode::asText).shouldContain("RegistrertArbeidssøker")
-        message["@løsning"].hasNonNull("RegistrertArbeidssøker")
-        message["@løsning"]["RegistrertArbeidssøker"]["erReellArbeidssøker"].asBoolean() shouldBe true
+        with(rapid.inspektør) {
+            size shouldBeExactly 1
+
+            field(0, "@behov").map(JsonNode::asText).shouldContain("RegistrertArbeidssøker")
+            field(0, "@løsning").hasNonNull("RegistrertArbeidssøker")
+            field(0, "@løsning")["RegistrertArbeidssøker"]["erReellArbeidssøker"].asBoolean() shouldBe true
+        }
     }
 }

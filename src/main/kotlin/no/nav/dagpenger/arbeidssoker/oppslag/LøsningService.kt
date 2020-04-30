@@ -1,6 +1,7 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
 import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
@@ -11,39 +12,38 @@ class LøsningService(
     rapidsConnection: RapidsConnection,
     private val arbeidssøkeroppslag: Arbeidssøkeroppslag
 ) : River.PacketListener {
-    companion object {
-        const val LØSNING = "@løsning"
-        const val BEHOV = "@behov"
-        const val REGISTRERT_ARBEIDSSØKER = "RegistrertArbeidssøker"
-        const val FNR = "fnr"
-        const val ID = "@id"
-    }
-
     init {
         River(rapidsConnection).apply {
-            validate { it.forbid(LØSNING) }
-            validate { it.requireKey(FNR) }
-            validate { it.requireAll(BEHOV, listOf(REGISTRERT_ARBEIDSSØKER)) }
-            validate { it.interestedIn(ID) }
+            validate { it.demandAll("@behov", listOf("RegistrertArbeidssøker")) }
+            validate { it.rejectKey("@løsning") }
+            validate { it.requireKey("@id") }
+            validate { it.requireKey("fødselsnummer") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
-        try {
-            val fnr = packet[FNR].asText()
-            val registrertArbeidssøker = arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr)
-            packet[LØSNING] = mapOf(REGISTRERT_ARBEIDSSØKER to registrertArbeidssøker.toMap())
+        withLoggingContext(
+            "behovId" to packet["@id"].asText()
+        ) {
+            val fnr = packet["fødselsnummer"].asText()
 
-            log.info {
-                "Registrert arbeidssøker: ${registrertArbeidssøker.erReellArbeidssøker}"
-            }
+            try {
+                val registrertArbeidssøker = arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr)
+                packet["@løsning"] = mapOf(
+                    "RegistrertArbeidssøker" to registrertArbeidssøker.toMap()
+                )
 
-            context.send(packet.toJson()).also {
-                log.info { "Behandlet: ${packet[ID].textValue()}" }
-            }
-        } catch (e: Exception) {
-            log.error(e) {
-                "feil ved henting av arbeidssøker-data: ${e.message}"
+                log.info {
+                    "Registrert arbeidssøker: ${registrertArbeidssøker.erReellArbeidssøker}"
+                }
+
+                log.info { "løser behov for ${packet["@id"].asText()}" }
+
+                context.send(packet.toJson())
+            } catch (e: Exception) {
+                log.error(e) {
+                    "feil ved henting av arbeidssøker-data: ${e.message}"
+                }
             }
         }
     }

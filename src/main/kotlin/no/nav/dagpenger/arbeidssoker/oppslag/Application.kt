@@ -26,4 +26,3 @@ fun main() {
         LøsningService(this, Arbeidssøkeroppslag(oppfølgingsstatusClient))
     }.start()
 }
-
