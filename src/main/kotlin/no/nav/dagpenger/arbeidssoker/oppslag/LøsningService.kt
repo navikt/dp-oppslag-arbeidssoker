@@ -18,14 +18,15 @@ class LøsningService(
         River(rapidsConnection).apply {
             validate { it.demandAll("@behov", listOf("RegistrertArbeidssøker")) }
             validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("@id") }
+            validate { it.requireKey("@id", "vedtakId") }
             validate { it.requireKey("fødselsnummer") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         withLoggingContext(
-            "behovId" to packet["@id"].asText()
+            "behovId" to packet["@id"].asText(),
+            "vedtakid" to packet["vedtakId"].asText()
         ) {
             val fnr = packet["fødselsnummer"].asText()
 
@@ -35,18 +36,14 @@ class LøsningService(
                         "RegistrertArbeidssøker" to it
                     )
 
-                    sikkerLogg.info {
-                        "Registrert arbeidssøker: $it"
-                    }
+                    sikkerLogg.info { "Registrert arbeidssøker: $it" }
                 }
 
                 log.info { "løser behov for ${packet["@id"].asText()}" }
 
                 context.send(packet.toJson())
             } catch (e: Exception) {
-                log.error(e) {
-                    "feil ved henting av arbeidssøker-data: ${e.message}"
-                }
+                log.error(e) { "feil ved henting av arbeidssøker-data: ${e.message}" }
             }
         }
     }

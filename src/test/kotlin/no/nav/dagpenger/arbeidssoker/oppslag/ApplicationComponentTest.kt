@@ -11,6 +11,7 @@ import io.mockk.mockk
 import java.time.LocalDate
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -32,13 +33,7 @@ internal class ApplicationComponentTest {
 
     @Test
     fun `skal motta behov og produsere RegistrertArbeidssøker-løsning`() {
-        rapid.sendTestMessage(
-            """{
-                    "@id": "1", 
-                    "@behov": ["RegistrertArbeidssøker"], 
-                    "fødselsnummer":"12345"
-                }""".trimIndent()
-        )
+        rapid.sendTestMessage(behov)
 
         with(rapid.inspektør) {
             size shouldBeExactly 1
@@ -52,3 +47,13 @@ internal class ApplicationComponentTest {
         }
     }
 }
+
+@Language("JSON")
+private val behov = """{
+  "@id": "1",
+  "@behov": [
+    "RegistrertArbeidssøker"
+  ],
+  "vedtakId": "12345",
+  "fødselsnummer": "12345"
+}""".trimIndent()
