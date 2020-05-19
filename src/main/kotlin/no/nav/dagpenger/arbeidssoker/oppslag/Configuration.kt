@@ -83,6 +83,7 @@ data class Configuration(
         val trustStorePath: String = config()[Key("nav.truststore.path", stringType)],
         val trustStorePassword: String = config()[Key("nav.truststore.password", stringType)],
         val rapidApplication: Map<String, String> = mapOf(
+            "RAPID_APP_NAME" to "dp-oppslag-arbeidssoker",
             "KAFKA_BOOTSTRAP_SERVERS" to brokers,
             "KAFKA_RESET_POLICY" to "earliest",
             "KAFKA_RAPID_TOPIC" to topic,
