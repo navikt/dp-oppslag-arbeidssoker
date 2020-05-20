@@ -90,7 +90,7 @@ data class Configuration(
             "KAFKA_CONSUMER_GROUP_ID" to consumerGroupId,
             "NAV_TRUSTSTORE_PATH" to trustStorePath,
             "NAV_TRUSTSTORE_PASSWORD" to trustStorePassword
-        )
+        ) + System.getenv().filter { it.key.startsWith("NAIS_") }
     )
 
     data class Serviceuser(
