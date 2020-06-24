@@ -10,7 +10,7 @@ import no.nav.helse.rapids_rivers.River
 private val log = KotlinLogging.logger {}
 private val sikkerLogg = KotlinLogging.logger("tjenestekall")
 
-class LøsningService(
+class RegistrertArbeidssøkerLøsningService(
     rapidsConnection: RapidsConnection,
     private val arbeidssøkeroppslag: Arbeidssøkeroppslag
 ) : River.PacketListener {

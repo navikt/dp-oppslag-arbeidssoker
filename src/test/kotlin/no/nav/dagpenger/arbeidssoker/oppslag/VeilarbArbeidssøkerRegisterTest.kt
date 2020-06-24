@@ -1,0 +1,80 @@
+package no.nav.dagpenger.arbeidssoker.oppslag
+
+import de.huxhorn.sulky.ulid.ULID
+import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldBeInteger
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotBeEmpty
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.MockRequestHandleScope
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.request.HttpRequestData
+import io.ktor.client.request.HttpResponseData
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.headersOf
+import java.time.LocalDate
+import kotlinx.serialization.builtins.list
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import org.junit.jupiter.api.Test
+
+internal class VeilarbArbeidssøkerRegisterTest {
+    private val json = Json(JsonConfiguration.Stable)
+    private val client =
+        VeilarbArbeidssøkerRegister(tokenProvider = { "" }, httpClientEngine = MockEngine { request ->
+            when (request.url.encodedPath) {
+                "arbeidssoker/perioder" -> {
+                    validerRequest(request)
+
+                    respondJson(
+                        json.stringify(
+                            Arbeidssøkerperiode.serializer().list,
+                            listOf(
+                                Arbeidssøkerperiode(
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now(),
+                                    status = Arbeidssøkerperiode.Status.ARBS
+                                )
+                            )
+                        )
+                    )
+                }
+                else -> error("Unhandled URL ${request.url.encodedPath}")
+            }
+        })
+
+    @Test
+    fun `funker dette da?`() {
+        val response = client.hentRegistreringsperiode(
+            fnr = "123",
+            fom = LocalDate.now(),
+            tom = LocalDate.now()
+        )
+        response.size shouldBe 1
+        response.first().formidlingsgruppe shouldBe Formidlingsgruppe.ARBS
+    }
+
+    private fun validerRequest(request: HttpRequestData) {
+        request.headers[HttpHeaders.Authorization].shouldContain("Bearer")
+        request.headers["Nav-Consumer-Id"].shouldNotBeEmpty()
+        request.url.parameters["fnr"].shouldBeInteger()
+
+        shouldNotThrowAny {
+            ULID.parseULID(request.headers["Nav-Call-Id"])
+
+            LocalDate.parse(request.url.parameters["fraOgMed"])
+            LocalDate.parse(request.url.parameters["tilOgMed"])
+        }
+    }
+}
+
+private fun MockRequestHandleScope.respondJson(content: String): HttpResponseData {
+    return respond(
+        content = content,
+        headers = headersOf(
+            HttpHeaders.ContentType to listOf(ContentType.Application.Json.toString())
+        )
+    )
+}
