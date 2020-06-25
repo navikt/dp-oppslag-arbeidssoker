@@ -14,7 +14,6 @@ import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
-import io.ktor.http.URLBuilder
 import io.ktor.util.KtorExperimentalAPI
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
@@ -36,7 +35,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 @KtorExperimentalAPI
 internal class VeilarbArbeidssøkerRegister(
-    baseUrl: String? = null,
+    val baseUrl: String? = null,
     tokenProvider: () -> String,
     httpClientEngine: HttpClientEngine = CIO.create {}
 ) : ArbeidssøkerRegister {
@@ -63,15 +62,6 @@ internal class VeilarbArbeidssøkerRegister(
         }
 
         defaultRequest {
-            url {
-                baseUrl?.let {
-                    URLBuilder(it).also {
-                        this.host = it.host
-                        this.port = it.port
-                    }
-                }
-            }
-
             header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
             header("Nav-Call-Id", ulid.nextValue())
         }
@@ -84,7 +74,7 @@ internal class VeilarbArbeidssøkerRegister(
     ): List<Periode> = runBlocking {
         log.info { "Henter arbeidssøkerperioder for fra og med $fom til og med $tom" }
 
-        client.get<List<Arbeidssøkerperiode>>("/arbeidssoker/perioder") {
+        client.get<List<Arbeidssøkerperiode>>("$baseUrl/arbeidssoker/perioder") {
             parameter("fnr", fnr)
             parameter("fraOgMed", fom)
             parameter("tilOgMed", tom)

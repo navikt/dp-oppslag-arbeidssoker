@@ -13,7 +13,9 @@ import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.Url
 import io.ktor.http.headersOf
+import io.ktor.http.hostWithPort
 import java.time.LocalDate
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
@@ -25,10 +27,10 @@ internal class VeilarbArbeidssøkerRegisterTest {
     private val client =
         VeilarbArbeidssøkerRegister(
             tokenProvider = { "" },
+            baseUrl = "https://test.local:8080",
             httpClientEngine = MockEngine { request ->
-                println(request.url)
-                when (request.url.encodedPath) {
-                    "arbeidssoker/perioder" -> {
+                when (request.url.fullUrl) {
+                    "https://test.local:8080/arbeidssoker/perioder" -> {
                         validerRequest(request)
 
                         respondJson(
@@ -44,7 +46,7 @@ internal class VeilarbArbeidssøkerRegisterTest {
                             )
                         )
                     }
-                    else -> error("Unhandled URL ${request.url.encodedPath}")
+                    else -> error("Unhandled URL ${request.url.fullUrl}")
                 }
             })
 
@@ -81,3 +83,6 @@ private fun MockRequestHandleScope.respondJson(content: String): HttpResponseDat
         )
     )
 }
+
+private val Url.hostWithPortIfRequired: String get() = if (port == protocol.defaultPort) host else hostWithPort
+private val Url.fullUrl: String get() = "${protocol.name}://$hostWithPortIfRequired$encodedPath"
