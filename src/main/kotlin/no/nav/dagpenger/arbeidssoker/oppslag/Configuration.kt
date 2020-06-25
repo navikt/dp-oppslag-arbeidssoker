@@ -41,7 +41,7 @@ private val devProperties = ConfigurationMap(
         "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
         "oppfoelgingsstatus.v2.url" to "https://arena-q1.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
         "veilarbregistrering.url" to "https://veilarbregistrering.nais.preprod.local",
-        "sts.baseUrl" to "https://security-token-service.default.svc.nais.local",
+        "sts.baseUrl" to "http://security-token-service.default.svc.nais.local",
         "soapsecuritytokenservice.url" to "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
         "allow.insecure.soap.requests" to true.toString()
     )
@@ -54,7 +54,7 @@ private val prodProperties = ConfigurationMap(
         "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
         "oppfoelgingsstatus.v2.url" to "https://arena.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
         "veilarbregistrering.url" to "https://veilarbregistrering.nais.adeo.no",
-        "sts.baseUrl" to "https://security-token-service.default.svc.nais.local",
+        "sts.baseUrl" to "http://security-token-service.default.svc.nais.local",
         "soapsecuritytokenservice.url" to "https://sts.adeo.no/SecurityTokenServiceProvider/",
         "allow.insecure.soap.requests" to true.toString()
     )
