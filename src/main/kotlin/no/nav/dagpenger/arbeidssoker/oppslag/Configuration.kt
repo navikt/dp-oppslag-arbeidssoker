@@ -111,7 +111,7 @@ data class Configuration(
     )
 
     data class VeilarbRegistreringConfig(
-        val endpoint: String = config()[Key("veilarbregistrering", stringType)]
+        val endpoint: String = config()[Key("veilarbregistrering.url", stringType)]
     )
 
     data class STS(
