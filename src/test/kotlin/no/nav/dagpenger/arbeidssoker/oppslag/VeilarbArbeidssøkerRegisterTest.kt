@@ -23,27 +23,30 @@ import org.junit.jupiter.api.Test
 internal class VeilarbArbeidssøkerRegisterTest {
     private val json = Json(JsonConfiguration.Stable)
     private val client =
-        VeilarbArbeidssøkerRegister(tokenProvider = { "" }, httpClientEngine = MockEngine { request ->
-            when (request.url.encodedPath) {
-                "arbeidssoker/perioder" -> {
-                    validerRequest(request)
+        VeilarbArbeidssøkerRegister(
+            tokenProvider = { "" },
+            httpClientEngine = MockEngine { request ->
+                println(request.url)
+                when (request.url.encodedPath) {
+                    "arbeidssoker/perioder" -> {
+                        validerRequest(request)
 
-                    respondJson(
-                        json.stringify(
-                            Arbeidssøkerperiode.serializer().list,
-                            listOf(
-                                Arbeidssøkerperiode(
-                                    fom = LocalDate.now(),
-                                    tom = LocalDate.now(),
-                                    status = Arbeidssøkerperiode.Status.ARBS
+                        respondJson(
+                            json.stringify(
+                                Arbeidssøkerperiode.serializer().list,
+                                listOf(
+                                    Arbeidssøkerperiode(
+                                        fom = LocalDate.now(),
+                                        tom = LocalDate.now(),
+                                        status = Arbeidssøkerperiode.Status.ARBS
+                                    )
                                 )
                             )
                         )
-                    )
+                    }
+                    else -> error("Unhandled URL ${request.url.encodedPath}")
                 }
-                else -> error("Unhandled URL ${request.url.encodedPath}")
-            }
-        })
+            })
 
     @Test
     fun `funker dette da?`() {

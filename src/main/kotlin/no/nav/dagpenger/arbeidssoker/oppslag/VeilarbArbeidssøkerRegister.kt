@@ -14,7 +14,7 @@ import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
-import io.ktor.http.takeFrom
+import io.ktor.http.URLBuilder
 import io.ktor.util.KtorExperimentalAPI
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
@@ -64,11 +64,16 @@ internal class VeilarbArbeidssøkerRegister(
 
         defaultRequest {
             url {
-                baseUrl?.let { this.takeFrom(it) }
-
-                header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
-                header("Nav-Call-Id", ulid.nextValue())
+                baseUrl?.let {
+                    URLBuilder(it).also {
+                        this.host = it.host
+                        this.port = it.port
+                    }
+                }
             }
+
+            header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
+            header("Nav-Call-Id", ulid.nextValue())
         }
     }
 
