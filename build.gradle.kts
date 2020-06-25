@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version Kotlin.version
     id(Spotless.spotless) version Spotless.version
     id(Shadow.shadow) version Shadow.version
+    kotlin("plugin.serialization") version Kotlin.version
 }
 
 buildscript {
@@ -43,16 +44,22 @@ val cxfVersion = "3.3.4"
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
-    // kafka
-    implementation(Kafka.clients)
-    implementation(Kafka.streams)
-
     // json
     implementation(Json.library)
     implementation(Ulid.ulid)
 
     // ktor
-    implementation(Ktor.serverNetty)
+    implementation(Dagpenger.Biblioteker.stsKlient)
+    implementation(Dagpenger.Biblioteker.Ktor.Client.authBearer)
+    implementation(Ktor.library("client-auth-jvm"))
+    implementation(Ktor.library("client-core"))
+    implementation(Ktor.library("client-cio"))
+    implementation(Ktor.library("client-json-jvm"))
+    implementation(Ktor.library("client-serialization-jvm"))
+    implementation(Ktor.library("client-logging-jvm"))
+    implementation(Ktor.library("client-serialization-jvm"))
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
 
     // logging
     implementation(Kotlin.Logging.kotlinLogging)
@@ -68,10 +75,7 @@ dependencies {
     testImplementation(Junit5.api)
     testImplementation(KoTest.runner)
     testImplementation(KoTest.assertions)
-
-    testImplementation(Kafka.streamTestUtils)
-    testImplementation("org.awaitility:awaitility:4.0.1")
-    testImplementation("no.nav:kafka-embedded-env:2.3.0")
+    testImplementation(Ktor.library("client-mock-jvm"))
     testImplementation(Mockk.mockk)
 
     // Soap stuff
@@ -112,6 +116,7 @@ tasks.withType<Test> {
         showStackTraces = true
         exceptionFormat = TestExceptionFormat.FULL
         events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+        showStandardStreams = true
     }
 }
 

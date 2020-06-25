@@ -28,7 +28,7 @@ internal class ApplicationComponentTest {
         )
     }
     private val rapid = TestRapid().apply {
-        LøsningService(this, arbeidssøkeroppslag)
+        RegistrertArbeidssøkerLøsningService(this, arbeidssøkeroppslag)
     }
 
     @Test

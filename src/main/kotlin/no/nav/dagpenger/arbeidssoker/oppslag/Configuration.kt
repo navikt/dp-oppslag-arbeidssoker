@@ -26,7 +26,9 @@ private val localProperties = ConfigurationMap(
         "kafka.reset.policy" to "earliest",
         "nav.truststore.path" to "bla/bla",
         "nav.truststore.password" to "foo",
-        "oppfoelgingsstatus.v2.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
+        "oppfoelgingsstatus.v2.url" to "kttps://localhost/ail_ws/Oppfoelgingsstatus_v2",
+        "veilarbregistrering.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
+        "sts.baseUrl" to "http://localhost",
         "soapsecuritytokenservice.url" to "http://localhost",
         "allow.insecure.soap.requests" to true.toString()
     )
@@ -38,6 +40,8 @@ private val devProperties = ConfigurationMap(
         "application.httpPort" to "8080",
         "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
         "oppfoelgingsstatus.v2.url" to "https://arena-q1.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
+        "veilarbregistrering.url" to "",
+        "sts.baseUrl" to "http://security-token-service.default.svc.nais.local",
         "soapsecuritytokenservice.url" to "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
         "allow.insecure.soap.requests" to true.toString()
     )
@@ -49,6 +53,8 @@ private val prodProperties = ConfigurationMap(
         "application.httpPort" to "8080",
         "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
         "oppfoelgingsstatus.v2.url" to "https://arena.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
+        "veilarbregistrering.url" to "",
+        "sts.baseUrl" to "http://security-token-service.default.svc.nais.local",
         "soapsecuritytokenservice.url" to "https://sts.adeo.no/SecurityTokenServiceProvider/",
         "allow.insecure.soap.requests" to true.toString()
     )
@@ -64,6 +70,8 @@ data class Configuration(
     val serviceuser: Serviceuser = Serviceuser(),
     val application: Application = Application(),
     val oppfoelgingsstatus: OppfoelginsstatusConfig = OppfoelginsstatusConfig(),
+    val veilarbregistrering: VeilarbRegistreringConfig = VeilarbRegistreringConfig(),
+    val sts: STS = STS(),
     val soapSTSClient: SoapSTSClient = SoapSTSClient(),
     val kafka: Kafka = Kafka()
 ) {
@@ -100,6 +108,14 @@ data class Configuration(
 
     data class OppfoelginsstatusConfig(
         val endpoint: String = config()[Key("oppfoelgingsstatus.v2.url", stringType)]
+    )
+
+    data class VeilarbRegistreringConfig(
+        val endpoint: String = config()[Key("veilarbregistrering", stringType)]
+    )
+
+    data class STS(
+        val baseUrl: String = config()[Key("sts.baseUrl", stringType)]
     )
 
     data class SoapSTSClient(
