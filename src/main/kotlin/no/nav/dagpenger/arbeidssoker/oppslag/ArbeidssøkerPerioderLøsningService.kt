@@ -41,7 +41,7 @@ class ArbeidssøkerPerioderLøsningService(
             val tom = packet["tom"].asLocalDate()
 
             try {
-                runBlocking { arbeidssøkerRegister.hentRegistreringsperiode(fnr = fnr, fom = fom, tom = fom) }.also {
+                runBlocking { arbeidssøkerRegister.hentRegistreringsperiode(fnr = fnr, fom = fom, tom = tom) }.also {
                     packet["@løsning"] = mapOf(
                         "ArbeidssøkerPerioder" to it
                     )
