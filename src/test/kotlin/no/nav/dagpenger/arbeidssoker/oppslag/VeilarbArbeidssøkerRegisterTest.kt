@@ -17,6 +17,7 @@ import io.ktor.http.Url
 import io.ktor.http.headersOf
 import io.ktor.http.hostWithPort
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.junit.jupiter.api.Test
@@ -39,8 +40,8 @@ internal class VeilarbArbeidssøkerRegisterTest {
                                 Arbeidssokerperioder(
                                     arbeidssokerperioder = listOf(
                                         ResponsePeriode(
-                                            fraOgMedDato = LocalDate.now(),
-                                            tilOgMedDato = LocalDate.now()
+                                            fraOgMedDato = LocalDateTime.now(),
+                                            tilOgMedDato = LocalDateTime.now()
                                         )
                                     )
 
