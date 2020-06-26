@@ -35,12 +35,12 @@ internal class VeilarbArbeidssøkerRegisterTest {
 
                         respondJson(
                             json.stringify(
-                                Arbeidssøkerperiode.serializer().list,
+                                Arbeidssokerperioder.serializer().list,
                                 listOf(
-                                    Arbeidssøkerperiode(
+                                    Arbeidssokerperioder(
                                         fom = LocalDate.now(),
                                         tom = LocalDate.now(),
-                                        status = Arbeidssøkerperiode.Status.ARBS
+                                        status = Arbeidssokerperioder.Status.ARBS
                                     )
                                 )
                             )

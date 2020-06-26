@@ -74,7 +74,7 @@ internal class VeilarbArbeidssøkerRegister(
     ): List<Periode> = runBlocking {
         log.info { "Henter arbeidssøkerperioder for fra og med $fom til og med $tom" }
 
-        client.get<List<Arbeidssøkerperiode>>("$baseUrl/arbeidssoker/perioder") {
+        client.get<List<Arbeidssokerperioder>>("$baseUrl/arbeidssoker/perioder") {
             parameter("fnr", fnr)
             parameter("fraOgMed", fom)
             parameter("tilOgMed", tom)
@@ -91,7 +91,7 @@ internal class VeilarbArbeidssøkerRegister(
 }
 
 @Serializable
-internal data class Arbeidssøkerperiode(
+internal data class Arbeidssokerperioder(
     @Serializable(with = LocalDateSerializer::class)
     val fom: LocalDate,
     @Serializable(with = LocalDateSerializer::class)
