@@ -39,9 +39,8 @@ internal class VeilarbArbeidssøkerRegisterTest {
                                 Arbeidssokerperioder(
                                     arbeidssokerperioder = listOf(
                                         ResponsePeriode(
-                                            fom = LocalDate.now(),
-                                            tom = LocalDate.now(),
-                                            status = ResponsePeriode.Status.ARBS
+                                            fraOgMedDato = LocalDate.now(),
+                                            tilOgMedDato = LocalDate.now()
                                         )
                                     )
 
@@ -62,7 +61,6 @@ internal class VeilarbArbeidssøkerRegisterTest {
             tom = LocalDate.now()
         )
         response.size shouldBe 1
-        response.first().formidlingsgruppe shouldBe Formidlingsgruppe.ARBS
     }
 
     private fun validerRequest(request: HttpRequestData) {

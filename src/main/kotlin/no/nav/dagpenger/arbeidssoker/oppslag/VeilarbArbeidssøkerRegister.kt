@@ -81,9 +81,8 @@ internal class VeilarbArbeidssøkerRegister(
         }.let {
             it.arbeidssokerperioder.map { responsePeriode ->
                 Periode(
-                    fom = responsePeriode.fom,
-                    tom = responsePeriode.tom,
-                    formidlingsgruppe = Formidlingsgruppe.valueOf(responsePeriode.status.toString())
+                    fom = responsePeriode.fraOgMedDato,
+                    tom = responsePeriode.tilOgMedDato
                 )
             }
         }.also {
@@ -98,15 +97,10 @@ internal data class Arbeidssokerperioder(val arbeidssokerperioder: List<Response
 @Serializable
 internal data class ResponsePeriode(
     @Serializable(with = LocalDateSerializer::class)
-    val fom: LocalDate,
+    val fraOgMedDato: LocalDate,
     @Serializable(with = LocalDateSerializer::class)
-    val tom: LocalDate,
-    val status: Status
-) {
-    enum class Status {
-        ARBS
-    }
-}
+    val tilOgMedDato: LocalDate?
+)
 
 @Serializer(forClass = LocalDate::class)
 object LocalDateSerializer : KSerializer<LocalDate> {

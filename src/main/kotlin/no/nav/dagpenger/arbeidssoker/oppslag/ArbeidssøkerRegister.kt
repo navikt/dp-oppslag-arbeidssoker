@@ -8,10 +8,5 @@ interface ArbeidssøkerRegister {
 
 data class Periode(
     val fom: LocalDate,
-    val tom: LocalDate,
-    val formidlingsgruppe: Formidlingsgruppe
+    val tom: LocalDate?
 )
-
-enum class Formidlingsgruppe {
-    ARBS
-}
