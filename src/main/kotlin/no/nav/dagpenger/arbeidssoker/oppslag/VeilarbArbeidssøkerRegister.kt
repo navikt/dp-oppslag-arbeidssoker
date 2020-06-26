@@ -16,7 +16,6 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.util.KtorExperimentalAPI
 import java.time.LocalDate
-import java.time.ZonedDateTime
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
@@ -82,8 +81,8 @@ internal class VeilarbArbeidssøkerRegister(
         }.let {
             it.arbeidssokerperioder.map { responsePeriode ->
                 Periode(
-                    fom = responsePeriode.fraOgMedDato.toLocalDate(),
-                    tom = responsePeriode.tilOgMedDato?.toLocalDate()
+                    fom = responsePeriode.fraOgMedDato,
+                    tom = responsePeriode.tilOgMedDato
                 )
             }
         }.also {
@@ -97,15 +96,15 @@ internal data class Arbeidssokerperioder(val arbeidssokerperioder: List<Response
 
 @Serializable
 internal data class ResponsePeriode(
-    @Serializable(with = ZonedDateTimeSerializer::class)
-    val fraOgMedDato: ZonedDateTime,
-    @Serializable(with = ZonedDateTimeSerializer::class)
-    val tilOgMedDato: ZonedDateTime?
+    @Serializable(with = LocalDateSerializer::class)
+    val fraOgMedDato: LocalDate,
+    @Serializable(with = LocalDateSerializer::class)
+    val tilOgMedDato: LocalDate?
 )
 
-@Serializer(forClass = ZonedDateTime::class)
-object ZonedDateTimeSerializer : KSerializer<ZonedDateTime> {
+@Serializer(forClass = LocalDate::class)
+object LocalDateSerializer : KSerializer<LocalDate> {
     override val descriptor = PrimitiveDescriptor("java.time.LocalDateTime", PrimitiveKind.STRING)
-    override fun deserialize(decoder: Decoder): ZonedDateTime = ZonedDateTime.parse(decoder.decodeString())
-    override fun serialize(encoder: Encoder, value: ZonedDateTime) = encoder.encodeString(value.toString())
+    override fun deserialize(decoder: Decoder): LocalDate = LocalDate.parse(decoder.decodeString())
+    override fun serialize(encoder: Encoder, value: LocalDate) = encoder.encodeString(value.toString())
 }
