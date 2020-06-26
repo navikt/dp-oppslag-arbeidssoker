@@ -29,6 +29,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import mu.KotlinLogging
 import no.nav.dagpenger.ktor.client.auth.providers.bearer
+import java.time.ZonedDateTime
 
 private val ulid = ULID()
 private val log = KotlinLogging.logger {}
@@ -97,15 +98,15 @@ internal data class Arbeidssokerperioder(val arbeidssokerperioder: List<Response
 
 @Serializable
 internal data class ResponsePeriode(
-    @Serializable(with = LocalDateSerializer::class)
-    val fraOgMedDato: LocalDateTime,
-    @Serializable(with = LocalDateSerializer::class)
-    val tilOgMedDato: LocalDateTime?
+    @Serializable(with = ZonedDateTimeSerializer::class)
+    val fraOgMedDato: ZonedDateTime,
+    @Serializable(with = ZonedDateTimeSerializer::class)
+    val tilOgMedDato: ZonedDateTime?
 )
 
-@Serializer(forClass = LocalDateTime::class)
-object LocalDateSerializer : KSerializer<LocalDateTime> {
+@Serializer(forClass = ZonedDateTime::class)
+object ZonedDateTimeSerializer : KSerializer<ZonedDateTime> {
     override val descriptor = PrimitiveDescriptor("java.time.LocalDateTime", PrimitiveKind.STRING)
-    override fun deserialize(decoder: Decoder): LocalDateTime = LocalDateTime.parse(decoder.decodeString())
-    override fun serialize(encoder: Encoder, value: LocalDateTime) = encoder.encodeString(value.toString())
+    override fun deserialize(decoder: Decoder): ZonedDateTime = ZonedDateTime.parse(decoder.decodeString())
+    override fun serialize(encoder: Encoder, value: ZonedDateTime) = encoder.encodeString(value.toString())
 }

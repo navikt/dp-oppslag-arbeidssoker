@@ -21,6 +21,7 @@ import java.time.LocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.junit.jupiter.api.Test
+import java.time.ZonedDateTime
 
 internal class VeilarbArbeidssøkerRegisterTest {
     private val json = Json(JsonConfiguration.Stable)
@@ -40,8 +41,8 @@ internal class VeilarbArbeidssøkerRegisterTest {
                                 Arbeidssokerperioder(
                                     arbeidssokerperioder = listOf(
                                         ResponsePeriode(
-                                            fraOgMedDato = LocalDateTime.now(),
-                                            tilOgMedDato = LocalDateTime.now()
+                                            fraOgMedDato = ZonedDateTime.now(),
+                                            tilOgMedDato = ZonedDateTime.now()
                                         )
                                     )
 
