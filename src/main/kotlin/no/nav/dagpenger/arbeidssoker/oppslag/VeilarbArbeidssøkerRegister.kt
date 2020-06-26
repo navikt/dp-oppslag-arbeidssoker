@@ -16,7 +16,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.util.KtorExperimentalAPI
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
@@ -29,7 +29,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import mu.KotlinLogging
 import no.nav.dagpenger.ktor.client.auth.providers.bearer
-import java.time.ZonedDateTime
 
 private val ulid = ULID()
 private val log = KotlinLogging.logger {}

@@ -17,11 +17,10 @@ import io.ktor.http.Url
 import io.ktor.http.headersOf
 import io.ktor.http.hostWithPort
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.junit.jupiter.api.Test
-import java.time.ZonedDateTime
 
 internal class VeilarbArbeidssøkerRegisterTest {
     private val json = Json(JsonConfiguration.Stable)
