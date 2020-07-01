@@ -51,6 +51,7 @@ dependencies {
     // ktor
     implementation(Dagpenger.Biblioteker.stsKlient)
     implementation(Dagpenger.Biblioteker.Ktor.Client.authBearer)
+    implementation(Dagpenger.Biblioteker.Ktor.Client.metrics)
     implementation(Ktor.library("client-auth-jvm"))
     implementation(Ktor.library("client-core"))
     implementation(Ktor.library("client-cio"))

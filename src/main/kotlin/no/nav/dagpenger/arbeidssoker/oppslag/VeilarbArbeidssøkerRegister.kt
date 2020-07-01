@@ -29,6 +29,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import mu.KotlinLogging
 import no.nav.dagpenger.ktor.client.auth.providers.bearer
+import no.nav.dagpenger.ktor.client.metrics.PrometheusMetrics
 import org.slf4j.MDC
 
 private val ulid = ULID()
@@ -62,6 +63,8 @@ internal class VeilarbArbeidssøkerRegister(
                 sendWithoutRequest = true
             }
         }
+
+        install(PrometheusMetrics)
 
         defaultRequest {
             header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
