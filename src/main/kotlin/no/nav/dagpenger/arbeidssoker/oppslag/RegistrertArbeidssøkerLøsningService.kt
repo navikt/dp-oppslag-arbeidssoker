@@ -1,6 +1,7 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -25,25 +26,27 @@ class RegistrertArbeidssøkerLøsningService(
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         withLoggingContext(
-            "behovId" to packet["@id"].asText(),
+            mdcBehovKey to packet["@id"].asText(),
             "vedtakid" to packet["vedtakId"].asText()
         ) {
-            val fnr = packet["fødselsnummer"].asText()
+            runBlocking(MDCContext()) {
+                val fnr = packet["fødselsnummer"].asText()
 
-            try {
-                runBlocking { arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr) }.also {
-                    packet["@løsning"] = mapOf(
-                        "RegistrertArbeidssøker" to it
-                    )
+                try {
+                    arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).also {
+                        packet["@løsning"] = mapOf(
+                            "RegistrertArbeidssøker" to it
+                        )
 
-                    sikkerLogg.info { "Registrert arbeidssøker: $it" }
+                        sikkerLogg.info { "Registrert arbeidssøker: $it" }
+                    }
+
+                    log.info { "løser behov for ${packet["@id"].asText()}" }
+
+                    context.send(packet.toJson())
+                } catch (e: Exception) {
+                    log.error(e) { "feil ved henting av arbeidssøker-data: ${e.message}" }
                 }
-
-                log.info { "løser behov for ${packet["@id"].asText()}" }
-
-                context.send(packet.toJson())
-            } catch (e: Exception) {
-                log.error(e) { "feil ved henting av arbeidssøker-data: ${e.message}" }
             }
         }
     }

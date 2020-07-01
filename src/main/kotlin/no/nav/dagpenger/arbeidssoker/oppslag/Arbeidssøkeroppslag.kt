@@ -4,7 +4,7 @@ import java.time.LocalDate
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
 
 class Arbeidssøkeroppslag(private val oppfølgingsstatusClient: OppfølgingsstatusClient) {
-    fun bestemRegistrertArbeidssøker(fnr: String): RegistrertArbeidssøker {
+    suspend fun bestemRegistrertArbeidssøker(fnr: String): RegistrertArbeidssøker {
         val formidlingsgruppeKode = try {
             oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr)
         } catch (e: Exception) {

@@ -9,6 +9,7 @@ import io.ktor.util.KtorExperimentalAPI
 import io.mockk.every
 import io.mockk.mockk
 import java.time.LocalDate
+import kotlinx.coroutines.runBlocking
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
@@ -20,7 +21,7 @@ import org.junit.jupiter.api.TestInstance
 internal class ApplicationComponentTest {
     private val arbeidssøkeroppslag: Arbeidssøkeroppslag = mockk<Arbeidssøkeroppslag>().also {
         every {
-            it.bestemRegistrertArbeidssøker("12345")
+            runBlocking { it.bestemRegistrertArbeidssøker("12345") }
         } returns RegistrertArbeidssøker(
             erRegistrert = true,
             formidlingsgruppe = "ARBS",

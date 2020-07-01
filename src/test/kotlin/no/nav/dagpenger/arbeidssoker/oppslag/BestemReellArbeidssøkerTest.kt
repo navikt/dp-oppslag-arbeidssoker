@@ -3,6 +3,7 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
 import org.junit.jupiter.api.Test
 
@@ -11,23 +12,23 @@ class BestemReellArbeidssøkerTest {
     private val IKKE_ARBEIDSSØKER = "IARBS"
 
     @Test
-    fun `Hvis arbs, så reellarbeidssøker`() {
+    fun `Hvis arbs, så reellarbeidssøker`() = runBlocking {
         val oppfølgingsstatusClient: OppfølgingsstatusClient = mockk()
         val arbeidssøkeroppslag = Arbeidssøkeroppslag(oppfølgingsstatusClient)
         val fnr = "12345"
 
-        every { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns ARBEIDSSØKER
+        every { runBlocking { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } } returns ARBEIDSSØKER
 
         arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erRegistrert shouldBe true
     }
 
     @Test
-    fun `Hvis ikke arbs, så ikke reellarbeidssøker`() {
+    fun `Hvis ikke arbs, så ikke reellarbeidssøker`() = runBlocking {
         val oppfølgingsstatusClient: OppfølgingsstatusClient = mockk()
         val arbeidssøkeroppslag = Arbeidssøkeroppslag(oppfølgingsstatusClient)
         val fnr = "12345"
 
-        every { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns IKKE_ARBEIDSSØKER
+        every { runBlocking { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } } returns IKKE_ARBEIDSSØKER
 
         arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erRegistrert shouldBe false
     }
