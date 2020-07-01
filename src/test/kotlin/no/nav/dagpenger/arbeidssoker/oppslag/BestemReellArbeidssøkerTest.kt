@@ -1,7 +1,7 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
 import io.kotest.matchers.shouldBe
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
@@ -17,7 +17,7 @@ class BestemReellArbeidssøkerTest {
         val arbeidssøkeroppslag = Arbeidssøkeroppslag(oppfølgingsstatusClient)
         val fnr = "12345"
 
-        every { runBlocking { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } } returns ARBEIDSSØKER
+        coEvery { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns ARBEIDSSØKER
 
         arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erRegistrert shouldBe true
     }
@@ -28,7 +28,7 @@ class BestemReellArbeidssøkerTest {
         val arbeidssøkeroppslag = Arbeidssøkeroppslag(oppfølgingsstatusClient)
         val fnr = "12345"
 
-        every { runBlocking { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } } returns IKKE_ARBEIDSSØKER
+        coEvery { oppfølgingsstatusClient.hentFormidlingsgruppeKode(fnr) } returns IKKE_ARBEIDSSØKER
 
         arbeidssøkeroppslag.bestemRegistrertArbeidssøker(fnr).erRegistrert shouldBe false
     }

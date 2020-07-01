@@ -6,10 +6,9 @@ import io.kotest.matchers.date.shouldBeToday
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import io.ktor.util.KtorExperimentalAPI
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.LocalDate
-import kotlinx.coroutines.runBlocking
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
@@ -20,8 +19,8 @@ import org.junit.jupiter.api.TestInstance
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ApplicationComponentTest {
     private val arbeidssøkeroppslag: Arbeidssøkeroppslag = mockk<Arbeidssøkeroppslag>().also {
-        every {
-            runBlocking { it.bestemRegistrertArbeidssøker("12345") }
+        coEvery {
+            it.bestemRegistrertArbeidssøker("12345")
         } returns RegistrertArbeidssøker(
             erRegistrert = true,
             formidlingsgruppe = "ARBS",
