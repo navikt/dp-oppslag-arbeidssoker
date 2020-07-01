@@ -64,7 +64,9 @@ internal class VeilarbArbeidssøkerRegister(
             }
         }
 
-        install(PrometheusMetrics)
+        install(PrometheusMetrics) {
+            baseName = "ktor_client_veilarbregistrering"
+        }
 
         defaultRequest {
             header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
