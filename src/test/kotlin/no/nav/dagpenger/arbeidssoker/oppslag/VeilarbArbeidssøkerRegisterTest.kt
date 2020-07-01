@@ -17,8 +17,11 @@ import io.ktor.http.Url
 import io.ktor.http.headersOf
 import io.ktor.http.hostWithPort
 import java.time.LocalDate
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.slf4j.MDCContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import mu.withLoggingContext
 import org.junit.jupiter.api.Test
 
 internal class VeilarbArbeidssøkerRegisterTest {
@@ -53,15 +56,20 @@ internal class VeilarbArbeidssøkerRegisterTest {
                 }
             })
 
+    private val behovId = ULID().nextULID()
     @Test
-    fun `funker dette da?`() {
-        val response = client.hentRegistreringsperiode(
-            fnr = "123",
-            fom = LocalDate.now(),
-            tom = LocalDate.now()
-        )
-        response.size shouldBe 1
-    }
+    fun `funker dette da?`() = withLoggingContext(
+            mdcBehovKey to behovId
+        ) {
+            runBlocking(MDCContext()) {
+                val response = client.hentRegistreringsperiode(
+                    fnr = "123",
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now()
+                )
+                response.size shouldBe 1
+            }
+        }
 
     private fun validerRequest(request: HttpRequestData) {
         request.headers[HttpHeaders.Authorization].shouldContain("Bearer")
@@ -70,6 +78,7 @@ internal class VeilarbArbeidssøkerRegisterTest {
 
         shouldNotThrowAny {
             ULID.parseULID(request.headers["Nav-Call-Id"])
+            request.headers["Nav-Call-Id"] shouldBe behovId
 
             LocalDate.parse(request.url.parameters["fraOgMed"])
             LocalDate.parse(request.url.parameters["tilOgMed"])

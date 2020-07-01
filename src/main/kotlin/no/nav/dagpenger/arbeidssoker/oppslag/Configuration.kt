@@ -66,6 +66,8 @@ private fun config() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getPro
     else -> systemProperties() overriding EnvironmentVariables overriding localProperties
 }
 
+const val mdcBehovKey = "behovId"
+
 data class Configuration(
     val serviceuser: Serviceuser = Serviceuser(),
     val application: Application = Application(),

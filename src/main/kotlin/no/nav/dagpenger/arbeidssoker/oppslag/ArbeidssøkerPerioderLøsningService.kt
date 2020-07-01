@@ -1,6 +1,7 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -33,27 +34,29 @@ class ArbeidssøkerPerioderLøsningService(
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         withLoggingContext(
-            "behovId" to packet["@id"].asText(),
+            mdcBehovKey to packet["@id"].asText(),
             "vedtakid" to packet["vedtakId"].asText()
         ) {
-            val fnr = packet["fødselsnummer"].asText()
-            val fom = packet["fom"].asLocalDate()
-            val tom = packet["tom"].asLocalDate()
+            runBlocking(MDCContext()) {
+                val fnr = packet["fødselsnummer"].asText()
+                val fom = packet["fom"].asLocalDate()
+                val tom = packet["tom"].asLocalDate()
 
-            try {
-                runBlocking { arbeidssøkerRegister.hentRegistreringsperiode(fnr = fnr, fom = fom, tom = tom) }.also {
-                    packet["@løsning"] = mapOf(
-                        "ArbeidssøkerPerioder" to it
-                    )
+                try {
+                    arbeidssøkerRegister.hentRegistreringsperiode(fnr = fnr, fom = fom, tom = tom).also {
+                        packet["@løsning"] = mapOf(
+                            "ArbeidssøkerPerioder" to it
+                        )
 
-                    sikkerLogg.info { "Perioder registret som arbeidssøker: $it" }
+                        sikkerLogg.info { "Perioder registret som arbeidssøker: $it" }
+                    }
+
+                    log.info { "løser behov for ArbeidssøkerPerioder" }
+
+                    context.send(packet.toJson())
+                } catch (e: Exception) {
+                    log.error(e) { "feil ved henting av arbeidssøker-data: ${e.message}" }
                 }
-
-                log.info { "løser behov for ArbeidssøkerPerioder" }
-
-                context.send(packet.toJson())
-            } catch (e: Exception) {
-                log.error(e) { "feil ved henting av arbeidssøker-data: ${e.message}" }
             }
         }
     }

@@ -1,5 +1,7 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap.arena
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
 import no.nav.tjeneste.virksomhet.oppfoelgingsstatus.v2.binding.OppfoelgingsstatusV2
@@ -12,12 +14,12 @@ class SoapArenaClient(
     private val oppfoelgingsstatusV2: OppfoelgingsstatusV2
 ) : OppfølgingsstatusClient {
 
-    override fun hentFormidlingsgruppeKode(fnr: String): String {
+    override suspend fun hentFormidlingsgruppeKode(fnr: String): String = withContext(Dispatchers.IO) {
         val request = HentOppfoelgingsstatusRequest().apply {
             bruker = Person().apply { this.ident = fnr }
         }
         val response = oppfoelgingsstatusV2.hentOppfoelgingsstatus(request)
 
-        return response.formidlingsgruppeKode.value
+        response.formidlingsgruppeKode.value
     }
 }

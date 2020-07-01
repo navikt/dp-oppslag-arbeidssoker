@@ -16,7 +16,8 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.util.KtorExperimentalAPI
 import java.time.LocalDate
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
@@ -28,6 +29,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import mu.KotlinLogging
 import no.nav.dagpenger.ktor.client.auth.providers.bearer
+import org.slf4j.MDC
 
 private val ulid = ULID()
 private val log = KotlinLogging.logger {}
@@ -63,15 +65,15 @@ internal class VeilarbArbeidssøkerRegister(
 
         defaultRequest {
             header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
-            header("Nav-Call-Id", ulid.nextValue())
+            header("Nav-Call-Id", runCatching { MDC.get(mdcBehovKey) }.getOrElse { ulid.nextULID() })
         }
     }
 
-    override fun hentRegistreringsperiode(
+    override suspend fun hentRegistreringsperiode(
         fnr: String,
         fom: LocalDate,
         tom: LocalDate
-    ): List<Periode> = runBlocking {
+    ): List<Periode> = withContext(Dispatchers.IO) {
         log.info { "Henter arbeidssøkerperioder for fra og med $fom til og med $tom" }
 
         client.get<Arbeidssokerperioder>("$baseUrl/arbeidssoker/perioder") {
