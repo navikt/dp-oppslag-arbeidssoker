@@ -16,7 +16,7 @@ spec:
     path: /isready
   port: 8080
   prometheus:
-    enabled: false
+    enabled: true
     path: /metrics
   replicas:
     max: 6
