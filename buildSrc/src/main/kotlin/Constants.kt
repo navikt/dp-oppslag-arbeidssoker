@@ -36,6 +36,7 @@ object Dagpenger {
 
             object Client {
                 const val metrics = "com.github.navikt.dp-biblioteker:ktor-client-metrics:$version"
+                const val authBearer = "com.github.navikt.dp-biblioteker:ktor-client-auth-bearer:$version"
             }
         }
 
