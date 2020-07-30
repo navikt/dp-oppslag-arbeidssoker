@@ -1,21 +1,21 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap
 
-import javax.xml.namespace.QName
 import no.nav.cxf.metrics.MetricFeature
 import no.nav.tjeneste.virksomhet.oppfoelgingsstatus.v2.binding.OppfoelgingsstatusV2
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean
 import org.apache.cxf.ws.addressing.WSAddressingFeature
+import javax.xml.namespace.QName
 
 object SoapPort {
 
     fun oppfoelgingsstatusV2(serviceUrl: String): OppfoelgingsstatusV2 {
         return createServicePort(
-                serviceUrl = serviceUrl,
-                serviceClazz = OppfoelgingsstatusV2::class.java,
-                wsdl = "wsdl/no/nav/tjeneste/virksomhet/oppfoelgingsstatus/v2/Binding.wsdl",
-                namespace = "http://nav.no/tjeneste/virksomhet/oppfoelgingsstatus/v2/Binding",
-                svcName = "Oppfoelgingsstatus_v2",
-                portName = "Oppfoelgingsstatus_v2Port"
+            serviceUrl = serviceUrl,
+            serviceClazz = OppfoelgingsstatusV2::class.java,
+            wsdl = "wsdl/no/nav/tjeneste/virksomhet/oppfoelgingsstatus/v2/Binding.wsdl",
+            namespace = "http://nav.no/tjeneste/virksomhet/oppfoelgingsstatus/v2/Binding",
+            svcName = "Oppfoelgingsstatus_v2",
+            portName = "Oppfoelgingsstatus_v2Port"
         )
     }
 

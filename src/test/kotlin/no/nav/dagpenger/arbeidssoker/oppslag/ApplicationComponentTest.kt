@@ -8,12 +8,12 @@ import io.kotest.matchers.shouldBe
 import io.ktor.util.KtorExperimentalAPI
 import io.mockk.coEvery
 import io.mockk.mockk
-import java.time.LocalDate
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.time.LocalDate
 
 @KtorExperimentalAPI
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -49,11 +49,13 @@ internal class ApplicationComponentTest {
 }
 
 @Language("JSON")
-private val behov = """{
+private val behov =
+    """{
   "@id": "1",
   "@behov": [
     "RegistrertArbeidssøker"
   ],
   "vedtakId": "12345",
   "fødselsnummer": "12345"
-}""".trimIndent()
+}
+    """.trimIndent()

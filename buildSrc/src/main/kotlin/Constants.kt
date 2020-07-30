@@ -121,11 +121,11 @@ object Konfig {
 }
 
 object Kotlin {
-    const val version = "1.3.71"
+    const val version = "1.3.72"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
 
     object Coroutines {
-        const val version = "1.3.5"
+        const val version = "1.3.7"
         fun module(name: String) = "org.jetbrains.kotlinx:kotlinx-coroutines-$name:$version"
     }
 
@@ -227,9 +227,13 @@ object Slf4j {
     const val api = "org.slf4j:slf4j-api:$version"
 }
 
+object Ktlint {
+    const val version = "0.37.2"
+}
+
 object Spotless {
-    const val version = "3.28.0"
-    const val spotless = "com.diffplug.gradle.spotless"
+    const val version = "5.1.0"
+    const val spotless = "com.diffplug.spotless"
 }
 
 object Shadow {

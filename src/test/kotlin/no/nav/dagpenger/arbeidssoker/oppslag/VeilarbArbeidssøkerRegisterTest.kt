@@ -16,13 +16,13 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.Url
 import io.ktor.http.headersOf
 import io.ktor.http.hostWithPort
-import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import mu.withLoggingContext
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 internal class VeilarbArbeidssøkerRegisterTest {
     private val json = Json(JsonConfiguration.Stable)
@@ -54,22 +54,23 @@ internal class VeilarbArbeidssøkerRegisterTest {
                     }
                     else -> error("Unhandled URL ${request.url.fullUrl}")
                 }
-            })
+            }
+        )
 
     private val behovId = ULID().nextULID()
     @Test
     fun `funker dette da?`() = withLoggingContext(
-            mdcBehovKey to behovId
-        ) {
-            runBlocking(MDCContext()) {
-                val response = client.hentRegistreringsperiode(
-                    fnr = "123",
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now()
-                )
-                response.size shouldBe 1
-            }
+        mdcBehovKey to behovId
+    ) {
+        runBlocking(MDCContext()) {
+            val response = client.hentRegistreringsperiode(
+                fnr = "123",
+                fom = LocalDate.now(),
+                tom = LocalDate.now()
+            )
+            response.size shouldBe 1
         }
+    }
 
     private fun validerRequest(request: HttpRequestData) {
         request.headers[HttpHeaders.Authorization].shouldContain("Bearer")
