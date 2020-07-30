@@ -1,7 +1,7 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
-import java.time.LocalDate
 import no.nav.dagpenger.arbeidssoker.oppslag.adapter.OppfølgingsstatusClient
+import java.time.LocalDate
 
 class Arbeidssøkeroppslag(private val oppfølgingsstatusClient: OppfølgingsstatusClient) {
     suspend fun bestemRegistrertArbeidssøker(fnr: String): RegistrertArbeidssøker {

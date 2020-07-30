@@ -1,8 +1,6 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.adapter.soap
 
 import de.huxhorn.sulky.ulid.ULID
-import javax.xml.bind.JAXBException
-import javax.xml.namespace.QName
 import no.nav.dagpenger.arbeidssoker.oppslag.mdcBehovKey
 import org.apache.cxf.binding.soap.SoapHeader
 import org.apache.cxf.binding.soap.SoapMessage
@@ -13,6 +11,8 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor
 import org.apache.cxf.phase.Phase
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
+import javax.xml.bind.JAXBException
+import javax.xml.namespace.QName
 
 private val log = LoggerFactory.getLogger(CallIdInterceptor::class.java)
 private val ulid = ULID()

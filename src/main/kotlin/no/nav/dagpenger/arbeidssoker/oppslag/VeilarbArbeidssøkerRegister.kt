@@ -15,7 +15,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.util.KtorExperimentalAPI
-import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Decoder
@@ -31,6 +30,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.ktor.client.auth.providers.bearer
 import no.nav.dagpenger.ktor.client.metrics.PrometheusMetrics
 import org.slf4j.MDC
+import java.time.LocalDate
 
 private val ulid = ULID()
 private val log = KotlinLogging.logger {}
