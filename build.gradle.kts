@@ -63,7 +63,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
 
     // mdc coroutine plugin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.3.4")
+    implementation(Kotlin.Coroutines.module("slf4j"))
 
     // logging
     implementation(Kotlin.Logging.kotlinLogging)
