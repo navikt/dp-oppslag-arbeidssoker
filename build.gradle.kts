@@ -59,8 +59,9 @@ dependencies {
     implementation(Ktor.library("client-serialization-jvm"))
     implementation(Ktor.library("client-logging-jvm"))
     implementation(Ktor.library("client-serialization-jvm"))
+    implementation(Ktor.serverNetty)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
 
     // mdc coroutine plugin
     implementation(Kotlin.Coroutines.module("slf4j"))
