@@ -17,15 +17,14 @@ import io.ktor.client.request.parameter
 import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.PrimitiveDescriptor
-import kotlinx.serialization.PrimitiveKind
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import mu.KotlinLogging
 import no.nav.dagpenger.ktor.client.auth.providers.bearer
 import no.nav.dagpenger.ktor.client.metrics.PrometheusMetrics
@@ -44,7 +43,12 @@ internal class VeilarbArbeidssøkerRegister(
 ) : ArbeidssøkerRegister {
     private val client: HttpClient = HttpClient(httpClientEngine) {
         install(JsonFeature) {
-            serializer = KotlinxSerializer(Json(JsonConfiguration.Stable.copy(ignoreUnknownKeys = true)))
+            // serializer = KotlinxSerializer(Json(JsonConfiguration.Stable.copy(ignoreUnknownKeys = true)))
+            serializer = KotlinxSerializer(
+                Json {
+                    ignoreUnknownKeys = true
+                },
+            )
         }
 
         install(Logging) {
@@ -111,7 +115,7 @@ internal data class ResponsePeriode(
 
 @Serializer(forClass = LocalDate::class)
 object LocalDateSerializer : KSerializer<LocalDate> {
-    override val descriptor = PrimitiveDescriptor("java.time.LocalDateTime", PrimitiveKind.STRING)
+    override val descriptor = PrimitiveSerialDescriptor("java.time.LocalDateTime", PrimitiveKind.STRING)
     override fun deserialize(decoder: Decoder): LocalDate = LocalDate.parse(decoder.decodeString())
     override fun serialize(encoder: Encoder, value: LocalDate) = encoder.encodeString(value.toString())
 }

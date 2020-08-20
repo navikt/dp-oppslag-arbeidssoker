@@ -19,13 +19,12 @@ import io.ktor.http.hostWithPort
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import mu.withLoggingContext
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 internal class VeilarbArbeidssøkerRegisterTest {
-    private val json = Json(JsonConfiguration.Stable)
+    private val json = Json {}
     private val client =
         VeilarbArbeidssøkerRegister(
             tokenProvider = { "" },
@@ -36,7 +35,7 @@ internal class VeilarbArbeidssøkerRegisterTest {
                         validerRequest(request)
 
                         respondJson(
-                            json.stringify(
+                            json.encodeToString(
                                 Arbeidssokerperioder.serializer(),
 
                                 Arbeidssokerperioder(
