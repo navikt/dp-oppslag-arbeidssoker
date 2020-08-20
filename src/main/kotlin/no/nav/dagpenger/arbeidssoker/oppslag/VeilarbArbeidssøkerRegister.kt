@@ -43,7 +43,6 @@ internal class VeilarbArbeidssøkerRegister(
 ) : ArbeidssøkerRegister {
     private val client: HttpClient = HttpClient(httpClientEngine) {
         install(JsonFeature) {
-            // serializer = KotlinxSerializer(Json(JsonConfiguration.Stable.copy(ignoreUnknownKeys = true)))
             serializer = KotlinxSerializer(
                 Json {
                     ignoreUnknownKeys = true
