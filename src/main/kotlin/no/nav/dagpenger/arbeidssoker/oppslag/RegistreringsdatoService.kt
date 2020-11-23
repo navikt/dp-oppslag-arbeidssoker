@@ -34,16 +34,18 @@ class RegistreringsdatoService(
         runBlocking {
             arbeidssøkerRegister.hentRegistreringsperiode(fnr, LocalDate.now(), LocalDate.now())
                 .also { registreringsperioder ->
-                    if (registreringsperioder.size > 1)
-                        throw IllegalArgumentException("ArbeisøkerRegister returnerer flere perioder")
-                    else {
-                        packet["fakta"]
-                            .map { (it as ObjectNode) to it["behov"].asText() }
-                            .filter { (_, behov) -> behov == REGISTRERINGS_DATO }
-                            .forEach { (faktum) ->
-                                faktum.put("svar", registreringsperioder[0].fom.toString())
-                            }
-                        context.send(packet.toJson())
+                    when {
+                        registreringsperioder.isEmpty() -> throw IllegalArgumentException("arbeidssøkerregister returnerer ingen perioder")
+                        registreringsperioder.size > 1 -> throw IllegalArgumentException("ArbeisøkerRegister returnerer flere perioder")
+                        else -> {
+                            packet["fakta"]
+                                .map { (it as ObjectNode) to it["behov"].asText() }
+                                .filter { (_, behov) -> behov == REGISTRERINGS_DATO }
+                                .forEach { (faktum) ->
+                                    faktum.put("svar", registreringsperioder[0].fom.toString())
+                                }
+                            context.send(packet.toJson())
+                        }
                     }
                 }
         }

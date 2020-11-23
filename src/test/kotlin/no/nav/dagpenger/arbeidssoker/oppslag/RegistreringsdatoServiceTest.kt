@@ -7,6 +7,7 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
 class RegistreringsdatoServiceTest {
@@ -21,11 +22,36 @@ class RegistreringsdatoServiceTest {
 
     @Test
     fun `svarer på behov`() {
+        val dato = LocalDate.of(2020, 1, 1)
         coEvery {
             arbeidsøkerRegister.hentRegistreringsperiode(any(), any(), any())
-        } returns listOf(Periode(LocalDate.now(), LocalDate.now()))
+        } returns listOf(Periode(dato, dato))
         testRapid.sendTestMessage(behovJson)
         assertEquals(1, testRapid.inspektør.size)
+
+        val message = testRapid.inspektør.message(0)
+        assertEquals("faktum_svar", message["@event_name"].asText())
+        assertEquals(dato.toString(), message["fakta"][0]["svar"].asText())
+    }
+
+    @Test
+    fun `kaster exception på flere perioder`() {
+        val dato1 = LocalDate.of(2020, 1, 1)
+        val dato2 = LocalDate.of(2020, 2, 2)
+        coEvery {
+            arbeidsøkerRegister.hentRegistreringsperiode(any(), any(), any())
+        } returns listOf(Periode(dato1, dato1), Periode(dato2, dato2))
+
+        assertThrows<IllegalArgumentException> { testRapid.sendTestMessage(behovJson) }
+    }
+
+    @Test
+    fun `kaster exception på ingen perioder`() {
+        coEvery {
+            arbeidsøkerRegister.hentRegistreringsperiode(any(), any(), any())
+        } returns emptyList()
+
+        assertThrows<IllegalArgumentException> { testRapid.sendTestMessage(behovJson) }
     }
 }
 
