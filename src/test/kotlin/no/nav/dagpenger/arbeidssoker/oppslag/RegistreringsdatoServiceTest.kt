@@ -22,36 +22,28 @@ class RegistreringsdatoServiceTest {
 
     @Test
     fun `svarer på behov`() {
-        val dato = LocalDate.of(2020, 1, 1)
+        val startDato = LocalDate.of(2020, 1, 1)
+        val sluttDato = startDato.plusDays(7)
+        val startDato2 = sluttDato.plusDays(1)
+        val sluttDato2 = sluttDato.plusDays(8)
+
+
         coEvery {
             arbeidsøkerRegister.hentRegistreringsperiode(any(), any(), any())
-        } returns listOf(Periode(dato, dato))
+        } returns listOf(
+                Periode(startDato, sluttDato),
+                Periode(startDato2,sluttDato2)
+        )
         testRapid.sendTestMessage(behovJson)
-        assertEquals(1, testRapid.inspektør.size)
 
+        assertEquals(1, testRapid.inspektør.size)
         val message = testRapid.inspektør.message(0)
         assertEquals("faktum_svar", message["@event_name"].asText())
-        assertEquals(dato.toString(), message["fakta"][0]["svar"].asText())
-    }
+        assertEquals(startDato.toString(), message["fakta"][0]["svar"][0]["fom"].asText())
+        assertEquals(sluttDato.toString(), message["fakta"][0]["svar"][0]["tom"].asText())
+        assertEquals(startDato2.toString(), message["fakta"][0]["svar"][1]["fom"].asText())
+        assertEquals(sluttDato2.toString(), message["fakta"][0]["svar"][1]["tom"].asText())
 
-    @Test
-    fun `kaster exception på flere perioder`() {
-        val dato1 = LocalDate.of(2020, 1, 1)
-        val dato2 = LocalDate.of(2020, 2, 2)
-        coEvery {
-            arbeidsøkerRegister.hentRegistreringsperiode(any(), any(), any())
-        } returns listOf(Periode(dato1, dato1), Periode(dato2, dato2))
-
-        assertThrows<IllegalArgumentException> { testRapid.sendTestMessage(behovJson) }
-    }
-
-    @Test
-    fun `kaster exception på ingen perioder`() {
-        coEvery {
-            arbeidsøkerRegister.hentRegistreringsperiode(any(), any(), any())
-        } returns emptyList()
-
-        assertThrows<IllegalArgumentException> { testRapid.sendTestMessage(behovJson) }
     }
 }
 
@@ -68,11 +60,10 @@ private val behovJson =
         {
           "behov": "Registreringsdato"
         }
-        
       ],
       "@behov": [
         "Registreringsdato"
       ],
-      "InnsendtSøknadsId": "123"
+        "Søknadstidspunkt": "2020-11-09"
     }
     """.trimIndent()
