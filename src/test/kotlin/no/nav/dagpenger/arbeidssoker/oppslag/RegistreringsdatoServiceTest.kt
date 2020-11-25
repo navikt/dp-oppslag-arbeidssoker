@@ -7,7 +7,6 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
 class RegistreringsdatoServiceTest {
@@ -27,23 +26,23 @@ class RegistreringsdatoServiceTest {
         val startDato2 = sluttDato.plusDays(1)
         val sluttDato2 = sluttDato.plusDays(8)
 
-
         coEvery {
             arbeidsøkerRegister.hentRegistreringsperiode(any(), any(), any())
         } returns listOf(
-                Periode(startDato, sluttDato),
-                Periode(startDato2,sluttDato2)
+            Periode(startDato, sluttDato),
+            Periode(startDato2, sluttDato2)
         )
         testRapid.sendTestMessage(behovJson)
 
-        assertEquals(1, testRapid.inspektør.size)
-        val message = testRapid.inspektør.message(0)
-        assertEquals("faktum_svar", message["@event_name"].asText())
-        assertEquals(startDato.toString(), message["fakta"][0]["svar"][0]["fom"].asText())
-        assertEquals(sluttDato.toString(), message["fakta"][0]["svar"][0]["tom"].asText())
-        assertEquals(startDato2.toString(), message["fakta"][0]["svar"][1]["fom"].asText())
-        assertEquals(sluttDato2.toString(), message["fakta"][0]["svar"][1]["tom"].asText())
-
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            field(0, "@løsning")["Registreringsdato"].also { løsning ->
+                assertEquals(startDato.toString(), løsning[0]["fom"].asText())
+                assertEquals(sluttDato.toString(), løsning[0]["tom"].asText())
+                assertEquals(startDato2.toString(), løsning[1]["fom"].asText())
+                assertEquals(sluttDato2.toString(), løsning[1]["tom"].asText())
+            }
+        }
     }
 }
 
