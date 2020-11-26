@@ -22,9 +22,10 @@ class RegistreringsdatoService(
     init {
         River(rapidsConnection).apply {
             validate { it.demandAll("@behov", listOf(REGISTRERINGS_DATO)) }
+            validate { it.demandValue("@event_name", "behov") }
             validate { it.requireKey("fnr") }
-            validate { it.requireKey("fakta")}
-            validate { it.requireKey(SØKNADS_TIDSPUNKT)}
+            validate { it.requireKey("fakta") }
+            validate { it.requireKey(SØKNADS_TIDSPUNKT) }
         }.register(this)
     }
 
@@ -40,23 +41,22 @@ class RegistreringsdatoService(
         runBlocking {
             arbeidssøkerRegister.hentRegistreringsperiode(fnr, søknadstidspunkt, LocalDate.now())
                 .also { registreringsperioder ->
-                            packet["fakta"]
-                                .map { (it as ObjectNode) to it["behov"].asText() }
-                                .filter { (_, behov) -> behov == REGISTRERINGS_DATO }
-                                .forEach { (faktum) ->
-                                    faktum.set<ArrayNode>("svar", toJson(registreringsperioder))
-                                }
-                            context.send(packet.toJson())
+                    packet["fakta"]
+                        .map { (it as ObjectNode) to it["behov"].asText() }
+                        .filter { (_, behov) -> behov == REGISTRERINGS_DATO }
+                        .forEach { (faktum) ->
+                            faktum.set<ArrayNode>("svar", toJson(registreringsperioder))
+                        }
+                    context.send(packet.toJson())
                 }
         }
     }
 
-    private fun toJson(registreringsPerioder: List<Periode>): ArrayNode
-    {
+    private fun toJson(registreringsPerioder: List<Periode>): ArrayNode {
         val mapper = ObjectMapper()
         mapper.createArrayNode().also { root ->
-            registreringsPerioder.forEach {periode ->
-                mapper.createObjectNode().also {node ->
+            registreringsPerioder.forEach { periode ->
+                mapper.createObjectNode().also { node ->
                     node.put("fom", periode.fom.toString())
                     node.put("tom", periode.tom.toString())
                     root.add(node)
