@@ -24,14 +24,15 @@ class RegistreringsperioderService(
     init {
         River(rapidsConnection).apply {
             validate { it.demandAll("@behov", listOf(behov)) }
-            validate { it.requireKey("fnr") }
+            validate { it.forbid("@løsning") }
+            validate { it.requireKey("identer") }
             validate { it.requireKey("fakta") }
             validate { it.requireKey("Søknadstidspunkt") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
-        val fnr = packet["fnr"].asText()
+        val fnr = packet["identer"].first { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }["id"].asText()
         val søknadstidspunkt = packet["Søknadstidspunkt"].asLocalDate()
 
         runBlocking {
