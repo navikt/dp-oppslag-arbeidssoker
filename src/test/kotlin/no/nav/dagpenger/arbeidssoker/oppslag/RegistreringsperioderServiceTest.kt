@@ -9,14 +9,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class RegistreringsdatoServiceTest {
+class RegistreringsperioderServiceTest {
     private val testRapid = TestRapid()
     private val arbeidsøkerRegister: ArbeidssøkerRegister = mockk()
 
     @BeforeEach
     fun setup() {
         testRapid.reset()
-        RegistreringsdatoService(testRapid, arbeidsøkerRegister)
+        RegistreringsperioderService(testRapid, arbeidsøkerRegister)
     }
 
     @Test
@@ -36,7 +36,7 @@ class RegistreringsdatoServiceTest {
 
         with(testRapid.inspektør) {
             assertEquals(1, size)
-            field(0, "@løsning")["Registreringsdato"].also { løsning ->
+            field(0, "@løsning")["Registreringsperioder"].also { løsning ->
                 assertEquals(startDato.toString(), løsning[0]["fom"].asText())
                 assertEquals(sluttDato.toString(), løsning[0]["tom"].asText())
                 assertEquals(startDato2.toString(), løsning[1]["fom"].asText())
@@ -57,11 +57,11 @@ private val behovJson =
       "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
       "fakta": [ 
         {
-          "behov": "Registreringsdato"
+          "behov": "Registreringsperioder"
         }
       ],
       "@behov": [
-        "Registreringsdato"
+        "Registreringsperioder"
       ],
         "Søknadstidspunkt": "2020-11-09"
     }

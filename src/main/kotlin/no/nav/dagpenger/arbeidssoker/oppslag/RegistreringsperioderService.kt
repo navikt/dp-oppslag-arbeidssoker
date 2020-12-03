@@ -12,13 +12,18 @@ import java.time.LocalDate
 private val log = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
-class RegistreringsdatoService(
+class RegistreringsperioderService(
     rapidsConnection: RapidsConnection,
     private val arbeidssøkerRegister: ArbeidssøkerRegister
 ) : River.PacketListener {
+
+    companion object {
+        private const val behov = "Registreringsperioder"
+    }
+
     init {
         River(rapidsConnection).apply {
-            validate { it.demandAll("@behov", listOf("Registreringsdato")) }
+            validate { it.demandAll("@behov", listOf(behov)) }
             validate { it.requireKey("fnr") }
             validate { it.requireKey("fakta") }
             validate { it.requireKey("Søknadstidspunkt") }
@@ -33,7 +38,7 @@ class RegistreringsdatoService(
             arbeidssøkerRegister.hentRegistreringsperiode(fnr, søknadstidspunkt, LocalDate.now())
         }.also { registreringsperioder ->
             packet["@løsning"] = mapOf(
-                "Registreringsdato" to registreringsperioder
+                behov to registreringsperioder
             )
         }
 
