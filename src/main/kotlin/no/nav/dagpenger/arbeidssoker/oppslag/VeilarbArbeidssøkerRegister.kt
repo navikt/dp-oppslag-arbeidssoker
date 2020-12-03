@@ -74,7 +74,7 @@ internal class VeilarbArbeidssøkerRegister(
 
         defaultRequest {
             header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
-            header("Nav-Call-Id", runCatching { MDC.get(mdcBehovKey) }.getOrElse { ulid.nextULID() })
+            header("Nav-Call-Id", runCatching { MDC.get(mdcSøknadIdKey) }.getOrElse { ulid.nextULID() })
         }
     }
 

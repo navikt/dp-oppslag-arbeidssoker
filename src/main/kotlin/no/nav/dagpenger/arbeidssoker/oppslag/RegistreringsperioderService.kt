@@ -2,6 +2,7 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -26,25 +27,32 @@ class RegistreringsperioderService(
             validate { it.forbid("@løsning") }
             validate { it.requireKey("identer") }
             validate { it.requireKey("fakta") }
+            validate { it.interestedIn("søknad_uuid") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         val fnr = packet["identer"].first { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }["id"].asText()
 
-        runBlocking {
-            arbeidssøkerRegister.hentRegistreringsperiode(
-                fnr,
-                LocalDate.now().minusDays(105),
-                LocalDate.now()
-            )
-        }.also { registreringsperioder ->
-            packet["@løsning"] = mapOf(
-                behov to registreringsperioder
-            )
+        val søknadId = packet["søknad_uuid"].asText()
+
+        withLoggingContext(
+            mdcSøknadIdKey to søknadId
+        ) {
+            runBlocking {
+                arbeidssøkerRegister.hentRegistreringsperiode(
+                    fnr,
+                    fom = LocalDate.now().minusDays(105),
+                    tom = LocalDate.now()
+                )
+            }.also { registreringsperioder ->
+                packet["@løsning"] = mapOf(
+                    behov to registreringsperioder
+                )
+            }
         }
 
-        log.info { "løser behov for ${packet["@id"].asText()}" }
+        log.info { "løser behov for $søknadId" }
 
         context.send(packet.toJson())
     }
