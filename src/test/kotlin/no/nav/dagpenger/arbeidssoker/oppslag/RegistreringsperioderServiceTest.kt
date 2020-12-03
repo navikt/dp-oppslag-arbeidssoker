@@ -62,7 +62,6 @@ private val behovJson =
       ],
       "@behov": [
         "Registreringsperioder"
-      ],
-        "Søknadstidspunkt": "2020-11-09"
+      ]
     }
     """.trimIndent()

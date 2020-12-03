@@ -6,7 +6,6 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDate
 import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
@@ -27,16 +26,18 @@ class RegistreringsperioderService(
             validate { it.forbid("@løsning") }
             validate { it.requireKey("identer") }
             validate { it.requireKey("fakta") }
-            validate { it.requireKey("Søknadstidspunkt") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         val fnr = packet["identer"].first { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }["id"].asText()
-        val søknadstidspunkt = packet["Søknadstidspunkt"].asLocalDate()
 
         runBlocking {
-            arbeidssøkerRegister.hentRegistreringsperiode(fnr, søknadstidspunkt, LocalDate.now())
+            arbeidssøkerRegister.hentRegistreringsperiode(
+                fnr,
+                LocalDate.now().minusDays(105),
+                LocalDate.now()
+            )
         }.also { registreringsperioder ->
             packet["@løsning"] = mapOf(
                 behov to registreringsperioder
