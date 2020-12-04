@@ -102,9 +102,9 @@ internal class VeilarbArbeidssøkerRegister(
             }.also {
                 log.info { "Fant ${it.size} arbeidssøkerperioder" }
             }
-        } catch(e: ClientRequestException) {
+        } catch (e: ClientRequestException) {
             val responseBody = e.response?.readText()
-            log.error(e) {"Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody"}
+            log.error(e) { "Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody" }
             throw e
         }
     }
