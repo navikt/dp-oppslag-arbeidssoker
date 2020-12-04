@@ -96,7 +96,7 @@ internal class VeilarbArbeidssøkerRegister(
                 it.arbeidssokerperioder.map { responsePeriode ->
                     Periode(
                         fom = responsePeriode.fraOgMedDato,
-                        tom = responsePeriode.tilOgMedDato
+                        tom = responsePeriode.tilOgMedDato ?: LocalDate.MAX
                     )
                 }
             }.also {
