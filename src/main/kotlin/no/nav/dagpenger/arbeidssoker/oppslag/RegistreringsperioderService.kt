@@ -1,6 +1,7 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -32,14 +33,15 @@ class RegistreringsperioderService(
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
-        val fnr = packet["identer"].first { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }["id"].asText()
+        val fnr =
+            packet["identer"].first { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }["id"].asText()
 
         val søknadId = packet["søknad_uuid"].asText()
 
         withLoggingContext(
             mdcSøknadIdKey to søknadId
         ) {
-            runBlocking {
+            runBlocking(MDCContext()) {
                 arbeidssøkerRegister.hentRegistreringsperiode(
                     fnr,
                     fom = LocalDate.now().minusDays(105),
