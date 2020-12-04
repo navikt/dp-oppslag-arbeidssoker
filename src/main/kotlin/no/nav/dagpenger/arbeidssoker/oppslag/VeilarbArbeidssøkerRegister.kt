@@ -4,6 +4,7 @@ import de.huxhorn.sulky.ulid.ULID
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.features.ClientRequestException
 import io.ktor.client.features.auth.Auth
 import io.ktor.client.features.defaultRequest
 import io.ktor.client.features.json.JsonFeature
@@ -14,6 +15,7 @@ import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
+import io.ktor.client.statement.readText
 import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -85,19 +87,25 @@ internal class VeilarbArbeidssøkerRegister(
     ): List<Periode> = withContext(Dispatchers.IO) {
         log.info { "Henter arbeidssøkerperioder for fra og med $fom til og med $tom" }
 
-        client.get<Arbeidssokerperioder>("$baseUrl/arbeidssoker/perioder") {
-            parameter("fnr", fnr)
-            parameter("fraOgMed", fom)
-            parameter("tilOgMed", tom)
-        }.let {
-            it.arbeidssokerperioder.map { responsePeriode ->
-                Periode(
-                    fom = responsePeriode.fraOgMedDato,
-                    tom = responsePeriode.tilOgMedDato
-                )
+        try {
+            client.get<Arbeidssokerperioder>("$baseUrl/arbeidssoker/perioder") {
+                parameter("fnr", fnr)
+                parameter("fraOgMed", fom)
+                parameter("tilOgMed", tom)
+            }.let {
+                it.arbeidssokerperioder.map { responsePeriode ->
+                    Periode(
+                        fom = responsePeriode.fraOgMedDato,
+                        tom = responsePeriode.tilOgMedDato
+                    )
+                }
+            }.also {
+                log.info { "Fant ${it.size} arbeidssøkerperioder" }
             }
-        }.also {
-            log.info { "Fant ${it.size} arbeidssøkerperioder" }
+        } catch(e: ClientRequestException) {
+            val responseBody = e.response?.readText()
+            log.error(e) {"Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody"}
+            throw e
         }
     }
 }
