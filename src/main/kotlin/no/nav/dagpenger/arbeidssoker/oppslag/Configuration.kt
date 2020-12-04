@@ -66,7 +66,7 @@ private fun config() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getPro
     else -> systemProperties() overriding EnvironmentVariables overriding localProperties
 }
 
-const val mdcSøknadIdKey = "søknadId"
+const val mdcSøknadIdKey = "soknadId"
 
 data class Configuration(
     val serviceuser: Serviceuser = Serviceuser(),
