@@ -5,6 +5,7 @@ import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
@@ -32,7 +33,7 @@ class RegistreringsperioderService(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val fnr =
             packet["identer"].first { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }["id"].asText()
 
@@ -56,10 +57,10 @@ class RegistreringsperioderService(
 
         log.info { "løser behov for $søknadId" }
 
-        context.send(packet.toJson())
+        context.publish(packet.toJson())
     }
 
-    override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
+    override fun onError(problems: MessageProblems, context: MessageContext) {
         log.error { problems.toString() }
         sikkerlogg.error { problems.toExtendedReport() }
     }
