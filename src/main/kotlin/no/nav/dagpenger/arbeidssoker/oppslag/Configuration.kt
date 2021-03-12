@@ -5,7 +5,6 @@ import com.natpryce.konfig.ConfigurationProperties.Companion.systemProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.booleanType
-import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 import no.nav.dagpenger.arbeidssoker.oppslag.Profile.DEV
@@ -13,19 +12,20 @@ import no.nav.dagpenger.arbeidssoker.oppslag.Profile.LOCAL
 import no.nav.dagpenger.arbeidssoker.oppslag.Profile.PROD
 import no.nav.dagpenger.arbeidssoker.oppslag.Profile.valueOf
 
-const val DAGPENGER_BEHOV_TOPIC = "privat-dagpenger-behov-v2"
+private val defaultProperties = ConfigurationMap(
+    mapOf(
+        "KAFKA_CONSUMER_GROUP_ID" to "dp-oppslag-arbeidssoker-v1",
+        "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
+        "KAFKA_RESET_POLICY" to "latest",
+        "HTTP_PORT" to "8080",
+    )
+)
 
 private val localProperties = ConfigurationMap(
     mapOf(
-        "kafka.bootstrap.servers" to "localhost:9092",
         "application.profile" to LOCAL.toString(),
-        "application.httpPort" to "8080",
-        "kafka.topic" to "topic",
         "username" to "username",
         "password" to "pass",
-        "kafka.reset.policy" to "earliest",
-        "nav.truststore.path" to "bla/bla",
-        "nav.truststore.password" to "foo",
         "oppfoelgingsstatus.v2.url" to "kttps://localhost/ail_ws/Oppfoelgingsstatus_v2",
         "veilarbregistrering.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
         "sts.baseUrl" to "http://localhost",
@@ -35,10 +35,7 @@ private val localProperties = ConfigurationMap(
 )
 private val devProperties = ConfigurationMap(
     mapOf(
-        "kafka.bootstrap.servers" to "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
         "application.profile" to DEV.toString(),
-        "application.httpPort" to "8080",
-        "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
         "oppfoelgingsstatus.v2.url" to "https://arena-q1.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
         "veilarbregistrering.url" to "https://veilarbregistrering-q1.nais.preprod.local/veilarbregistrering/api",
         "sts.baseUrl" to "http://security-token-service.default.svc.nais.local",
@@ -48,10 +45,7 @@ private val devProperties = ConfigurationMap(
 )
 private val prodProperties = ConfigurationMap(
     mapOf(
-        "kafka.bootstrap.servers" to "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
         "application.profile" to PROD.toString(),
-        "application.httpPort" to "8080",
-        "kafka.topic" to DAGPENGER_BEHOV_TOPIC,
         "oppfoelgingsstatus.v2.url" to "https://arena.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
         "veilarbregistrering.url" to "https://veilarbregistrering.nais.adeo.no/veilarbregistrering/api",
         "sts.baseUrl" to "http://security-token-service.default.svc.nais.local",
@@ -61,9 +55,9 @@ private val prodProperties = ConfigurationMap(
 )
 
 private fun config() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
-    "dev-fss" -> systemProperties() overriding EnvironmentVariables overriding devProperties
-    "prod-fss" -> systemProperties() overriding EnvironmentVariables overriding prodProperties
-    else -> systemProperties() overriding EnvironmentVariables overriding localProperties
+    "dev-fss" -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
+    "prod-fss" -> systemProperties() overriding EnvironmentVariables overriding prodProperties overriding defaultProperties
+    else -> systemProperties() overriding EnvironmentVariables overriding localProperties overriding defaultProperties
 }
 
 const val mdcSøknadIdKey = "soknadId"
@@ -78,29 +72,12 @@ data class Configuration(
     val kafka: Kafka = Kafka()
 ) {
     data class Application(
-        val id: String = config().getOrElse(Key("application.id", stringType), "dp-oppslag-arbeidssoker-alfa-1"),
         val profile: Profile = config()[Key("application.profile", stringType)].let { valueOf(it) },
-        val httpPort: Int = config()[Key("application.httpPort", intType)]
     )
 
     data class Kafka(
-        val brokers: String = config()[Key("kafka.bootstrap.servers", stringType)],
-        val topic: String = config()[Key("kafka.topic", stringType)],
-        val consumerGroupId: String = config().getOrElse(
-            Key("application.id", stringType),
-            "dp-oppslag-arbeidssoker-alfa-1"
-        ),
-        val trustStorePath: String = config()[Key("nav.truststore.path", stringType)],
-        val trustStorePassword: String = config()[Key("nav.truststore.password", stringType)],
-        val rapidApplication: Map<String, String> = mapOf(
-            "RAPID_APP_NAME" to "dp-oppslag-arbeidssoker",
-            "KAFKA_BOOTSTRAP_SERVERS" to brokers,
-            "KAFKA_RESET_POLICY" to "earliest",
-            "KAFKA_RAPID_TOPIC" to topic,
-            "KAFKA_CONSUMER_GROUP_ID" to consumerGroupId,
-            "NAV_TRUSTSTORE_PATH" to trustStorePath,
-            "NAV_TRUSTSTORE_PASSWORD" to trustStorePassword
-        ) + System.getenv().filter { it.key.startsWith("NAIS_") }
+        val rapidApplication: Map<String, String> = config().list().reversed()
+            .fold(emptyMap()) { map, pair -> map + pair.second }
     )
 
     data class Serviceuser(
