@@ -34,7 +34,7 @@ spec:
     - name: KAFKA_PREFER_ON_PREM
       value: "true"
   kafka:
-    pool: nav-dev
+    pool: nav-prod
   vault:
     enabled: true
     paths:
