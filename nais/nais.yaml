@@ -31,10 +31,10 @@ spec:
   secureLogs:
     enabled: true
   kafka:
-    pool: nav-dev
+    pool: {{kafka_pool}}
   vault:
     enabled: true
     paths:
-      - kvPath: "serviceuser/data/dev/srvdp-arbeidssoker-o"
+      - kvPath: "serviceuser/data/{{vault_path}}/srvdp-arbeidssoker-o"
         mountPath: "/var/run/secrets/nais.io/service_user/"
-  
+
