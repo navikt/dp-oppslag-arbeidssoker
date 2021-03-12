@@ -30,9 +30,6 @@ spec:
       memory: 512Mi
   secureLogs:
     enabled: true
-  env:
-    - name: KAFKA_PREFER_ON_PREM
-      value: "true"
   kafka:
     pool: nav-prod
   vault:
