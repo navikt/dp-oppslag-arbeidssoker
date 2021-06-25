@@ -26,7 +26,7 @@ class RegistreringsperioderService(
     init {
         River(rapidsConnection).apply {
             validate { it.demandAll("@behov", listOf(behov)) }
-            validate { it.forbid("@løsning") }
+            validate { it.rejectKey("@løsning") }
             validate { it.requireKey("identer") }
             validate { it.requireKey("fakta") }
             validate { it.interestedIn("søknad_uuid") }
