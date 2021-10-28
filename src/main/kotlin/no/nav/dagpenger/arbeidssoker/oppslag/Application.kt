@@ -1,6 +1,7 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
-import no.nav.dagpenger.oidc.StsOidcClient
+import kotlinx.coroutines.runBlocking
+import no.nav.dagpenger.aad.api.ClientCredentialsClient
 import no.nav.helse.rapids_rivers.RapidApplication
 
 fun main() {
@@ -13,14 +14,18 @@ fun main() {
 }
 
 private fun createVeilarbArbeidssøkerRegister(configuration: Configuration): VeilarbArbeidssøkerRegister {
-    return StsOidcClient(
-        stsBaseUrl = configuration.sts.baseUrl,
-        username = configuration.serviceuser.username,
-        password = configuration.serviceuser.password
-    ).run {
+    return ClientCredentialsClient {
+        scope {
+            add(configuration.veilarbregistrering.scope)
+        }
+    }.let { clientCredentialsClient ->
         VeilarbArbeidssøkerRegister(
             configuration.veilarbregistrering.endpoint,
-            { oidcToken().access_token }
+            {
+                runBlocking {
+                    clientCredentialsClient.getAccessToken()
+                }
+            }
         )
     }
 }

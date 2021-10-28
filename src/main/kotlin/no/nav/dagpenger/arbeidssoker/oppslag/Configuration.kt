@@ -18,6 +18,7 @@ private val defaultProperties = ConfigurationMap(
         "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
         "KAFKA_RESET_POLICY" to "latest",
         "HTTP_PORT" to "8080",
+        "veilarbregistrering.scope" to "api://dev-fss.paw.veilarbregistrering/.default"
     )
 )
 
@@ -90,7 +91,8 @@ data class Configuration(
     )
 
     data class VeilarbRegistreringConfig(
-        val endpoint: String = config()[Key("veilarbregistrering.url", stringType)]
+        val endpoint: String = config()[Key("veilarbregistrering.url", stringType)],
+        val scope: String = config()[Key("veilarbregistrering.scope", stringType)]
     )
 
     data class STS(

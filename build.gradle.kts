@@ -49,7 +49,6 @@ dependencies {
     implementation(Ulid.ulid)
 
     // ktor
-    implementation(Dagpenger.Biblioteker.stsKlient)
     implementation(Dagpenger.Biblioteker.Ktor.Client.authBearer)
     implementation(Dagpenger.Biblioteker.Ktor.Client.metrics)
     implementation(Ktor.library("client-auth-jvm"))
@@ -61,6 +60,7 @@ dependencies {
     implementation(Ktor.library("client-serialization-jvm"))
     implementation(Ktor.serverNetty)
 
+    implementation("com.github.navikt.dp-biblioteker:aad-klient:2021.10.22-12.25.95ff9731951b")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
 
     // mdc coroutine plugin

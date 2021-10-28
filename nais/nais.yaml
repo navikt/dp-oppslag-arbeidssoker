@@ -37,4 +37,6 @@ spec:
     paths:
       - kvPath: "serviceuser/data/{{vault_path}}/srvdp-arbeidssoker-o"
         mountPath: "/var/run/secrets/nais.io/service_user/"
-
+  azure:
+    application:
+      enabled: true
