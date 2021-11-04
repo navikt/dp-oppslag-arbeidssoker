@@ -104,6 +104,9 @@ internal class VeilarbArbeidssøkerRegister(
             val responseBody = e.response?.readText()
             log.error(e) { "Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody" }
             throw e
+        } catch (e: Exception) {
+            log.error("Kunne ikke hente arbeidssøkerperiode.", e)
+            throw e
         }
     }
 }
