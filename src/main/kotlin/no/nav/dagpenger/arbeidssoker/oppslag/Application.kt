@@ -16,7 +16,7 @@ fun main() {
 }
 
 private fun createVeilarbArbeidssøkerRegister(configuration: Configuration): VeilarbArbeidssøkerRegister {
-    return ClientCredentialsClient {
+    return ClientCredentialsClient(env = config()) {
         scope {
             add(configuration.veilarbregistrering.scope)
         }
@@ -27,9 +27,7 @@ private fun createVeilarbArbeidssøkerRegister(configuration: Configuration): Ve
                 runBlocking {
                     runCatching {
                         clientCredentialsClient.getAccessToken()
-                    }
-                        .onFailure { log.error("Fikk ikke tak i token:", it) }
-                        .getOrThrow()
+                    }.onFailure { log.error("Fikk ikke tak i token:", it) }.getOrThrow()
                 }
             }
         )
