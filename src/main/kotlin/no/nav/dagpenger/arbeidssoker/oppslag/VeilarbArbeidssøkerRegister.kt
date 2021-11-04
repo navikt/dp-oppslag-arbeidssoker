@@ -7,8 +7,8 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.features.ClientRequestException
 import io.ktor.client.features.auth.Auth
 import io.ktor.client.features.defaultRequest
+import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.features.logging.LogLevel
 import io.ktor.client.features.logging.Logger
 import io.ktor.client.features.logging.Logging
@@ -18,14 +18,6 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.readText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import no.nav.dagpenger.ktor.client.auth.providers.bearer
 import no.nav.dagpenger.ktor.client.metrics.PrometheusMetrics
@@ -43,14 +35,8 @@ internal class VeilarbArbeidssøkerRegister(
 ) : ArbeidssøkerRegister {
     private val client: HttpClient = HttpClient(httpClientEngine) {
         install(JsonFeature) {
-            // serializer = KotlinxSerializer(Json(JsonConfiguration.Stable.copy(ignoreUnknownKeys = true)))
-            serializer = KotlinxSerializer(
-                Json {
-                    ignoreUnknownKeys = true
-                },
-            )
+            serializer = JacksonSerializer()
         }
-
         install(Logging) {
             logger = object : Logger {
                 override fun log(message: String) {
@@ -101,7 +87,7 @@ internal class VeilarbArbeidssøkerRegister(
                 log.info { "Fant ${it.size} arbeidssøkerperioder" }
             }
         } catch (e: ClientRequestException) {
-            val responseBody = e.response?.readText()
+            val responseBody = e.response.readText()
             log.error(e) { "Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody" }
             throw e
         } catch (e: Exception) {
@@ -111,20 +97,9 @@ internal class VeilarbArbeidssøkerRegister(
     }
 }
 
-@Serializable
 internal data class Arbeidssokerperioder(val arbeidssokerperioder: List<ResponsePeriode>)
 
-@Serializable
 internal data class ResponsePeriode(
-    @Serializable(with = LocalDateSerializer::class)
     val fraOgMedDato: LocalDate,
-    @Serializable(with = LocalDateSerializer::class)
     val tilOgMedDato: LocalDate?
 )
-
-@Serializer(forClass = LocalDate::class)
-object LocalDateSerializer : KSerializer<LocalDate> {
-    override val descriptor = PrimitiveSerialDescriptor("java.time.LocalDateTime", PrimitiveKind.STRING)
-    override fun deserialize(decoder: Decoder): LocalDate = LocalDate.parse(decoder.decodeString())
-    override fun serialize(encoder: Encoder, value: LocalDate) = encoder.encodeString(value.toString())
-}
