@@ -49,7 +49,7 @@ private val prodProperties = ConfigurationMap(
         "application.profile" to PROD.toString(),
         "oppfoelgingsstatus.v2.url" to "https://arena.adeo.no/ail_ws/Oppfoelgingsstatus_v2",
         "veilarbregistrering.url" to "https://veilarbregistrering.nais.adeo.no/veilarbregistrering/api",
-        "veilarbregistrering.scope" to "api://prod-fss.paw.veilarbregistrering/.default"
+        "veilarbregistrering.scope" to "api://prod-fss.paw.veilarbregistrering/.default",
         "sts.baseUrl" to "http://security-token-service.default.svc.nais.local",
         "soapsecuritytokenservice.url" to "https://sts.adeo.no/SecurityTokenServiceProvider/",
         "allow.insecure.soap.requests" to true.toString()
