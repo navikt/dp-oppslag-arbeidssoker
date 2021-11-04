@@ -32,6 +32,7 @@ spec:
     enabled: true
   kafka:
     pool: {{kafka_pool}}
+  webproxy: true
   azure:
     application:
       enabled: true
