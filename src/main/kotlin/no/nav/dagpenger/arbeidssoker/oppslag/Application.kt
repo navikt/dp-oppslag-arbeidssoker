@@ -1,9 +1,11 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
 import no.nav.helse.rapids_rivers.RapidApplication
 
+private val log = KotlinLogging.logger {}
 fun main() {
     val configuration = Configuration()
     val veilarbArbeidssøkerRegister = createVeilarbArbeidssøkerRegister(configuration)
@@ -23,7 +25,13 @@ private fun createVeilarbArbeidssøkerRegister(configuration: Configuration): Ve
             configuration.veilarbregistrering.endpoint,
             {
                 runBlocking {
-                    clientCredentialsClient.getAccessToken()
+                    runCatching {
+                        clientCredentialsClient.getAccessToken()
+
+                    }
+                        .onFailure { log.error("Fikk ikke tak i token:", it) }
+                        .getOrThrow()
+
                 }
             }
         )
