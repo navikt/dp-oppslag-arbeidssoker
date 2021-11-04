@@ -24,9 +24,6 @@ private val defaultProperties = ConfigurationMap(
 
 private val localProperties = ConfigurationMap(
     mapOf(
-        "application.profile" to LOCAL.toString(),
-        "username" to "username",
-        "password" to "pass",
         "oppfoelgingsstatus.v2.url" to "kttps://localhost/ail_ws/Oppfoelgingsstatus_v2",
         "veilarbregistrering.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
         "sts.baseUrl" to "http://localhost",
@@ -42,6 +39,7 @@ private val devProperties = ConfigurationMap(
         "sts.baseUrl" to "http://security-token-service.default.svc.nais.local",
         "soapsecuritytokenservice.url" to "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
         "allow.insecure.soap.requests" to true.toString()
+        "veilarbregistrering.scope" to "api://dev-fss.paw.veilarbregistrering/.default"
     )
 )
 private val prodProperties = ConfigurationMap(
@@ -65,9 +63,6 @@ private fun config() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getPro
 const val mdcSøknadIdKey = "soknadId"
 
 data class Configuration(
-    val serviceuser: Serviceuser = Serviceuser(),
-    val application: Application = Application(),
-    val oppfoelgingsstatus: OppfoelginsstatusConfig = OppfoelginsstatusConfig(),
     val veilarbregistrering: VeilarbRegistreringConfig = VeilarbRegistreringConfig(),
     val sts: STS = STS(),
     val soapSTSClient: SoapSTSClient = SoapSTSClient(),
