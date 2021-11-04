@@ -27,11 +27,9 @@ private fun createVeilarbArbeidssøkerRegister(configuration: Configuration): Ve
                 runBlocking {
                     runCatching {
                         clientCredentialsClient.getAccessToken()
-
                     }
                         .onFailure { log.error("Fikk ikke tak i token:", it) }
                         .getOrThrow()
-
                 }
             }
         )
