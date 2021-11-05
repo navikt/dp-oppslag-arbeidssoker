@@ -47,7 +47,7 @@ private fun createVeilarbArbeidssøkerRegister(configuration: Configuration): Ve
                     }
                 }
 
-                level = LogLevel.ALL
+                level = LogLevel.INFO
             }
         }
     ) {

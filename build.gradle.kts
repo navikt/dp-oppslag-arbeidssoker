@@ -36,6 +36,7 @@ dependencies {
     implementation(Ktor.library("client-jackson"))
     implementation(Ktor.library("client-cio"))
     implementation(Ktor.library("client-logging-jvm"))
+    implementation(Jackson.jsr310)
     implementation(Ktor.serverNetty)
     implementation("com.github.navikt.dp-biblioteker:aad-klient:2021.10.22-12.25.95ff9731951b")
 

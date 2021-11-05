@@ -1,5 +1,6 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import de.huxhorn.sulky.ulid.ULID
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
@@ -35,7 +36,9 @@ internal class VeilarbArbeidssøkerRegister(
 ) : ArbeidssøkerRegister {
     private val client: HttpClient = HttpClient(httpClientEngine) {
         install(JsonFeature) {
-            serializer = JacksonSerializer()
+            serializer = JacksonSerializer() {
+                this.registerModule(JavaTimeModule())
+            }
         }
         install(Logging) {
             logger = object : Logger {
@@ -44,7 +47,7 @@ internal class VeilarbArbeidssøkerRegister(
                 }
             }
 
-            level = LogLevel.ALL
+            level = LogLevel.INFO
         }
 
         install(Auth) {
