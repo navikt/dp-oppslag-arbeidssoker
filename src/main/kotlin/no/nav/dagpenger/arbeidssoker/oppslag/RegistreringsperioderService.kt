@@ -3,12 +3,12 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
-import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.withMDC
 import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
@@ -29,7 +29,7 @@ class RegistreringsperioderService(
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("identer") }
             validate { it.requireKey("fakta") }
-            validate { it.interestedIn("søknad_uuid") }
+            validate { it.interestedIn("søknad_uuid", "@behovId") }
         }.register(this)
     }
 
@@ -39,8 +39,12 @@ class RegistreringsperioderService(
 
         val søknadId = packet["søknad_uuid"].asText()
 
-        withLoggingContext(
-            mdcSøknadIdKey to søknadId
+        withMDC(
+            mapOf(
+                mdcSøknadIdKey to søknadId,
+                "behovId" to packet["@behovId"].asText()
+            )
+
         ) {
             runBlocking(MDCContext()) {
                 arbeidssøkerRegister.hentRegistreringsperiode(

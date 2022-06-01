@@ -72,7 +72,7 @@ internal class VeilarbArbeidssøkerRegister(
         fom: LocalDate,
         tom: LocalDate
     ): List<Periode> = withContext(Dispatchers.IO) {
-        log.info { "Henter arbeidssøkerperioder for fra og med $fom til og med $tom" }
+        log.info { "Henter arbeidssøkerperioder fra og med '$fom' til og med '$tom'" }
 
         try {
             client.get<Arbeidssokerperioder>("$baseUrl/arbeidssoker/perioder") {

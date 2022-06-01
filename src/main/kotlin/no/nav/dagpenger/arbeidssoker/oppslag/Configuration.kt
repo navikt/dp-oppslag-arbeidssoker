@@ -41,7 +41,7 @@ internal fun config() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getPr
     else -> systemProperties() overriding EnvironmentVariables overriding localProperties overriding defaultProperties
 }
 
-const val mdcSøknadIdKey = "soknadId"
+const val mdcSøknadIdKey = "søknad_uuid"
 
 data class Configuration(
     val veilarbregistrering: VeilarbRegistreringConfig = VeilarbRegistreringConfig(),
