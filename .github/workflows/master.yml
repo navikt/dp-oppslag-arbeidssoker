@@ -1,11 +1,6 @@
 name: Bygg og deploy ved push til main
 
-on:
-  # Trigger the workflow on push or pull request,
-  # but only for the master branch
-  push:
-    branches:
-      - main
+on: [push]
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
@@ -54,8 +49,8 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: .nais/nais.yaml
-          VARS: .nais/dev/vars.yaml
+          RESOURCE: nais/nais.yaml
+          VARS: nais/dev/vars.yaml
           PRINT_PAYLOAD: true
 
 #  deploy-prod:
@@ -69,6 +64,6 @@ jobs:
 #        env:
 #          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
 #          CLUSTER: prod-gcp
-#          RESOURCE: .nais/nais.yaml
-#          VARS: .nais/prod/vars.yaml
+#          RESOURCE: nais/nais.yaml
+#          VARS: nais/prod/vars.yaml
 #          PRINT_PAYLOAD: true
