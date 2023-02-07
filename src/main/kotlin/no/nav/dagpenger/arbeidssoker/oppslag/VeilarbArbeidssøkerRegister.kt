@@ -3,25 +3,23 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import de.huxhorn.sulky.ulid.ULID
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.features.ClientRequestException
-import io.ktor.client.features.auth.Auth
-import io.ktor.client.features.defaultRequest
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.logging.LogLevel
-import io.ktor.client.features.logging.Logger
-import io.ktor.client.features.logging.Logging
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
-import io.ktor.client.statement.readText
+import io.ktor.client.statement.bodyAsText
+import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
-import no.nav.dagpenger.ktor.client.auth.providers.bearer
-import no.nav.dagpenger.ktor.client.metrics.PrometheusMetrics
 import org.slf4j.MDC
 import java.time.LocalDate
 
@@ -35,8 +33,8 @@ internal class VeilarbArbeidssøkerRegister(
     httpClientEngine: HttpClientEngine = CIO.create {}
 ) : ArbeidssøkerRegister {
     private val client: HttpClient = HttpClient(httpClientEngine) {
-        install(JsonFeature) {
-            serializer = JacksonSerializer() {
+        install(ContentNegotiation) {
+            jackson {
                 this.registerModule(JavaTimeModule())
             }
         }
@@ -50,20 +48,10 @@ internal class VeilarbArbeidssøkerRegister(
             level = LogLevel.INFO
         }
 
-        install(Auth) {
-            bearer {
-                this.tokenProvider = tokenProvider
-                sendWithoutRequest = true
-            }
-        }
-
-        install(PrometheusMetrics) {
-            baseName = "ktor_client_veilarbregistrering"
-        }
-
         defaultRequest {
             header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
             header("Nav-Call-Id", runCatching { MDC.get(mdcSøknadIdKey) }.getOrElse { ulid.nextULID() })
+            header("Authorization", "Bearer ${tokenProvider.invoke()}")
         }
     }
 
@@ -73,13 +61,12 @@ internal class VeilarbArbeidssøkerRegister(
         tom: LocalDate
     ): List<Periode> = withContext(Dispatchers.IO) {
         log.info { "Henter arbeidssøkerperioder fra og med '$fom' til og med '$tom'" }
-
         try {
-            client.get<Arbeidssokerperioder>("$baseUrl/arbeidssoker/perioder") {
+            client.get("$baseUrl/arbeidssoker/perioder") {
                 parameter("fnr", fnr)
                 parameter("fraOgMed", fom)
                 parameter("tilOgMed", tom)
-            }.let {
+            }.body<Arbeidssokerperioder>().let {
                 it.arbeidssokerperioder.map { responsePeriode ->
                     Periode(
                         fom = responsePeriode.fraOgMedDato,
@@ -90,7 +77,7 @@ internal class VeilarbArbeidssøkerRegister(
                 log.info { "Fant ${it.size} arbeidssøkerperioder" }
             }
         } catch (e: ClientRequestException) {
-            val responseBody = e.response.readText()
+            val responseBody = e.response.bodyAsText()
             log.error(e) { "Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody" }
             throw e
         } catch (e: Exception) {

@@ -1,4 +1,3 @@
-
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
@@ -20,7 +19,7 @@ repositories {
 
 application {
     applicationName = "dp-oppslag-arbeidssoker"
-    mainClassName = "no.nav.dagpenger.arbeidssoker.oppslag.ApplicationKt"
+    mainClass.set("no.nav.dagpenger.arbeidssoker.oppslag.ApplicationKt")
 }
 
 dependencies {
@@ -29,16 +28,12 @@ dependencies {
     implementation(Ulid.ulid)
 
     // ktor
-    implementation(Dagpenger.Biblioteker.Ktor.Client.authBearer)
-    implementation(Dagpenger.Biblioteker.Ktor.Client.metrics)
-    implementation(Ktor.library("client-auth-jvm"))
-    implementation(Ktor.library("client-core"))
-    implementation(Ktor.library("client-jackson"))
-    implementation(Ktor.library("client-cio"))
-    implementation(Ktor.library("client-logging-jvm"))
+    implementation(Ktor2.Client.library("cio"))
+    implementation(Ktor2.Client.library("content-negotiation"))
+    implementation(Ktor2.Client.library("logging"))
+    implementation("io.ktor:ktor-serialization-jackson:${Ktor2.version}")
+    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:${Dagpenger.Biblioteker.version}")
     implementation(Jackson.jsr310)
-    implementation(Ktor.serverNetty)
-    implementation("com.github.navikt.dp-biblioteker:aad-klient:2021.10.22-12.25.95ff9731951b")
 
     // mdc coroutine plugin
     implementation(Kotlin.Coroutines.module("slf4j"))
@@ -50,14 +45,14 @@ dependencies {
     implementation(Konfig.konfig)
 
     // rapid rivers
-    implementation(RapidAndRivers)
+    implementation(RapidAndRiversKtor2)
 
     // test
     testRuntimeOnly(Junit5.engine)
     testImplementation(Junit5.api)
     testImplementation(KoTest.runner)
     testImplementation(KoTest.assertions)
-    testImplementation(Ktor.library("client-mock-jvm"))
+    testImplementation(Ktor2.Client.library("mock"))
     testImplementation(Mockk.mockk)
 }
 
@@ -87,7 +82,7 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "6.2.2"
+    gradleVersion = "7.6"
 }
 
 tasks.named("shadowJar") {

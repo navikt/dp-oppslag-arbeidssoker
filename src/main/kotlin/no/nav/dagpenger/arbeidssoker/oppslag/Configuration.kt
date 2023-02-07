@@ -6,6 +6,9 @@ import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
+import kotlinx.coroutines.runBlocking
+import no.nav.dagpenger.oauth2.CachedOauth2Client
+import no.nav.dagpenger.oauth2.OAuth2Config
 
 private val defaultProperties = ConfigurationMap(
     mapOf(
@@ -35,25 +38,41 @@ private val prodProperties = ConfigurationMap(
     )
 )
 
-internal fun config() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
-    "dev-fss" -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
-    "prod-fss" -> systemProperties() overriding EnvironmentVariables overriding prodProperties overriding defaultProperties
-    else -> systemProperties() overriding EnvironmentVariables overriding localProperties overriding defaultProperties
-}
+internal val config
+    get() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
+        "dev-gcp" -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
+        "prod-gcp" -> systemProperties() overriding EnvironmentVariables overriding prodProperties overriding defaultProperties
+        else -> systemProperties() overriding EnvironmentVariables overriding localProperties overriding defaultProperties
+    }
 
 const val mdcSøknadIdKey = "søknad_uuid"
 
-data class Configuration(
-    val veilarbregistrering: VeilarbRegistreringConfig = VeilarbRegistreringConfig(),
-    val kafka: Kafka = Kafka()
-) {
-    data class Kafka(
-        val rapidApplication: Map<String, String> = config().list().reversed()
-            .fold(emptyMap()) { map, pair -> map + pair.second }
+private val azureAdClient: CachedOauth2Client by lazy {
+    val azureAdConfig = OAuth2Config.AzureAd(config)
+    CachedOauth2Client(
+        tokenEndpointUrl = azureAdConfig.tokenEndpointUrl,
+        authType = azureAdConfig.clientSecret()
     )
+}
 
-    data class VeilarbRegistreringConfig(
-        val endpoint: String = config()[Key("veilarbregistrering.url", stringType)],
-        val scope: String = config()[Key("veilarbregistrering.scope", stringType)]
-    )
+val veilarbregistreringBaseurl: String = config[Key("veilarbregistrering.url", stringType)]
+
+val veilarbregistreringTokenSupplier by lazy {
+    {
+        runBlocking {
+            azureAdClient.clientCredentials(
+                config[
+                    Key(
+                        "veilarbregistrering.scope",
+                        stringType
+                    )
+                ]
+            ).accessToken
+        }
+    }
+}
+
+val kafkaConfig: Map<String, String> by lazy {
+    config.list().reversed()
+        .fold(emptyMap()) { map, pair -> map + pair.second }
 }

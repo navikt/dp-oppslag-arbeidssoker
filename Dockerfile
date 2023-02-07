@@ -1,6 +1,5 @@
-FROM navikt/java:17
+FROM ghcr.io/navikt/baseimages/temurin:19
 
-COPY init-scripts/* /init-scripts/
 COPY build/libs/*-all.jar app.jar
 
 ENV LOG_FORMAT="logstash" \
