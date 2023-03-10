@@ -27,7 +27,7 @@ private val localProperties = ConfigurationMap(
 )
 private val devProperties = ConfigurationMap(
     mapOf(
-        "veilarbregistrering.url" to "https://veilarbregistrering.dev.intern.nav.no/veilarbregistrering/api",
+        "veilarbregistrering.url" to "https://veilarbregistrering.intern.dev.nav.no/veilarbregistrering/api",
         "veilarbregistrering.scope" to "api://dev-gcp.paw.veilarbregistrering/.default"
     )
 )
