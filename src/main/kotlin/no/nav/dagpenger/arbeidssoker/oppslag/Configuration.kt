@@ -16,26 +16,26 @@ private val defaultProperties = ConfigurationMap(
         "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
         "KAFKA_RESET_POLICY" to "latest",
         "HTTP_PORT" to "8080",
-    )
+    ),
 )
 
 private val localProperties = ConfigurationMap(
     mapOf(
         "veilarbregistrering.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
         "veilarbregistrering.scope" to "api://dev-fss.paw.veilarbregistrering/.default",
-    )
+    ),
 )
 private val devProperties = ConfigurationMap(
     mapOf(
         "veilarbregistrering.url" to "https://veilarbregistrering.intern.dev.nav.no/veilarbregistrering/api",
-        "veilarbregistrering.scope" to "api://dev-gcp.paw.veilarbregistrering/.default"
-    )
+        "veilarbregistrering.scope" to "api://dev-gcp.paw.veilarbregistrering/.default",
+    ),
 )
 private val prodProperties = ConfigurationMap(
     mapOf(
         "veilarbregistrering.url" to "https://veilarbregistrering.intern.nav.no/veilarbregistrering/api",
         "veilarbregistrering.scope" to "api://prod-gcp.paw.veilarbregistrering/.default",
-    )
+    ),
 )
 
 internal val config
@@ -51,7 +51,7 @@ private val azureAdClient: CachedOauth2Client by lazy {
     val azureAdConfig = OAuth2Config.AzureAd(config)
     CachedOauth2Client(
         tokenEndpointUrl = azureAdConfig.tokenEndpointUrl,
-        authType = azureAdConfig.clientSecret()
+        authType = azureAdConfig.clientSecret(),
     )
 }
 
@@ -64,9 +64,9 @@ val veilarbregistreringTokenSupplier by lazy {
                 config[
                     Key(
                         "veilarbregistrering.scope",
-                        stringType
-                    )
-                ]
+                        stringType,
+                    ),
+                ],
             ).accessToken
         }
     }
