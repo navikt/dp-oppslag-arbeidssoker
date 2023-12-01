@@ -18,14 +18,13 @@ spec:
     path: /metrics
   replicas:
     max: 6
-    min: 1
+    min: 2
   resources:
     limits:
-      cpu: 500m
-      memory: 1024Mi
-    requests:
-      cpu: 200m
       memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 256Mi
   secureLogs:
     enabled: true
   kafka:
