@@ -1,20 +1,10 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
 plugins {
     application
-    kotlin("jvm") version Kotlin.version
-    id(Spotless.spotless) version Spotless.version
-    id(Shadow.shadow) version Shadow.version
-}
-apply {
-    plugin(Spotless.spotless)
 }
 
 repositories {
     mavenCentral()
-    maven("https://packages.confluent.io/maven/")
-    maven("https://jitpack.io")
+    maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
 }
 
 application {
@@ -25,70 +15,28 @@ application {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
-    implementation(Ulid.ulid)
+    implementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:8.3.0")
 
     // ktor
-    implementation(Ktor2.Client.library("cio"))
-    implementation(Ktor2.Client.library("content-negotiation"))
-    implementation(Ktor2.Client.library("logging"))
-    implementation("io.ktor:ktor-serialization-jackson:${Ktor2.version}")
-    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:${Dagpenger.Biblioteker.version}")
-    implementation(Jackson.jsr310)
+    implementation(libs.bundles.ktor.client)
+
+    implementation(libs.dp.biblioteker.oauth2.klient)
+    implementation(libs.bundles.jackson)
 
     // mdc coroutine plugin
-    implementation(Kotlin.Coroutines.module("slf4j"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.4")
 
     // logging
-    implementation(Kotlin.Logging.kotlinLogging)
+    implementation(libs.kotlin.logging)
 
     // miljøkonfig
-    implementation(Konfig.konfig)
+    implementation(libs.konfig)
 
     // rapid rivers
-    implementation(RapidAndRiversKtor2)
+    implementation(libs.rapids.and.rivers)
 
     // test
-    testRuntimeOnly(Junit5.engine)
-    testImplementation(Junit5.api)
-    testImplementation(KoTest.runner)
-    testImplementation(KoTest.assertions)
-    testImplementation(Ktor2.Client.library("mock"))
-    testImplementation(Mockk.mockk)
-}
-
-spotless {
-    kotlin {
-        ktlint(Ktlint.version)
-    }
-    kotlinGradle {
-        target("*.gradle.kts", "buildSrc/**/*.kt*")
-        ktlint(Ktlint.version)
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-    testLogging {
-        showExceptions = true
-        showStackTraces = true
-        exceptionFormat = TestExceptionFormat.FULL
-        events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
-        showStandardStreams = true
-    }
-}
-
-tasks.withType<Wrapper> {
-    gradleVersion = "7.6"
-}
-
-tasks.named("shadowJar") {
-    dependsOn("test")
-}
-
-tasks.named("compileKotlin") {
-    dependsOn("spotlessCheck")
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.ktor.client.mock)
+    testImplementation(libs.mockk)
 }
