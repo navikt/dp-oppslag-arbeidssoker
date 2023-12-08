@@ -16,16 +16,15 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 class RegistreringsperioderService(
     rapidsConnection: RapidsConnection,
-    private val arbeidssøkerRegister: ArbeidssøkerRegister
+    private val arbeidssøkerRegister: ArbeidssøkerRegister,
 ) : River.PacketListener {
-
     companion object {
-        private const val behov = "Registreringsperioder"
+        private const val BEHOV = "Registreringsperioder"
     }
 
     init {
         River(rapidsConnection).apply {
-            validate { it.demandAll("@behov", listOf(behov)) }
+            validate { it.demandAll("@behov", listOf(BEHOV)) }
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("identer") }
             validate { it.requireKey("fakta") }
@@ -33,7 +32,10 @@ class RegistreringsperioderService(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val fnr =
             packet["identer"].first { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }["id"].asText()
 
@@ -41,21 +43,21 @@ class RegistreringsperioderService(
 
         withMDC(
             mapOf(
-                mdcSøknadIdKey to søknadId,
-                "behovId" to packet["@behovId"].asText()
-            )
-
+                SØKNAD_UUID to søknadId,
+                "behovId" to packet["@behovId"].asText(),
+            ),
         ) {
             runBlocking(MDCContext()) {
                 arbeidssøkerRegister.hentRegistreringsperiode(
                     fnr,
                     fom = LocalDate.now().minusDays(105),
-                    tom = LocalDate.now()
+                    tom = LocalDate.now(),
                 )
             }.also { registreringsperioder ->
-                packet["@løsning"] = mapOf(
-                    behov to registreringsperioder
-                )
+                packet["@løsning"] =
+                    mapOf(
+                        BEHOV to registreringsperioder,
+                    )
             }
         }
 
@@ -64,7 +66,10 @@ class RegistreringsperioderService(
         context.publish(packet.toJson())
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
+    override fun onError(
+        problems: MessageProblems,
+        context: MessageContext,
+    ) {
         log.error { problems.toString() }
         sikkerlogg.error { problems.toExtendedReport() }
     }

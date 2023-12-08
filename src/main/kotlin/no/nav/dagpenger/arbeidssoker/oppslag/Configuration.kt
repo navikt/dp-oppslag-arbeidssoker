@@ -10,42 +10,47 @@ import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 
-private val defaultProperties = ConfigurationMap(
-    mapOf(
-        "KAFKA_CONSUMER_GROUP_ID" to "dp-oppslag-arbeidssoker-v1",
-        "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
-        "KAFKA_RESET_POLICY" to "latest",
-        "HTTP_PORT" to "8080",
-    ),
-)
+private val defaultProperties =
+    ConfigurationMap(
+        mapOf(
+            "KAFKA_CONSUMER_GROUP_ID" to "dp-oppslag-arbeidssoker-v1",
+            "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
+            "KAFKA_RESET_POLICY" to "latest",
+            "HTTP_PORT" to "8080",
+        ),
+    )
 
-private val localProperties = ConfigurationMap(
-    mapOf(
-        "veilarbregistrering.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
-        "veilarbregistrering.scope" to "api://dev-fss.paw.veilarbregistrering/.default",
-    ),
-)
-private val devProperties = ConfigurationMap(
-    mapOf(
-        "veilarbregistrering.url" to "https://veilarbregistrering.intern.dev.nav.no/veilarbregistrering/api",
-        "veilarbregistrering.scope" to "api://dev-gcp.paw.veilarbregistrering/.default",
-    ),
-)
-private val prodProperties = ConfigurationMap(
-    mapOf(
-        "veilarbregistrering.url" to "https://veilarbregistrering.intern.nav.no/veilarbregistrering/api",
-        "veilarbregistrering.scope" to "api://prod-gcp.paw.veilarbregistrering/.default",
-    ),
-)
+private val localProperties =
+    ConfigurationMap(
+        mapOf(
+            "veilarbregistrering.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
+            "veilarbregistrering.scope" to "api://dev-fss.paw.veilarbregistrering/.default",
+        ),
+    )
+private val devProperties =
+    ConfigurationMap(
+        mapOf(
+            "veilarbregistrering.url" to "https://veilarbregistrering.intern.dev.nav.no/veilarbregistrering/api",
+            "veilarbregistrering.scope" to "api://dev-gcp.paw.veilarbregistrering/.default",
+        ),
+    )
+private val prodProperties =
+    ConfigurationMap(
+        mapOf(
+            "veilarbregistrering.url" to "https://veilarbregistrering.intern.nav.no/veilarbregistrering/api",
+            "veilarbregistrering.scope" to "api://prod-gcp.paw.veilarbregistrering/.default",
+        ),
+    )
 
 internal val config
-    get() = when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
-        "dev-gcp" -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
-        "prod-gcp" -> systemProperties() overriding EnvironmentVariables overriding prodProperties overriding defaultProperties
-        else -> systemProperties() overriding EnvironmentVariables overriding localProperties overriding defaultProperties
-    }
+    get() =
+        when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
+            "dev-gcp" -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
+            "prod-gcp" -> systemProperties() overriding EnvironmentVariables overriding prodProperties overriding defaultProperties
+            else -> systemProperties() overriding EnvironmentVariables overriding localProperties overriding defaultProperties
+        }
 
-const val mdcSøknadIdKey = "søknad_uuid"
+const val SØKNAD_UUID = "søknad_uuid"
 
 private val azureAdClient: CachedOauth2Client by lazy {
     val azureAdConfig = OAuth2Config.AzureAd(config)

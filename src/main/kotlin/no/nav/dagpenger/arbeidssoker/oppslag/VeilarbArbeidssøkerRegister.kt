@@ -30,66 +30,69 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 internal class VeilarbArbeidssøkerRegister(
     val baseUrl: String? = null,
     tokenProvider: () -> String,
-    httpClientEngine: HttpClientEngine = CIO.create {}
+    httpClientEngine: HttpClientEngine = CIO.create {},
 ) : ArbeidssøkerRegister {
-    private val client: HttpClient = HttpClient(httpClientEngine) {
-        install(ContentNegotiation) {
-            jackson {
-                this.registerModule(JavaTimeModule())
-            }
-        }
-        install(Logging) {
-            logger = object : Logger {
-                override fun log(message: String) {
-                    sikkerlogg.info { message }
+    private val client: HttpClient =
+        HttpClient(httpClientEngine) {
+            install(ContentNegotiation) {
+                jackson {
+                    this.registerModule(JavaTimeModule())
                 }
             }
+            install(Logging) {
+                logger =
+                    object : Logger {
+                        override fun log(message: String) {
+                            sikkerlogg.info { message }
+                        }
+                    }
 
-            level = LogLevel.INFO
-        }
+                level = LogLevel.INFO
+            }
 
-        defaultRequest {
-            header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
-            header("Nav-Call-Id", runCatching { MDC.get(mdcSøknadIdKey) }.getOrElse { ulid.nextULID() })
-            header("Authorization", "Bearer ${tokenProvider.invoke()}")
+            defaultRequest {
+                header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
+                header("Nav-Call-Id", runCatching { MDC.get(SØKNAD_UUID) }.getOrElse { ulid.nextULID() })
+                header("Authorization", "Bearer ${tokenProvider.invoke()}")
+            }
         }
-    }
 
     override suspend fun hentRegistreringsperiode(
         fnr: String,
         fom: LocalDate,
-        tom: LocalDate
-    ): List<Periode> = withContext(Dispatchers.IO) {
-        log.info { "Henter arbeidssøkerperioder fra og med '$fom' til og med '$tom'" }
-        try {
-            client.get("$baseUrl/arbeidssoker/perioder") {
-                parameter("fnr", fnr)
-                parameter("fraOgMed", fom)
-                parameter("tilOgMed", tom)
-            }.body<Arbeidssokerperioder>().let {
-                it.arbeidssokerperioder.map { responsePeriode ->
-                    Periode(
-                        fom = responsePeriode.fraOgMedDato,
-                        tom = responsePeriode.tilOgMedDato ?: LocalDate.MAX
-                    )
+        tom: LocalDate,
+    ): List<Periode> =
+        withContext(Dispatchers.IO) {
+            log.info { "Henter arbeidssøkerperioder fra og med '$fom' til og med '$tom'" }
+            try {
+                client.get("$baseUrl/arbeidssoker/perioder") {
+                    parameter("fnr", fnr)
+                    parameter("fraOgMed", fom)
+                    parameter("tilOgMed", tom)
+                }.body<Arbeidssokerperioder>().let {
+                    it.arbeidssokerperioder.map { responsePeriode ->
+                        Periode(
+                            fom = responsePeriode.fraOgMedDato,
+                            tom = responsePeriode.tilOgMedDato ?: LocalDate.MAX,
+                        )
+                    }
+                }.also {
+                    log.info { "Fant ${it.size} arbeidssøkerperioder" }
                 }
-            }.also {
-                log.info { "Fant ${it.size} arbeidssøkerperioder" }
+            } catch (e: ClientRequestException) {
+                val responseBody = e.response.bodyAsText()
+                log.error(e) { "Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody" }
+                throw e
+            } catch (e: Exception) {
+                log.error("Kunne ikke hente arbeidssøkerperiode.", e)
+                throw e
             }
-        } catch (e: ClientRequestException) {
-            val responseBody = e.response.bodyAsText()
-            log.error(e) { "Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody" }
-            throw e
-        } catch (e: Exception) {
-            log.error("Kunne ikke hente arbeidssøkerperiode.", e)
-            throw e
         }
-    }
 }
 
 internal data class Arbeidssokerperioder(val arbeidssokerperioder: List<ResponsePeriode>)
 
 internal data class ResponsePeriode(
     val fraOgMedDato: LocalDate,
-    val tilOgMedDato: LocalDate?
+    val tilOgMedDato: LocalDate?,
 )

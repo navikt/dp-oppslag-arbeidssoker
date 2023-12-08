@@ -28,10 +28,11 @@ class RegistreringsperioderServiceTest {
 
         coEvery {
             arbeidsøkerRegister.hentRegistreringsperiode(any(), any(), any())
-        } returns listOf(
-            Periode(startDato, sluttDato),
-            Periode(startDato2, sluttDato2)
-        )
+        } returns
+            listOf(
+                Periode(startDato, sluttDato),
+                Periode(startDato2, sluttDato2),
+            )
         testRapid.sendTestMessage(behovJson)
 
         with(testRapid.inspektør) {

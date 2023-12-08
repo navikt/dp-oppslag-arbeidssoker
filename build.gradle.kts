@@ -1,4 +1,5 @@
 plugins {
+    id("common")
     application
 }
 
@@ -9,7 +10,7 @@ repositories {
 
 application {
     applicationName = "dp-oppslag-arbeidssoker"
-    mainClass.set("no.nav.dagpenger.arbeidssoker.oppslag.ApplicationKt")
+    mainClass.set("no.nav.dagpenger.arbeidssoker.oppslag.AppKt")
 }
 
 dependencies {
@@ -28,7 +29,7 @@ dependencies {
 
     // logging
     implementation(libs.kotlin.logging)
-
+    implementation(libs.ktor.serialization.jackson)
     // miljøkonfig
     implementation(libs.konfig)
 
