@@ -13,4 +13,5 @@ interface ArbeidssøkerRegister {
 data class Periode(
     val fom: LocalDate,
     val tom: LocalDate,
-)
+    val range: ClosedRange<LocalDate> = fom..tom,
+) : ClosedRange<LocalDate> by range
