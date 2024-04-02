@@ -9,6 +9,7 @@ import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
+import java.time.LocalDate
 
 class RegistrertSomArbeidssøkerService(
     rapidsConnection: RapidsConnection,
@@ -41,24 +42,32 @@ class RegistrertSomArbeidssøkerService(
             "behovId" to packet["@behovId"].asText(),
         ) {
             val ønsketDato = packet["RegistrertSomArbeidssøker"]["Virkningsdato"].asLocalDate()
-            runBlocking {
-                arbeidssøkerRegister.hentRegistreringsperiode(
-                    fnr,
-                    fom = ønsketDato.minusDays(105),
-                    tom = ønsketDato,
-                )
-            }.also { registreringsperioder: List<Periode> ->
-                // Finn den siste perioden som inneholder ønsketDato
-                val periode = registreringsperioder.last { ønsketDato in it }
-                packet["@løsning"] =
-                    mapOf(
-                        "RegistrertSomArbeidssøker" to
-                            mapOf(
-                                "verdi" to periode.fom,
-                                "gyldigFra" to periode.fom,
-                            ),
+            val registreringsperioder =
+                runBlocking {
+                    arbeidssøkerRegister.hentRegistreringsperiode(
+                        fnr,
+                        fom = ønsketDato.minusDays(105),
+                        tom = ønsketDato,
                     )
-            }
+                }
+            // Finn den siste perioden som inneholder ønsketDato
+            val periode = registreringsperioder.lastOrNull { ønsketDato in it }
+            val løsning =
+                when (periode) {
+                    null ->
+                        mapOf("verdi" to LocalDate.MAX)
+                            .also {
+                                // TODO: Vi bør gjøre noe annet enn å bruke MAX
+                                log.warn { "Fant ingen registrering for i perioden $ønsketDato" }
+                            }
+
+                    else ->
+                        mapOf(
+                            "verdi" to periode.fom,
+                            "gyldigFra" to periode.fom,
+                        )
+                }
+            packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)
         }
 
         log.info { "løser behov for $søknadId" }
