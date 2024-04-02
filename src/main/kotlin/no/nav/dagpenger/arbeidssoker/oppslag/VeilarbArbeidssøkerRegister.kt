@@ -52,7 +52,7 @@ internal class VeilarbArbeidssøkerRegister(
 
             defaultRequest {
                 header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
-                header("Nav-Call-Id", runCatching { MDC.get(SØKNAD_UUID) }.getOrElse { ulid.nextULID() })
+                header("Nav-Call-Id", runCatching { MDC.get(SØKNAD_ID) }.getOrElse { ulid.nextULID() })
                 header("Authorization", "Bearer ${tokenProvider.invoke()}")
             }
         }

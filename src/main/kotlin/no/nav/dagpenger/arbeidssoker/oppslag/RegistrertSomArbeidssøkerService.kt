@@ -26,7 +26,7 @@ class RegistrertSomArbeidssøkerService(
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("ident") }
             validate { it.requireKey("RegistrertSomArbeidssøker") }
-            validate { it.interestedIn("søknadId", "@behovId") }
+            validate { it.interestedIn("søknadId", "@behovId", "behandlingId") }
         }.register(this)
     }
 
@@ -38,7 +38,8 @@ class RegistrertSomArbeidssøkerService(
         val søknadId = packet["søknadId"].asText()
 
         withLoggingContext(
-            SØKNAD_UUID to søknadId,
+            SØKNAD_ID to søknadId,
+            "behandlingId" to packet["behandlingId"].asText(),
             "behovId" to packet["@behovId"].asText(),
         ) {
             val ønsketDato = packet["RegistrertSomArbeidssøker"]["Virkningsdato"].asLocalDate()

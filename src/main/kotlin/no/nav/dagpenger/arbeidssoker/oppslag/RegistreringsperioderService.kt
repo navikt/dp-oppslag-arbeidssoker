@@ -43,7 +43,7 @@ class RegistreringsperioderService(
 
         withMDC(
             mapOf(
-                SØKNAD_UUID to søknadId,
+                SØKNAD_ID to søknadId,
                 "behovId" to packet["@behovId"].asText(),
             ),
         ) {

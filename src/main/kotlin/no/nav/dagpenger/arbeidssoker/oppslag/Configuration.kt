@@ -50,7 +50,7 @@ internal val config
             else -> systemProperties() overriding EnvironmentVariables overriding localProperties overriding defaultProperties
         }
 
-const val SØKNAD_UUID = "søknad_uuid"
+const val SØKNAD_ID = "søknadId"
 
 private val azureAdClient: CachedOauth2Client by lazy {
     val azureAdConfig = OAuth2Config.AzureAd(config)
