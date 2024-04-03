@@ -36,7 +36,10 @@ class RegistrertSomArbeidssøkerServiceTest {
         with(rapid.inspektør) {
             assertEquals(1, size)
             val løsning = field(0, "@løsning")
-            assertEquals(ønsketDato, løsning["RegistrertSomArbeidssøker"]["verdi"].asLocalDate())
+            val verdi = løsning["RegistrertSomArbeidssøker"]
+            assertEquals(true, verdi["verdi"].asBoolean())
+            assertEquals(ønsketDato, verdi["gyldigTilOgMed"].asLocalDate())
+            assertEquals(ønsketDato, verdi["gyldigFraOgMed"].asLocalDate())
         }
     }
 

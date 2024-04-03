@@ -9,7 +9,6 @@ import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
-import java.time.LocalDate
 
 class RegistrertSomArbeidssøkerService(
     rapidsConnection: RapidsConnection,
@@ -53,21 +52,13 @@ class RegistrertSomArbeidssøkerService(
                 }
             // Finn den siste perioden som inneholder ønsketDato
             val periode = registreringsperioder.lastOrNull { ønsketDato in it }
+            val erRegistrertSomArbeidssøker = periode != null
             val løsning =
-                when (periode) {
-                    null ->
-                        mapOf("verdi" to LocalDate.MAX)
-                            .also {
-                                // TODO: Vi bør gjøre noe annet enn å bruke MAX
-                                log.warn { "Fant ingen registrering for i perioden $ønsketDato" }
-                            }
-
-                    else ->
-                        mapOf(
-                            "verdi" to periode.fom,
-                            "gyldigFra" to periode.fom,
-                        )
-                }
+                mapOf(
+                    "verdi" to erRegistrertSomArbeidssøker,
+                    "gyldigFraOgMed" to ønsketDato,
+                    "gyldigTilOgMed" to ønsketDato,
+                )
             packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)
         }
 
