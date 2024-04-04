@@ -28,7 +28,7 @@ private val ulid = ULID()
 private val log = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
-internal class VeilarbArbeidssøkerregister(
+class VeilarbArbeidssøkerregister(
     val baseUrl: String? = null,
     tokenProvider: () -> String,
     httpClientEngine: HttpClientEngine = CIO.create {},

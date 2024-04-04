@@ -2,7 +2,6 @@ package no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import de.huxhorn.sulky.ulid.ULID
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
@@ -28,13 +27,12 @@ import org.slf4j.MDC
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class PawArbeidssøkerregister(
+class PawArbeidssøkerregister(
     val baseUrl: String? = null,
     tokenProvider: () -> String,
     httpClientEngine: HttpClientEngine = CIO.create {},
 ) : Arbeidssøkerregister {
     private companion object {
-        private val ulid = ULID()
         private val log = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall")
     }
