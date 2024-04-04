@@ -48,17 +48,21 @@ class PawRegistreringsperioderService(
                 "behovId" to packet["@behovId"].asText(),
             ),
         ) {
-            val perioder =
-                runBlocking(MDCContext()) {
-                    arbeidssøkerRegister.hentRegistreringsperiode(
-                        fnr,
-                        fom = LocalDate.now().minusDays(105),
-                        tom = LocalDate.now(),
-                    )
-                }
-            val min = perioder.minByOrNull { it.fom }
-            val maks = perioder.maxByOrNull { it.fom }
-            log.info { "PAW - Fant ${perioder.size} med første dato=$min og siste dato=$maks" }
+            runCatching {
+                val perioder =
+                    runBlocking(MDCContext()) {
+                        arbeidssøkerRegister.hentRegistreringsperiode(
+                            fnr,
+                            fom = LocalDate.now().minusDays(105),
+                            tom = LocalDate.now(),
+                        )
+                    }
+                val min = perioder.minByOrNull { it.fom }
+                val maks = perioder.maxByOrNull { it.fom }
+                log.info { "PAW - Fant ${perioder.size} med første dato=$min og siste dato=$maks" }
+            }.onFailure {
+                log.error(it) { "Noe gikk galt mot PAW" }
+            }
         }
     }
 
