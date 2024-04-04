@@ -1,6 +1,5 @@
 package no.nav.dagpenger.arbeidssoker.oppslag
 
-import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.PawArbeidssøkerregister
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.VeilarbArbeidssøkerregister
 import no.nav.dagpenger.arbeidssoker.oppslag.tjeneste.RegistreringsperioderService
 import no.nav.dagpenger.arbeidssoker.oppslag.tjeneste.RegistrertSomArbeidssøkerService
