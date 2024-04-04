@@ -32,6 +32,8 @@ private val devProperties =
         mapOf(
             "veilarbregistrering.url" to "https://veilarbregistrering.intern.dev.nav.no/veilarbregistrering/api",
             "veilarbregistrering.scope" to "api://dev-gcp.paw.veilarbregistrering/.default",
+            "paw-arbeidssoekerregisteret.url" to "https://paw-arbeidssoekerregisteret-api-oppslag.paw",
+            "paw-arbeidssoekerregisteret.scope" to "api://dev-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
         ),
     )
 private val prodProperties =
@@ -39,6 +41,8 @@ private val prodProperties =
         mapOf(
             "veilarbregistrering.url" to "https://veilarbregistrering.intern.nav.no/veilarbregistrering/api",
             "veilarbregistrering.scope" to "api://prod-gcp.paw.veilarbregistrering/.default",
+            "paw-arbeidssoekerregisteret.url" to "https://paw-arbeidssoekerregisteret-api-oppslag.paw",
+            "paw-arbeidssoekerregisteret.scope" to "api://prod-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
         ),
     )
 
@@ -61,17 +65,22 @@ private val azureAdClient: CachedOauth2Client by lazy {
 }
 
 val veilarbregistreringBaseurl: String = config[Key("veilarbregistrering.url", stringType)]
+val pawArbeidssøkerregisterBaseurl: String = config[Key("paw-arbeidssoekerregisteret.url", stringType)]
 
 val veilarbregistreringTokenSupplier by lazy {
     {
         runBlocking {
             azureAdClient.clientCredentials(
-                config[
-                    Key(
-                        "veilarbregistrering.scope",
-                        stringType,
-                    ),
-                ],
+                config[Key("veilarbregistrering.scope", stringType)],
+            ).accessToken
+        }
+    }
+}
+val pawArbeidssøkerregisterTokenSupplier by lazy {
+    {
+        runBlocking {
+            azureAdClient.clientCredentials(
+                config[Key("paw-arbeidssoekerregisteret.scope", stringType)],
             ).accessToken
         }
     }

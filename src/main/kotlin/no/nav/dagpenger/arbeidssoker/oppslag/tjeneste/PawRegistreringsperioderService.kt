@@ -13,7 +13,7 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.withMDC
 import java.time.LocalDate
 
-class RegistreringsperioderService(
+class PawRegistreringsperioderService(
     rapidsConnection: RapidsConnection,
     private val arbeidssøkerRegister: Arbeidssøkerregister,
 ) : River.PacketListener {
@@ -48,27 +48,17 @@ class RegistreringsperioderService(
                 "behovId" to packet["@behovId"].asText(),
             ),
         ) {
-            runBlocking(MDCContext()) {
+            val perioder = runBlocking(MDCContext()) {
                 arbeidssøkerRegister.hentRegistreringsperiode(
                     fnr,
                     fom = LocalDate.now().minusDays(105),
                     tom = LocalDate.now(),
                 )
-            }.also { registreringsperioder ->
-                packet["@løsning"] =
-                    mapOf(
-                        BEHOV to registreringsperioder,
-                    )
-
-                val min = registreringsperioder.minByOrNull { it.fom }
-                val maks = registreringsperioder.maxByOrNull { it.fom }
-                log.info { "Fant ${registreringsperioder.size} med første dato=$min og siste dato=$maks" }
             }
+            val min = perioder.minByOrNull { it.fom }
+            val maks = perioder.maxByOrNull { it.fom }
+            log.info { "PAW - Fant ${perioder.size} med første dato=$min og siste dato=$maks" }
         }
-
-        log.info { "løser behov for $søknadId" }
-
-        context.publish(packet.toJson())
     }
 
     override fun onError(
