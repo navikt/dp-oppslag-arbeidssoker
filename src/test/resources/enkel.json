@@ -1,0 +1,33 @@
+{
+  "http-request": {
+    "path": "/api/v1/veileder/arbeidssoekerperioder",
+    "method": "POST",
+    "body": {
+      "identitetsnummer": "12345678910"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "body": [
+      {
+        "periodeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "startet": {
+          "tidspunkt": "2017-07-21T17:32:28Z",
+          "utfoertAv": {
+            "type": "UKJENT_VERDI"
+          },
+          "kilde": "string",
+          "aarsak": "string"
+        },
+        "avsluttet": {
+          "tidspunkt": "2017-07-21T17:32:28Z",
+          "utfoertAv": {
+            "type": "UKJENT_VERDI"
+          },
+          "kilde": "string",
+          "aarsak": "string"
+        }
+      }
+    ]
+  }
+}

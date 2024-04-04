@@ -40,4 +40,6 @@ dependencies {
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.mockk)
+
+    testImplementation("in.specmatic:specmatic-core:1.3.9")
 }

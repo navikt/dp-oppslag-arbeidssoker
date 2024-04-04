@@ -1,5 +1,6 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import de.huxhorn.sulky.ulid.ULID
 import io.ktor.client.HttpClient
@@ -12,10 +13,12 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,21 +26,25 @@ import mu.KotlinLogging
 import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
 import org.slf4j.MDC
 import java.time.LocalDate
+import java.time.LocalDateTime
 
-private val ulid = ULID()
-private val log = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall")
-
-internal class VeilarbArbeidssøkerregister(
+internal class PawArbeidssøkerregister(
     val baseUrl: String? = null,
     tokenProvider: () -> String,
     httpClientEngine: HttpClientEngine = CIO.create {},
 ) : Arbeidssøkerregister {
+    private companion object {
+        private val ulid = ULID()
+        private val log = KotlinLogging.logger {}
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall")
+    }
+
     private val client: HttpClient =
         HttpClient(httpClientEngine) {
             install(ContentNegotiation) {
                 jackson {
-                    this.registerModule(JavaTimeModule())
+                    registerModule(JavaTimeModule())
+                    disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 }
             }
             install(Logging) {
@@ -53,7 +60,7 @@ internal class VeilarbArbeidssøkerregister(
 
             defaultRequest {
                 header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
-                header("Nav-Call-Id", runCatching { MDC.get(SØKNAD_ID) }.getOrElse { ulid.nextULID() })
+                runCatching { MDC.get(SØKNAD_ID) }.onSuccess { header("Nav-Call-Id", it) }
                 header("Authorization", "Bearer ${tokenProvider.invoke()}")
             }
         }
@@ -66,15 +73,14 @@ internal class VeilarbArbeidssøkerregister(
         withContext(Dispatchers.IO) {
             log.info { "Henter arbeidssøkerperioder fra og med '$fom' til og med '$tom'" }
             try {
-                client.get("$baseUrl/arbeidssoker/perioder") {
-                    parameter("fnr", fnr)
-                    parameter("fraOgMed", fom)
-                    parameter("tilOgMed", tom)
-                }.body<Arbeidssokerperioder>().let {
-                    it.arbeidssokerperioder.map { responsePeriode ->
+                client.post("$baseUrl/api/v1/veileder/arbeidssoekerperioder") {
+                    contentType(ContentType.Application.Json)
+                    setBody(mapOf("identitetsnummer" to fnr))
+                }.body<List<ResponsePeriode>>().let {
+                    it.map { responsePeriode ->
                         Periode(
-                            fom = responsePeriode.fraOgMedDato,
-                            tom = responsePeriode.tilOgMedDato ?: LocalDate.MAX,
+                            fom = responsePeriode.startet.tidspunkt.toLocalDate(),
+                            tom = responsePeriode.avsluttet?.tidspunkt?.toLocalDate() ?: LocalDate.MAX,
                         )
                     }
                 }.also {
@@ -90,7 +96,12 @@ internal class VeilarbArbeidssøkerregister(
             }
         }
 
-    private data class Arbeidssokerperioder(val arbeidssokerperioder: List<ResponsePeriode>)
+    private data class ResponsePeriode(
+        val startet: Metadata,
+        val avsluttet: Metadata? = null,
+    )
 
-    private data class ResponsePeriode(val fraOgMedDato: LocalDate, val tilOgMedDato: LocalDate?)
+    private data class Metadata(
+        val tidspunkt: LocalDateTime,
+    )
 }

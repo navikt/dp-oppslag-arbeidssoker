@@ -1,0 +1,11 @@
+{
+  "sources": [
+    {
+      "provider": "git",
+      "repository": "https://github.com/navikt/paw-arbeidssoekerregisteret-api-oppslag.git",
+      "stub": [
+        "src/main/resources/openapi/documentation.yaml"
+      ]
+    }
+  ]
+}
