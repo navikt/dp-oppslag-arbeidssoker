@@ -1,7 +1,9 @@
-package no.nav.dagpenger.arbeidssoker.oppslag
+package no.nav.dagpenger.arbeidssoker.oppslag.tjeneste
 
 import io.mockk.coEvery
 import io.mockk.mockk
+import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
+import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Periode
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -11,7 +13,7 @@ import java.time.LocalDate
 
 class RegistreringsperioderServiceTest {
     private val testRapid = TestRapid()
-    private val arbeidsøkerRegister: ArbeidssøkerRegister = mockk()
+    private val arbeidsøkerRegister: Arbeidssøkerregister = mockk()
 
     @BeforeEach
     fun setup() {

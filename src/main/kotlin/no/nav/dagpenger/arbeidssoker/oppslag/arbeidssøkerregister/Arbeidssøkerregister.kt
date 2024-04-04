@@ -1,8 +1,8 @@
-package no.nav.dagpenger.arbeidssoker.oppslag
+package no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister
 
 import java.time.LocalDate
 
-interface ArbeidssøkerRegister {
+interface Arbeidssøkerregister {
     suspend fun hentRegistreringsperiode(
         fnr: String,
         fom: LocalDate,

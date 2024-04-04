@@ -1,8 +1,10 @@
-package no.nav.dagpenger.arbeidssoker.oppslag
+package no.nav.dagpenger.arbeidssoker.oppslag.tjeneste
 
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import mu.withLoggingContext
+import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
+import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
@@ -12,7 +14,7 @@ import no.nav.helse.rapids_rivers.asLocalDate
 
 class RegistrertSomArbeidssøkerService(
     rapidsConnection: RapidsConnection,
-    private val arbeidssøkerRegister: ArbeidssøkerRegister,
+    private val arbeidssøkerRegister: Arbeidssøkerregister,
 ) : River.PacketListener {
     companion object {
         private val log = KotlinLogging.logger {}

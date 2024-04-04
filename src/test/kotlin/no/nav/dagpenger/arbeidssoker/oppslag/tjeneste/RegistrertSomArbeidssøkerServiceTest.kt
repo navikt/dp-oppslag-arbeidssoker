@@ -1,7 +1,9 @@
-package no.nav.dagpenger.arbeidssoker.oppslag
+package no.nav.dagpenger.arbeidssoker.oppslag.tjeneste
 
 import io.mockk.coEvery
 import io.mockk.mockk
+import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
+import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Periode
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -10,7 +12,7 @@ import java.time.LocalDate
 
 class RegistrertSomArbeidssøkerServiceTest {
     private val rapid = TestRapid()
-    private val arbeidsøkerRegister: ArbeidssøkerRegister = mockk()
+    private val arbeidsøkerRegister: Arbeidssøkerregister = mockk()
     private val ønsketDato = LocalDate.of(2020, 1, 1)
 
     init {

@@ -1,4 +1,4 @@
-package no.nav.dagpenger.arbeidssoker.oppslag
+package no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import de.huxhorn.sulky.ulid.ULID
@@ -27,11 +27,11 @@ private val ulid = ULID()
 private val log = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
-internal class VeilarbArbeidssøkerRegister(
+internal class VeilarbArbeidssøkerregister(
     val baseUrl: String? = null,
     tokenProvider: () -> String,
     httpClientEngine: HttpClientEngine = CIO.create {},
-) : ArbeidssøkerRegister {
+) : Arbeidssøkerregister {
     private val client: HttpClient =
         HttpClient(httpClientEngine) {
             install(ContentNegotiation) {
@@ -88,11 +88,8 @@ internal class VeilarbArbeidssøkerRegister(
                 throw e
             }
         }
+
+    private data class Arbeidssokerperioder(val arbeidssokerperioder: List<ResponsePeriode>)
+
+    private data class ResponsePeriode(val fraOgMedDato: LocalDate, val tilOgMedDato: LocalDate?)
 }
-
-internal data class Arbeidssokerperioder(val arbeidssokerperioder: List<ResponsePeriode>)
-
-internal data class ResponsePeriode(
-    val fraOgMedDato: LocalDate,
-    val tilOgMedDato: LocalDate?,
-)

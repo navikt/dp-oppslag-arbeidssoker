@@ -1,8 +1,10 @@
-package no.nav.dagpenger.arbeidssoker.oppslag
+package no.nav.dagpenger.arbeidssoker.oppslag.tjeneste
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
+import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
+import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
@@ -16,7 +18,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 class RegistreringsperioderService(
     rapidsConnection: RapidsConnection,
-    private val arbeidssøkerRegister: ArbeidssøkerRegister,
+    private val arbeidssøkerRegister: Arbeidssøkerregister,
 ) : River.PacketListener {
     companion object {
         private const val BEHOV = "Registreringsperioder"
