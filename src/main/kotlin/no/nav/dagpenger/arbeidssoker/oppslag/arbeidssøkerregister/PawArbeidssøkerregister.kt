@@ -23,9 +23,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
+import no.nav.paw.arbeidssøkerregister.api.models.ArbeidssoekerperiodeResponseDTO
 import org.slf4j.MDC
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 class PawArbeidssøkerregister(
     val baseUrl: String? = null,
@@ -74,11 +74,11 @@ class PawArbeidssøkerregister(
                 client.post("$baseUrl/api/v1/veileder/arbeidssoekerperioder") {
                     contentType(ContentType.Application.Json)
                     setBody(mapOf("identitetsnummer" to fnr))
-                }.body<List<ResponsePeriode>>().let {
-                    it.map { responsePeriode ->
+                }.body<List<ArbeidssoekerperiodeResponseDTO>>().let {
+                    it.map { arbeidssøkerperiode ->
                         Periode(
-                            fom = responsePeriode.startet.tidspunkt.toLocalDate(),
-                            tom = responsePeriode.avsluttet?.tidspunkt?.toLocalDate() ?: LocalDate.MAX,
+                            fom = arbeidssøkerperiode.startet.tidspunkt.toLocalDate(),
+                            tom = arbeidssøkerperiode.avsluttet?.tidspunkt?.toLocalDate() ?: LocalDate.MAX,
                         )
                     }
                 }.also {
@@ -93,13 +93,4 @@ class PawArbeidssøkerregister(
                 throw e
             }
         }
-
-    private data class ResponsePeriode(
-        val startet: Metadata,
-        val avsluttet: Metadata? = null,
-    )
-
-    private data class Metadata(
-        val tidspunkt: LocalDateTime,
-    )
 }

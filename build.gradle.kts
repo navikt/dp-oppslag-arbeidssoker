@@ -1,6 +1,7 @@
 plugins {
     id("common")
     application
+    id("org.openapi.generator") version "7.4.0"
 }
 
 repositories {
@@ -42,4 +43,27 @@ dependencies {
     testImplementation(libs.mockk)
 
     testImplementation("in.specmatic:specmatic-core:1.3.9")
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir("${layout.buildDirectory.get()}/generated/src/main/kotlin")
+        }
+    }
+}
+
+openApiGenerate {
+    generatorName.set("kotlin")
+    remoteInputSpec.set(
+        @Suppress("ktlint:standard:max-line-length")
+        "https://raw.githubusercontent.com/navikt/paw-arbeidssoekerregisteret-api-oppslag/main/src/main/resources/openapi/documentation.yaml",
+    )
+    outputDir.set("${layout.buildDirectory.get()}/generated/")
+    packageName.set("no.nav.paw.arbeidssøkerregister.api")
+    globalProperties.set(mapOf("models" to ""))
+    modelNameSuffix.set("DTO")
+    configOptions.set(
+        mapOf("serializationLibrary" to "jackson"),
+    )
 }
