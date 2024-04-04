@@ -25,7 +25,7 @@ fun main() {
         )
         PawRegistreringsperioderService(
             this,
-            arbeidssøkerRegister,
+            pawArbeidssøkerRegister,
         )
         // For dp-behandling
         RegistrertSomArbeidssøkerService(
