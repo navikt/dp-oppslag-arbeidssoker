@@ -32,7 +32,7 @@ private val devProperties =
         mapOf(
             "veilarbregistrering.url" to "https://veilarbregistrering.intern.dev.nav.no/veilarbregistrering/api",
             "veilarbregistrering.scope" to "api://dev-gcp.paw.veilarbregistrering/.default",
-            "paw-arbeidssoekerregisteret.url" to "https://paw-arbeidssoekerregisteret-api-oppslag.paw",
+            "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag.paw",
             "paw-arbeidssoekerregisteret.scope" to "api://dev-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
         ),
     )
@@ -41,7 +41,7 @@ private val prodProperties =
         mapOf(
             "veilarbregistrering.url" to "https://veilarbregistrering.intern.nav.no/veilarbregistrering/api",
             "veilarbregistrering.scope" to "api://prod-gcp.paw.veilarbregistrering/.default",
-            "paw-arbeidssoekerregisteret.url" to "https://paw-arbeidssoekerregisteret-api-oppslag.paw",
+            "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag.paw",
             "paw-arbeidssoekerregisteret.scope" to "api://prod-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
         ),
     )
