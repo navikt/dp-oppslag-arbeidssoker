@@ -1,5 +1,6 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDate
 
 interface Arbeidssøkerregister {
@@ -13,5 +14,5 @@ interface Arbeidssøkerregister {
 data class Periode(
     val fom: LocalDate,
     val tom: LocalDate,
-    val range: ClosedRange<LocalDate> = fom..tom,
+    @JsonIgnore val range: ClosedRange<LocalDate> = fom..tom,
 ) : ClosedRange<LocalDate> by range
