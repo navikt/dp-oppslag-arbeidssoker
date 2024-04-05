@@ -14,5 +14,7 @@ interface Arbeidssøkerregister {
 data class Periode(
     val fom: LocalDate,
     val tom: LocalDate,
-    @JsonIgnore val range: ClosedRange<LocalDate> = fom..tom,
-) : ClosedRange<LocalDate> by range
+    @JsonIgnore private val range: ClosedRange<LocalDate> = fom..tom,
+) {
+    operator fun contains(date: LocalDate): Boolean = date in range
+}
