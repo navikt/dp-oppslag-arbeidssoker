@@ -53,6 +53,16 @@ sourceSets {
     }
 }
 
+spotless {
+    kotlin {
+        targetExclude("**/generated/**")
+    }
+}
+
+tasks.compileKotlin {
+    dependsOn("openApiGenerate")
+}
+
 openApiGenerate {
     generatorName.set("kotlin")
     remoteInputSpec.set(
