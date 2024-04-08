@@ -17,7 +17,7 @@ fun main() {
         val pawArbeidssøkerRegister =
             PawArbeidssøkerregister(
                 baseUrl = pawArbeidssøkerregisterBaseurl,
-                tokenProvider = veilarbregistreringTokenSupplier,
+                tokenProvider = pawArbeidssøkerregisterTokenSupplier,
             )
         RegistreringsperioderService(
             this,
