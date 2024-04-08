@@ -2,8 +2,10 @@ package no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister
 
 import `in`.specmatic.stub.ContractStub
 import `in`.specmatic.stub.createStub
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.ktor.client.plugins.ServerResponseException
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -18,6 +20,7 @@ class PawArbeidssøkerregisterTest {
         )
 
     private val enkelPeriode by lazy { javaClass.getResource("/enkel.json")!!.readText() }
+    private val feil by lazy { javaClass.getResource("/feil.json")!!.readText() }
 
     @Test
     fun `test henting av arbeidssøkerperioder`() {
@@ -28,6 +31,17 @@ class PawArbeidssøkerregisterTest {
         perioder.first().apply {
             fom shouldBe LocalDate.of(2017, 7, 21)
             tom shouldBe LocalDate.of(2017, 7, 21)
+        }
+    }
+
+    @Test
+    fun `test henting av arbeidssøkerperioder ved feil`() {
+        stub.setExpectation(feil)
+
+        shouldThrow<ServerResponseException> {
+            runBlocking {
+                klient.hentRegistreringsperiode("01987654321", LocalDate.now(), LocalDate.now())
+            }
         }
     }
 

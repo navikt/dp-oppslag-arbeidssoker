@@ -40,6 +40,7 @@ class PawArbeidssøkerregister(
 
     private val client: HttpClient =
         HttpClient(httpClientEngine) {
+            expectSuccess = true
             install(ContentNegotiation) {
                 jackson {
                     registerModule(JavaTimeModule())

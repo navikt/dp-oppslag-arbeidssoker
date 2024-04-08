@@ -1,0 +1,12 @@
+{
+  "http-request": {
+    "path": "/api/v1/veileder/arbeidssoekerperioder",
+    "method": "POST",
+    "body": {
+      "identitetsnummer": "010987654321"
+    }
+  },
+  "http-response": {
+    "status": 500
+  }
+}
