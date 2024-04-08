@@ -12,6 +12,7 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -28,8 +29,8 @@ import org.slf4j.MDC
 import java.time.LocalDate
 
 class PawArbeidssøkerregister(
-    val baseUrl: String? = null,
-    tokenProvider: () -> String,
+    private val baseUrl: String? = null,
+    private val tokenProvider: () -> String,
     httpClientEngine: HttpClientEngine = CIO.create {},
 ) : Arbeidssøkerregister {
     private companion object {
@@ -59,7 +60,6 @@ class PawArbeidssøkerregister(
             defaultRequest {
                 header("Nav-Consumer-Id", "dp-oppslag-arbeidssoker")
                 runCatching { MDC.get(SØKNAD_ID) }.onSuccess { header("Nav-Call-Id", it) }
-                header("Authorization", "Bearer ${tokenProvider.invoke()}")
             }
         }
 
@@ -72,6 +72,7 @@ class PawArbeidssøkerregister(
             log.info { "Henter arbeidssøkerperioder fra og med '$fom' til og med '$tom'" }
             try {
                 client.post("$baseUrl/api/v1/veileder/arbeidssoekerperioder") {
+                    bearerAuth(tokenProvider.invoke())
                     contentType(ContentType.Application.Json)
                     setBody(mapOf("identitetsnummer" to fnr))
                 }.body<List<ArbeidssoekerperiodeResponseDTO>>().let {
