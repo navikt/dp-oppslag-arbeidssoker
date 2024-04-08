@@ -7,7 +7,6 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -21,8 +20,7 @@ class PawArbeidssøkerregisterTest {
     private val enkelPeriode by lazy { javaClass.getResource("/enkel.json")!!.readText() }
 
     @Test
-    @Disabled
-    fun `test something`() {
+    fun `test henting av arbeidssøkerperioder`() {
         stub.setExpectation(enkelPeriode)
 
         val perioder = runBlocking { klient.hentRegistreringsperiode("12345678910", LocalDate.now(), LocalDate.now()) }

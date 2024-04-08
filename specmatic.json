@@ -7,5 +7,8 @@
         "src/main/resources/openapi/documentation.yaml"
       ]
     }
-  ]
+  ],
+  "hooks": {
+    "stub_load_contract": "./.fix-paw-openapi.sh"
+  }
 }
