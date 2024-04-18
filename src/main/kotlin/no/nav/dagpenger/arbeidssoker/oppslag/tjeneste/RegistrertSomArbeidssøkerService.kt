@@ -25,7 +25,7 @@ class RegistrertSomArbeidssøkerService(
         River(rapidsConnection).apply {
             validate { it.demandAllOrAny("@behov", listOf("RegistrertSomArbeidssøker")) }
             validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("ident") }
+            validate { it.requireKey("ident", "gjelderDato") }
             validate { it.requireKey("RegistrertSomArbeidssøker") }
             validate { it.interestedIn("søknadId", "@behovId", "behandlingId") }
         }.register(this)
@@ -43,23 +43,25 @@ class RegistrertSomArbeidssøkerService(
             "behandlingId" to packet["behandlingId"].asText(),
             "behovId" to packet["@behovId"].asText(),
         ) {
+            val gjelderDato = packet["gjelderDato"].asLocalDate()
+            // TODO: Skal vi bruke denne?
             val ønsketDato = packet["RegistrertSomArbeidssøker"]["Virkningsdato"].asLocalDate()
             val registreringsperioder =
                 runBlocking {
                     arbeidssøkerRegister.hentRegistreringsperiode(
                         fnr,
-                        fom = ønsketDato.minusDays(105),
-                        tom = ønsketDato,
+                        fom = gjelderDato.minusDays(105),
+                        tom = gjelderDato,
                     )
                 }
             // Finn den siste perioden som inneholder ønsketDato
-            val periode = registreringsperioder.lastOrNull { ønsketDato in it }
+            val periode = registreringsperioder.lastOrNull { gjelderDato in it }
             val erRegistrertSomArbeidssøker = periode != null
             val løsning =
                 mapOf(
                     "verdi" to erRegistrertSomArbeidssøker,
-                    "gyldigFraOgMed" to ønsketDato,
-                    "gyldigTilOgMed" to ønsketDato,
+                    "gyldigFraOgMed" to gjelderDato,
+                    "gyldigTilOgMed" to gjelderDato,
                 )
             packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)
         }
