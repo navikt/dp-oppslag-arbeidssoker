@@ -63,10 +63,10 @@ tasks.compileKotlin {
     dependsOn("openApiGenerate")
 }
 
+@Suppress("ktlint:standard:max-line-length")
 openApiGenerate {
     generatorName.set("kotlin")
     remoteInputSpec.set(
-        @Suppress("ktlint:standard:max-line-length")
         "https://raw.githubusercontent.com/navikt/paw-arbeidssoekerregisteret-api-oppslag/main/src/main/resources/openapi/documentation.yaml",
     )
     outputDir.set("${layout.buildDirectory.get()}/generated/")
