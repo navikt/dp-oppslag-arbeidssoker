@@ -40,10 +40,6 @@ spec:
   accessPolicy:
     outbound:
       rules:
-        - application: veilarbregistrering
-          namespace: paw
         - application: paw-arbeidssoekerregisteret-api-oppslag
           namespace: paw
-      external:
-        - host: {{ veilarbregistrering.ingress }}
 

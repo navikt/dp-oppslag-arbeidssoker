@@ -20,18 +20,9 @@ private val defaultProperties =
         ),
     )
 
-private val localProperties =
-    ConfigurationMap(
-        mapOf(
-            "veilarbregistrering.url" to "https://localhost/ail_ws/Oppfoelgingsstatus_v2",
-            "veilarbregistrering.scope" to "api://dev-fss.paw.veilarbregistrering/.default",
-        ),
-    )
 private val devProperties =
     ConfigurationMap(
         mapOf(
-            "veilarbregistrering.url" to "https://veilarbregistrering.intern.dev.nav.no/veilarbregistrering/api",
-            "veilarbregistrering.scope" to "api://dev-gcp.paw.veilarbregistrering/.default",
             "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag.paw",
             "paw-arbeidssoekerregisteret.scope" to "api://dev-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
         ),
@@ -39,8 +30,6 @@ private val devProperties =
 private val prodProperties =
     ConfigurationMap(
         mapOf(
-            "veilarbregistrering.url" to "https://veilarbregistrering.intern.nav.no/veilarbregistrering/api",
-            "veilarbregistrering.scope" to "api://prod-gcp.paw.veilarbregistrering/.default",
             "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag.paw",
             "paw-arbeidssoekerregisteret.scope" to "api://prod-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
         ),
@@ -49,9 +38,9 @@ private val prodProperties =
 internal val config
     get() =
         when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
-            "dev-gcp" -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
             "prod-gcp" -> systemProperties() overriding EnvironmentVariables overriding prodProperties overriding defaultProperties
-            else -> systemProperties() overriding EnvironmentVariables overriding localProperties overriding defaultProperties
+            "dev-gcp" -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
+            else -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
         }
 
 const val SØKNAD_ID = "søknadId"
@@ -64,18 +53,8 @@ private val azureAdClient: CachedOauth2Client by lazy {
     )
 }
 
-val veilarbregistreringBaseurl: String = config[Key("veilarbregistrering.url", stringType)]
 val pawArbeidssøkerregisterBaseurl: String = config[Key("paw-arbeidssoekerregisteret.url", stringType)]
 
-val veilarbregistreringTokenSupplier by lazy {
-    {
-        runBlocking {
-            azureAdClient.clientCredentials(
-                config[Key("veilarbregistrering.scope", stringType)],
-            ).accessToken
-        }
-    }
-}
 val pawArbeidssøkerregisterTokenSupplier by lazy {
     {
         runBlocking {
