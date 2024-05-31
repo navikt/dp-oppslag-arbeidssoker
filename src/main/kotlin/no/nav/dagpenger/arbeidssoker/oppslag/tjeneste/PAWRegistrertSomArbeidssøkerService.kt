@@ -13,7 +13,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
 
-class RegistrertSomArbeidssøkerService(
+class PAWRegistrertSomArbeidssøkerService(
     rapidsConnection: RapidsConnection,
     private val arbeidssøkerRegister: Arbeidssøkerregister,
 ) : River.PacketListener {
@@ -60,16 +60,6 @@ class RegistrertSomArbeidssøkerService(
             val periode = registreringsperioder.lastOrNull { gjelderDato in it }
             val erRegistrertSomArbeidssøker = periode != null
             log.info { "Registrert som arbeidssøker: $erRegistrertSomArbeidssøker" }
-            val løsning =
-                mapOf(
-                    "verdi" to erRegistrertSomArbeidssøker,
-                    "gyldigFraOgMed" to gjelderDato,
-                    "gyldigTilOgMed" to gjelderDato,
-                )
-            packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)
-            log.info { "løser behov '$BEHOV'" }
-
-            context.publish(packet.toJson())
         }
     }
 

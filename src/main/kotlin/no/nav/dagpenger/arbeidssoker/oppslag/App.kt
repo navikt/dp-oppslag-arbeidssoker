@@ -2,7 +2,7 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.PawArbeidssøkerregister
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.VeilarbArbeidssøkerregister
-import no.nav.dagpenger.arbeidssoker.oppslag.tjeneste.PawRegistreringsperioderService
+import no.nav.dagpenger.arbeidssoker.oppslag.tjeneste.PAWRegistrertSomArbeidssøkerService
 import no.nav.dagpenger.arbeidssoker.oppslag.tjeneste.RegistreringsperioderService
 import no.nav.dagpenger.arbeidssoker.oppslag.tjeneste.RegistrertSomArbeidssøkerService
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -19,15 +19,18 @@ fun main() {
                 baseUrl = pawArbeidssøkerregisterBaseurl,
                 tokenProvider = pawArbeidssøkerregisterTokenSupplier,
             )
+
+        // For dp-quiz (ikke i bruk)
         RegistreringsperioderService(
             this,
             arbeidssøkerRegister,
         )
-        PawRegistreringsperioderService(
+
+        // For dp-behandling
+        PAWRegistrertSomArbeidssøkerService(
             this,
             pawArbeidssøkerRegister,
         )
-        // For dp-behandling
         RegistrertSomArbeidssøkerService(
             this,
             arbeidssøkerRegister,
