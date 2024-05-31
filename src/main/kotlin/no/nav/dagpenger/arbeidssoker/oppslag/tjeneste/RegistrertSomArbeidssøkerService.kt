@@ -1,6 +1,7 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.tjeneste
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
@@ -19,14 +20,15 @@ class RegistrertSomArbeidssøkerService(
     companion object {
         private val log = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.RegistrertSomArbeidssøkerService")
+        const val BEHOV = "RegistrertSomArbeidssøker"
     }
 
     init {
         River(rapidsConnection).apply {
-            validate { it.demandAllOrAny("@behov", listOf("RegistrertSomArbeidssøker")) }
+            validate { it.demandAllOrAny("@behov", listOf(BEHOV)) }
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("ident", "gjelderDato") }
-            validate { it.requireKey("RegistrertSomArbeidssøker") }
+            validate { it.requireKey(BEHOV) }
             validate { it.interestedIn("søknadId", "@behovId", "behandlingId") }
         }.register(this)
     }
@@ -47,7 +49,7 @@ class RegistrertSomArbeidssøkerService(
             // TODO: Skal vi bruke denne?
             val ønsketDato = packet["RegistrertSomArbeidssøker"]["Virkningsdato"].asLocalDate()
             val registreringsperioder =
-                runBlocking {
+                runBlocking(MDCContext()) {
                     arbeidssøkerRegister.hentRegistreringsperiode(
                         fnr,
                         fom = gjelderDato.minusDays(105),
@@ -64,11 +66,10 @@ class RegistrertSomArbeidssøkerService(
                     "gyldigTilOgMed" to gjelderDato,
                 )
             packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)
+            log.info { "løser behov '$BEHOV'" }
+
+            context.publish(packet.toJson())
         }
-
-        log.info { "løser behov for $søknadId" }
-
-        context.publish(packet.toJson())
     }
 
     override fun onError(
