@@ -14,7 +14,8 @@
         "startet": {
           "tidspunkt": "2017-07-21T17:32:28Z",
           "utfoertAv": {
-            "type": "UKJENT_VERDI"
+            "type": "UKJENT_VERDI",
+            "id": "string"
           },
           "kilde": "string",
           "aarsak": "string"
@@ -22,7 +23,8 @@
         "avsluttet": {
           "tidspunkt": "2017-07-21T17:32:28Z",
           "utfoertAv": {
-            "type": "UKJENT_VERDI"
+            "type": "UKJENT_VERDI",
+            "id": "string"
           },
           "kilde": "string",
           "aarsak": "string"
