@@ -26,7 +26,7 @@ class RegistrertSomArbeidssøkerServiceTest {
         val startDato2 = sluttDato.minusDays(1)
 
         coEvery {
-            arbeidsøkerRegister.hentRegistreringsperiode(any(), any(), any())
+            arbeidsøkerRegister.hentRegistreringsperiode(any())
         } returns
             listOf(
                 Periode(gjelderDato, sluttDato),

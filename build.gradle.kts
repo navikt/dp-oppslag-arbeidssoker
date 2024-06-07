@@ -53,13 +53,16 @@ sourceSets {
     }
 }
 
-spotless {
-    kotlin {
-        targetExclude("**/generated/**")
+ktlint {
+    filter {
+        exclude("**/generated/**")
     }
 }
 
 tasks.compileKotlin {
+    dependsOn("openApiGenerate")
+}
+tasks.runKtlintFormatOverMainSourceSet {
     dependsOn("openApiGenerate")
 }
 
