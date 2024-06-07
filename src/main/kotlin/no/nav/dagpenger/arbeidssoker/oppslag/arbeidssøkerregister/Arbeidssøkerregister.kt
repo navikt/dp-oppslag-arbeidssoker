@@ -4,11 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDate
 
 interface Arbeidssøkerregister {
-    suspend fun hentRegistreringsperiode(
-        fnr: String,
-        fom: LocalDate,
-        tom: LocalDate,
-    ): List<Periode>
+    suspend fun hentRegistreringsperiode(fnr: String): List<Periode>
 }
 
 data class Periode(

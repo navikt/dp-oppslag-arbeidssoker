@@ -26,7 +26,7 @@ class PawArbeidssøkerregisterTest {
     fun `test henting av arbeidssøkerperioder`() {
         stub.setExpectation(enkelPeriode)
 
-        val perioder = runBlocking { klient.hentRegistreringsperiode("12345678910", LocalDate.now(), LocalDate.now()) }
+        val perioder = runBlocking { klient.hentRegistreringsperiode("12345678910") }
         perioder shouldHaveSize 1
         perioder.first().apply {
             fom shouldBe LocalDate.of(2017, 7, 21)
@@ -40,7 +40,7 @@ class PawArbeidssøkerregisterTest {
 
         shouldThrow<ServerResponseException> {
             runBlocking {
-                klient.hentRegistreringsperiode("01987654321", LocalDate.now(), LocalDate.now())
+                klient.hentRegistreringsperiode("01987654321")
             }
         }
     }

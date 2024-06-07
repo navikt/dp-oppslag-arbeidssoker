@@ -52,8 +52,6 @@ class RegistrertSomArbeidssøkerService(
                 runBlocking(MDCContext()) {
                     arbeidssøkerRegister.hentRegistreringsperiode(
                         fnr,
-                        fom = gjelderDato.minusDays(105),
-                        tom = gjelderDato,
                     )
                 }
             // Finn den siste perioden som inneholder ønsketDato

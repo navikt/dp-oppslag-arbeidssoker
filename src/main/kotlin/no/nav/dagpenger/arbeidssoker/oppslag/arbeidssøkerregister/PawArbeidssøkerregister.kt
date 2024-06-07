@@ -64,13 +64,8 @@ class PawArbeidssøkerregister(
             }
         }
 
-    override suspend fun hentRegistreringsperiode(
-        fnr: String,
-        fom: LocalDate,
-        tom: LocalDate,
-    ): List<Periode> =
+    override suspend fun hentRegistreringsperiode(fnr: String): List<Periode> =
         withContext(Dispatchers.IO) {
-            log.info { "Henter arbeidssøkerperioder fra og med '$fom' til og med '$tom'" }
             try {
                 client.post("$baseUrl/api/v1/veileder/arbeidssoekerperioder") {
                     bearerAuth(tokenProvider.invoke())
