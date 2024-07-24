@@ -55,6 +55,7 @@ sourceSets {
 
 ktlint {
     filter {
+        exclude("**/generated/**")
         exclude("generated")
     }
 }
