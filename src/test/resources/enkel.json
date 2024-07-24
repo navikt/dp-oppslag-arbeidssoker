@@ -2,6 +2,9 @@
   "http-request": {
     "path": "/api/v1/veileder/arbeidssoekerperioder",
     "method": "POST",
+    "headers": {
+      "Authorization": "Bearer 123"
+    },
     "body": {
       "identitetsnummer": "12345678910"
     }

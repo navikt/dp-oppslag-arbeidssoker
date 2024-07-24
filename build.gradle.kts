@@ -55,7 +55,7 @@ sourceSets {
 
 ktlint {
     filter {
-        exclude("**/generated/**")
+        exclude("generated")
     }
 }
 
@@ -63,6 +63,9 @@ tasks.compileKotlin {
     dependsOn("openApiGenerate")
 }
 tasks.runKtlintFormatOverMainSourceSet {
+    dependsOn("openApiGenerate")
+}
+tasks.runKtlintCheckOverMainSourceSet {
     dependsOn("openApiGenerate")
 }
 
