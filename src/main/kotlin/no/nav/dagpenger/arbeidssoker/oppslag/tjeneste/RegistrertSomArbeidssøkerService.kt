@@ -24,13 +24,14 @@ class RegistrertSomArbeidssøkerService(
     }
 
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandAllOrAny("@behov", listOf(BEHOV)) }
-            validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("ident", "gjelderDato") }
-            validate { it.requireKey(BEHOV) }
-            validate { it.interestedIn("søknadId", "@behovId", "behandlingId") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandAllOrAny("@behov", listOf(BEHOV)) }
+                validate { it.rejectKey("@løsning") }
+                validate { it.requireKey("ident", "gjelderDato") }
+                validate { it.requireKey(BEHOV) }
+                validate { it.interestedIn("søknadId", "@behovId", "behandlingId") }
+            }.register(this)
     }
 
     override fun onPacket(
@@ -65,8 +66,15 @@ class RegistrertSomArbeidssøkerService(
                     "gyldigTilOgMed" to gjelderDato,
                 )
             packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)
-            log.info { "løser behov '$BEHOV'" }
 
+            // Ta med ufiltret respons fra arbeidssøkerregisteret for å sikre bedre sporing
+            packet["@kilde"] =
+                mapOf(
+                    "navn" to "paw-arbeidssoekerregisteret-api-oppslag",
+                    "data" to registreringsperioder,
+                )
+
+            log.info { "løser behov '$BEHOV'" }
             context.publish(packet.toJson())
         }
     }
