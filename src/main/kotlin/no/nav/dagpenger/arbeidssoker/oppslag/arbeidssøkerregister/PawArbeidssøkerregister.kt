@@ -18,6 +18,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.Dispatchers
@@ -67,20 +68,24 @@ class PawArbeidssøkerregister(
     override suspend fun hentRegistreringsperiode(fnr: String): List<Periode> =
         withContext(Dispatchers.IO) {
             try {
-                client.post("$baseUrl/api/v1/veileder/arbeidssoekerperioder") {
-                    bearerAuth(tokenProvider.invoke())
-                    contentType(ContentType.Application.Json)
-                    setBody(mapOf("identitetsnummer" to fnr))
-                }.body<List<ArbeidssoekerperiodeResponseDTO>>().let {
-                    it.map { arbeidssøkerperiode ->
-                        Periode(
-                            fom = arbeidssøkerperiode.startet.tidspunkt.toLocalDate(),
-                            tom = arbeidssøkerperiode.avsluttet?.tidspunkt?.toLocalDate() ?: LocalDate.MAX,
-                        )
+                client
+                    .post("$baseUrl/api/v1/veileder/arbeidssoekerperioder") {
+                        bearerAuth(tokenProvider.invoke())
+                        contentType(ContentType.Application.Json)
+                        MDC.get("behandlingId")?.let { header(HttpHeaders.XCorrelationId, it) }
+                        MDC.get("behovId")?.let { header(HttpHeaders.XRequestId, it) }
+                        setBody(mapOf("identitetsnummer" to fnr))
+                    }.body<List<ArbeidssoekerperiodeResponseDTO>>()
+                    .let {
+                        it.map { arbeidssøkerperiode ->
+                            Periode(
+                                fom = arbeidssøkerperiode.startet.tidspunkt.toLocalDate(),
+                                tom = arbeidssøkerperiode.avsluttet?.tidspunkt?.toLocalDate() ?: LocalDate.MAX,
+                            )
+                        }
+                    }.also {
+                        log.info { "Fant ${it.size} arbeidssøkerperioder" }
                     }
-                }.also {
-                    log.info { "Fant ${it.size} arbeidssøkerperioder" }
-                }
             } catch (e: ClientRequestException) {
                 val responseBody = e.response.bodyAsText()
                 log.error(e) { "Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody" }
