@@ -58,14 +58,17 @@ val pawArbeidssøkerregisterBaseurl: String = config[Key("paw-arbeidssoekerregis
 val pawArbeidssøkerregisterTokenSupplier by lazy {
     {
         runBlocking {
-            azureAdClient.clientCredentials(
-                config[Key("paw-arbeidssoekerregisteret.scope", stringType)],
-            ).accessToken
+            azureAdClient
+                .clientCredentials(
+                    config[Key("paw-arbeidssoekerregisteret.scope", stringType)],
+                ).accessToken
         }
     }
 }
 
 val kafkaConfig: Map<String, String> by lazy {
-    config.list().reversed()
+    config
+        .list()
+        .reversed()
         .fold(emptyMap()) { map, pair -> map + pair.second }
 }
