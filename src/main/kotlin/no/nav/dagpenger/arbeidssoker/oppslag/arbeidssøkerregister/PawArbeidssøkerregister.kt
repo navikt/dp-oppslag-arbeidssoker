@@ -31,7 +31,7 @@ import java.time.LocalDate
 
 class PawArbeidssøkerregister(
     private val baseUrl: String? = null,
-    private val tokenProvider: () -> String,
+    private val tokenProvider: () -> String?,
     httpClientEngine: HttpClientEngine = CIO.create {},
 ) : Arbeidssøkerregister {
     private companion object {
@@ -67,10 +67,11 @@ class PawArbeidssøkerregister(
 
     override suspend fun hentRegistreringsperiode(fnr: String): List<Periode> =
         withContext(Dispatchers.IO) {
+            val token = tokenProvider.invoke()!!
             try {
                 client
                     .post("$baseUrl/api/v1/veileder/arbeidssoekerperioder") {
-                        bearerAuth(tokenProvider.invoke())
+                        bearerAuth(token)
                         contentType(ContentType.Application.Json)
                         MDC.get("behandlingId")?.let { header(HttpHeaders.XCorrelationId, it) }
                         MDC.get("behovId")?.let {
