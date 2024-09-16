@@ -26,7 +26,7 @@ dependencies {
     implementation(libs.bundles.jackson)
 
     // mdc coroutine plugin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.9.0")
 
     // logging
     implementation(libs.kotlin.logging)
