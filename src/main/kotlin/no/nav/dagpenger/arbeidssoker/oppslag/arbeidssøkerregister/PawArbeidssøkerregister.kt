@@ -74,8 +74,8 @@ class PawArbeidssøkerregister(
                         bearerAuth(token)
                         contentType(ContentType.Application.Json)
                         MDC.get("behandlingId")?.let { header(HttpHeaders.XCorrelationId, it) }
-                        MDC.get("behovId")?.let {
-                            header(HttpHeaders.XRequestId, it).also { log.info { "Legger ved behovId=$it" } }
+                        MDC.get("behovId")?.let { behovId ->
+                            header(HttpHeaders.XRequestId, behovId).also { log.info { "Legger ved behovId=$behovId" } }
                         }
                         setBody(mapOf("identitetsnummer" to fnr))
                     }.body<List<ArbeidssoekerperiodeResponseDTO>>()
