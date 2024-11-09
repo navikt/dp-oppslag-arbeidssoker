@@ -1,11 +1,11 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.tjeneste
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Periode
+import no.nav.helse.rapids_rivers.asLocalDate
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
