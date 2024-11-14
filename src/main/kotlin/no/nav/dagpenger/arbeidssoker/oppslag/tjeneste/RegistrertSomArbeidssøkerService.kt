@@ -46,8 +46,6 @@ class RegistrertSomArbeidssøkerService(
             "behandlingId" to packet["behandlingId"].asText(),
             "behovId" to packet["@behovId"].asText(),
         ) {
-            val gjelderDato = packet["gjelderDato"].asLocalDate()
-            // TODO: Skal vi bruke denne?
             val ønsketDato = packet["RegistrertSomArbeidssøker"]["Virkningsdato"].asLocalDate()
             val registreringsperioder =
                 runBlocking(MDCContext()) {
@@ -56,14 +54,14 @@ class RegistrertSomArbeidssøkerService(
                     )
                 }
             // Finn den siste perioden som inneholder ønsketDato
-            val periode = registreringsperioder.lastOrNull { gjelderDato in it }
+            val periode = registreringsperioder.lastOrNull { ønsketDato in it }
             val erRegistrertSomArbeidssøker = periode != null
             log.info { "Registrert som arbeidssøker: $erRegistrertSomArbeidssøker" }
             val løsning =
                 mapOf(
                     "verdi" to erRegistrertSomArbeidssøker,
-                    "gyldigFraOgMed" to gjelderDato,
-                    "gyldigTilOgMed" to gjelderDato,
+                    "gyldigFraOgMed" to ønsketDato,
+                    "gyldigTilOgMed" to ønsketDato,
                 )
             packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)
 

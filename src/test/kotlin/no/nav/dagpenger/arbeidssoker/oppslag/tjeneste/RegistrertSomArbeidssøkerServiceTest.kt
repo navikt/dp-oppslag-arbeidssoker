@@ -13,7 +13,7 @@ import java.time.LocalDate
 class RegistrertSomArbeidssøkerServiceTest {
     private val rapid = TestRapid()
     private val arbeidsøkerRegister: Arbeidssøkerregister = mockk()
-    private val gjelderDato = LocalDate.of(2020, 1, 1)
+    private val prøvingsdato = LocalDate.of(2020, 1, 1)
 
     init {
 
@@ -22,14 +22,14 @@ class RegistrertSomArbeidssøkerServiceTest {
 
     @Test
     fun `svarer på om person er registrert som arbeidssøker`() {
-        val sluttDato = gjelderDato.minusDays(7)
+        val sluttDato = prøvingsdato.minusDays(7)
         val startDato2 = sluttDato.minusDays(1)
 
         coEvery {
             arbeidsøkerRegister.hentRegistreringsperiode(any())
         } returns
             listOf(
-                Periode(gjelderDato, sluttDato),
+                Periode(prøvingsdato, sluttDato),
                 Periode(startDato2, LocalDate.MAX),
             )
         rapid.sendTestMessage(json)
@@ -39,8 +39,8 @@ class RegistrertSomArbeidssøkerServiceTest {
             val løsning = field(0, "@løsning")
             val verdi = løsning["RegistrertSomArbeidssøker"]
             assertEquals(true, verdi["verdi"].asBoolean())
-            assertEquals(gjelderDato, verdi["gyldigTilOgMed"].asLocalDate())
-            assertEquals(gjelderDato, verdi["gyldigFraOgMed"].asLocalDate())
+            assertEquals(prøvingsdato, verdi["gyldigTilOgMed"].asLocalDate())
+            assertEquals(prøvingsdato, verdi["gyldigFraOgMed"].asLocalDate())
         }
     }
 
@@ -55,18 +55,18 @@ class RegistrertSomArbeidssøkerServiceTest {
           ],
           "ident": "11109233444",
           "behandlingId": "018e9e8d-35f3-7835-9569-5c59ec0737da",
-          "gjelderDato": "$gjelderDato",
+          "gjelderDato": "$prøvingsdato",
           "fagsakId": "123",
           "søknadId": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf",
           "søknad_uuid": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf",
           "RegistrertSomArbeidssøker": {
-            "Virkningsdato": "$gjelderDato",
+            "Virkningsdato": "$prøvingsdato",
             "InnsendtSøknadsId": {
               "urn": "urn:soknad:4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
             },
             "søknad_uuid": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
           },
-          "Virkningsdato": "$gjelderDato",
+          "Virkningsdato": "$prøvingsdato",
           "InnsendtSøknadsId": {
             "urn": "urn:soknad:4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
           },
