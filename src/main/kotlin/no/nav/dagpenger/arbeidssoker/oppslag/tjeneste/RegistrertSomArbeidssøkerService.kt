@@ -61,13 +61,17 @@ class RegistrertSomArbeidssøkerService(
                     mapOf(
                         "verdi" to true,
                         "gyldigFraOgMed" to periode.fom,
-                    )
+                    ).also {
+                        log.info { "Registrert som arbeidssøker: $periode på $ønsketDato" }
+                    }
                 } else {
                     mapOf(
                         "verdi" to false,
                         "gyldigFraOgMed" to ønsketDato,
                         "gyldigTilOgMed" to ønsketDato,
-                    )
+                    ).also {
+                        log.info { "Ikke registrert som arbeidssøker på $ønsketDato" }
+                    }
                 }
 
             packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)

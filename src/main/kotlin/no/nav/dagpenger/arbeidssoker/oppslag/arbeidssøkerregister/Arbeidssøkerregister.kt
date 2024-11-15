@@ -12,6 +12,9 @@ data class Periode(
     val tom: LocalDate,
     @JsonIgnore private val range: ClosedRange<LocalDate> = fom..tom,
 ) {
-
     operator fun contains(date: LocalDate): Boolean = date in range
+
+    override fun toString(): String {
+        return "Periode(fom=$fom, tom=$tom)"
+    }
 }
