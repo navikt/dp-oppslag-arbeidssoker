@@ -22,15 +22,17 @@ class RegistrertSomArbeidssøkerServiceTest {
 
     @Test
     fun `svarer på om person er registrert som arbeidssøker`() {
-        val sluttDato = prøvingsdato.minusDays(7)
-        val startDato2 = sluttDato.minusDays(1)
+        val startDatoPeriode1 = prøvingsdato.minusDays(1)
+        val sluttDatoPeriode1 = startDatoPeriode1.plusDays(10)
+        val startDatoPeriode2 = startDatoPeriode1.minusDays(10)
+        val sluttDatoPeriode2 = startDatoPeriode2.plusDays(9)
 
         coEvery {
             arbeidsøkerRegister.hentRegistreringsperiode(any())
         } returns
             listOf(
-                Periode(prøvingsdato, sluttDato),
-                Periode(startDato2, LocalDate.MAX),
+                Periode(fom = startDatoPeriode1, tom = sluttDatoPeriode1),
+                Periode(fom = startDatoPeriode2, tom = sluttDatoPeriode2),
             )
         rapid.sendTestMessage(json)
 
@@ -39,8 +41,25 @@ class RegistrertSomArbeidssøkerServiceTest {
             val løsning = field(0, "@løsning")
             val verdi = løsning["RegistrertSomArbeidssøker"]
             assertEquals(true, verdi["verdi"].asBoolean())
-            assertEquals(prøvingsdato, verdi["gyldigTilOgMed"].asLocalDate())
+            assertEquals(startDatoPeriode1, verdi["gyldigFraOgMed"].asLocalDate())
+        }
+    }
+
+    @Test
+    fun `svarer på om person ikke er registrert som arbeidssøker`() {
+        coEvery {
+            arbeidsøkerRegister.hentRegistreringsperiode(any())
+        } returns
+            emptyList()
+        rapid.sendTestMessage(json)
+
+        with(rapid.inspektør) {
+            assertEquals(1, size)
+            val løsning = field(0, "@løsning")
+            val verdi = løsning["RegistrertSomArbeidssøker"]
+            assertEquals(false, verdi["verdi"].asBoolean())
             assertEquals(prøvingsdato, verdi["gyldigFraOgMed"].asLocalDate())
+            assertEquals(prøvingsdato, verdi["gyldigTilOgMed"].asLocalDate())
         }
     }
 

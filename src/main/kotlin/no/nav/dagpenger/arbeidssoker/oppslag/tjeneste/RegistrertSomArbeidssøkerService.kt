@@ -55,14 +55,21 @@ class RegistrertSomArbeidssøkerService(
                 }
             // Finn den siste perioden som inneholder ønsketDato
             val periode = registreringsperioder.lastOrNull { ønsketDato in it }
-            val erRegistrertSomArbeidssøker = periode != null
-            log.info { "Registrert som arbeidssøker: $erRegistrertSomArbeidssøker" }
+
             val løsning =
-                mapOf(
-                    "verdi" to erRegistrertSomArbeidssøker,
-                    "gyldigFraOgMed" to ønsketDato,
-                    "gyldigTilOgMed" to ønsketDato,
-                )
+                if (periode != null) {
+                    mapOf(
+                        "verdi" to true,
+                        "gyldigFraOgMed" to periode.fom,
+                    )
+                } else {
+                    mapOf(
+                        "verdi" to false,
+                        "gyldigFraOgMed" to ønsketDato,
+                        "gyldigTilOgMed" to ønsketDato,
+                    )
+                }
+
             packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)
 
             // Ta med ufiltret respons fra arbeidssøkerregisteret for å sikre bedre sporing
