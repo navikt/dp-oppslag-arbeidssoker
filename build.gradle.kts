@@ -22,7 +22,7 @@ dependencies {
     // ktor
     implementation(libs.bundles.ktor.client)
 
-    implementation(libs.dp.biblioteker.oauth2.klient)
+    implementation("no.nav.dagpenger:oauth2-klient:2024.12.19-12.57.9d42f60a1165")
     implementation(libs.bundles.jackson)
 
     // mdc coroutine plugin
@@ -39,10 +39,11 @@ dependencies {
 
     // test
     testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.rapids.and.rivers.test)
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.mockk)
 
-    testImplementation("in.specmatic:specmatic-core:1.3.39")
+    testImplementation("io.specmatic:specmatic-core:2.0.48")
 }
 
 sourceSets {
