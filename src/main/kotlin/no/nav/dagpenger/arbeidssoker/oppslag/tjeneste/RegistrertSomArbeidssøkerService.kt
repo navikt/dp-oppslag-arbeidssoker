@@ -1,17 +1,19 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.tjeneste
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.MessageProblems
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDate
 
 class RegistrertSomArbeidssøkerService(
     rapidsConnection: RapidsConnection,
@@ -37,6 +39,8 @@ class RegistrertSomArbeidssøkerService(
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
     ) {
         val fnr = packet["ident"].asText()
         val søknadId = packet["søknadId"].asText()
@@ -91,6 +95,7 @@ class RegistrertSomArbeidssøkerService(
     override fun onError(
         problems: MessageProblems,
         context: MessageContext,
+        metadata: MessageMetadata,
     ) {
         log.error { problems.toString() }
         sikkerlogg.error { problems.toExtendedReport() }

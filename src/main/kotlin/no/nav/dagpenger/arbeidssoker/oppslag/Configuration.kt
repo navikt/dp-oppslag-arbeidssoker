@@ -61,7 +61,7 @@ val pawArbeidssøkerregisterTokenSupplier by lazy {
             azureAdClient
                 .clientCredentials(
                     config[Key("paw-arbeidssoekerregisteret.scope", stringType)],
-                ).accessToken
+                ).access_token
         }
     }
 }
