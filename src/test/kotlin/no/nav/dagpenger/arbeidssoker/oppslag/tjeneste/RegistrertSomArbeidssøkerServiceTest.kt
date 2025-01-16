@@ -63,6 +63,19 @@ class RegistrertSomArbeidssøkerServiceTest {
         }
     }
 
+    @Test
+    fun `skal ikke løse behov som allerede er løst`() {
+        coEvery {
+            arbeidsøkerRegister.hentRegistreringsperiode(any())
+        } returns
+            emptyList()
+        rapid.sendTestMessage(jsonMedLøsing)
+
+        with(rapid.inspektør) {
+            assertEquals(0, size)
+        }
+    }
+
     // language=json
     private val json =
         """
@@ -84,6 +97,50 @@ class RegistrertSomArbeidssøkerServiceTest {
               "urn": "urn:soknad:4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
             },
             "søknad_uuid": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
+          },
+          "Prøvingsdato": "$prøvingsdato",
+          "InnsendtSøknadsId": {
+            "urn": "urn:soknad:4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
+          },
+          "@id": "0c60ca43-f54b-4a1b-9ab3-5646024a0815",
+          "@opprettet": "2024-04-02T13:23:58.789361",
+          "system_read_count": 0,
+          "system_participating_services": [
+            {
+              "id": "0c60ca43-f54b-4a1b-9ab3-5646024a0815",
+              "time": "2024-04-02T13:23:58.789361"
+            }
+          ]
+        }
+        """.trimIndent()
+
+    // language=json
+    private val jsonMedLøsing =
+        """
+        {
+          "@event_name": "behov",
+          "@behovId": "83894fc2-6e45-4534-abd1-97a441c57b2f",
+          "@behov": [
+            "RegistrertSomArbeidssøker"
+          ],
+          "ident": "11109233444",
+          "behandlingId": "018e9e8d-35f3-7835-9569-5c59ec0737da",
+          "gjelderDato": "$prøvingsdato",
+          "fagsakId": "123",
+          "søknadId": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf",
+          "søknad_uuid": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf",
+          "RegistrertSomArbeidssøker": {
+            "Prøvingsdato": "$prøvingsdato",
+            "InnsendtSøknadsId": {
+              "urn": "urn:soknad:4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
+            },
+            "søknad_uuid": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
+          },
+          "@løsning": {
+            "RegistrertSomArbeidssøker": {
+              "verdi": true,
+              "gyldigFraOgMed": "$prøvingsdato"
+            }
           },
           "Prøvingsdato": "$prøvingsdato",
           "InnsendtSøknadsId": {
