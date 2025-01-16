@@ -53,12 +53,7 @@ class RegistrertSomArbeidssøkerService(
             "behandlingId" to packet["behandlingId"].asText(),
             "behovId" to packet["@behovId"].asText(),
         ) {
-            val prøvingsdato =
-                if (packet[BEHOV].has("Prøvingsdato")) {
-                    packet[BEHOV]["Prøvingsdato"].asLocalDate()
-                } else {
-                    packet[BEHOV]["Virkningsdato"].asLocalDate()
-                }
+            val prøvingsdato = packet[BEHOV]["Prøvingsdato"].asLocalDate()
             val registreringsperioder =
                 runBlocking(MDCContext()) {
                     arbeidssøkerRegister.hentRegistreringsperiode(

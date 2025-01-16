@@ -56,8 +56,7 @@ sourceSets {
 
 ktlint {
     filter {
-        exclude("**/generated/**")
-        exclude("generated")
+        exclude { element -> element.file.path.contains("generated/") }
     }
 }
 
