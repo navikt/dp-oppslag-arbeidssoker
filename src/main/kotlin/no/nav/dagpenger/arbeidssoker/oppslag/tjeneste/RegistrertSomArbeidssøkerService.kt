@@ -31,6 +31,7 @@ class RegistrertSomArbeidssøkerService(
                 precondition {
                     it.requireValue("@event_name", "behov")
                     it.requireAllOrAny("@behov", listOf(BEHOV))
+                    it.forbid("@løsning")
                 }
                 validate { it.requireKey("ident", "gjelderDato") }
                 validate { it.requireKey(BEHOV) }
