@@ -79,13 +79,13 @@ class RegistrertSomArbeidssøkerServiceTest {
           "søknadId": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf",
           "søknad_uuid": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf",
           "RegistrertSomArbeidssøker": {
-            "Prøvingsdato": "$prøvingsdato",
+            "Virkningsdato": "$prøvingsdato",
             "InnsendtSøknadsId": {
               "urn": "urn:soknad:4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
             },
             "søknad_uuid": "4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
           },
-          "Prøvingsdato": "$prøvingsdato",
+          "Virkningsdato": "$prøvingsdato",
           "InnsendtSøknadsId": {
             "urn": "urn:soknad:4afce924-6cb4-4ab4-a92b-fe91e24f31bf"
           },

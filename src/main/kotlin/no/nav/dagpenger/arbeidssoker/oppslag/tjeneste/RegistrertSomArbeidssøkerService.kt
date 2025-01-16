@@ -28,10 +28,8 @@ class RegistrertSomArbeidssøkerService(
     init {
         River(rapidsConnection)
             .apply {
-                precondition {
-                    it.requireValue("@event_name", "behov")
-                    it.requireAllOrAny("@behov", listOf(BEHOV))
-                }
+                validate { it.demandAllOrAny("@behov", listOf(BEHOV)) }
+                validate { it.rejectKey("@løsning") }
                 validate { it.requireKey("ident", "gjelderDato") }
                 validate { it.requireKey(BEHOV) }
                 validate { it.interestedIn("søknadId", "@behovId", "behandlingId") }
@@ -52,12 +50,7 @@ class RegistrertSomArbeidssøkerService(
             "behandlingId" to packet["behandlingId"].asText(),
             "behovId" to packet["@behovId"].asText(),
         ) {
-            val prøvingsdato =
-                if (packet[BEHOV].has("Prøvingsdato")) {
-                    packet[BEHOV]["Prøvingsdato"].asLocalDate()
-                } else {
-                    packet[BEHOV]["Virkningsdato"].asLocalDate()
-                }
+            val ønsketDato = packet["RegistrertSomArbeidssøker"]["Virkningsdato"].asLocalDate()
             val registreringsperioder =
                 runBlocking(MDCContext()) {
                     arbeidssøkerRegister.hentRegistreringsperiode(
@@ -65,7 +58,7 @@ class RegistrertSomArbeidssøkerService(
                     )
                 }
             // Finn den siste perioden som inneholder ønsketDato
-            val periode = registreringsperioder.lastOrNull { prøvingsdato in it }
+            val periode = registreringsperioder.lastOrNull { ønsketDato in it }
 
             val løsning =
                 if (periode != null) {
@@ -73,19 +66,19 @@ class RegistrertSomArbeidssøkerService(
                         "verdi" to true,
                         "gyldigFraOgMed" to periode.fom,
                     ).also {
-                        log.info { "Registrert som arbeidssøker: $periode på $prøvingsdato" }
+                        log.info { "Registrert som arbeidssøker: $periode på $ønsketDato" }
                     }
                 } else {
                     mapOf(
                         "verdi" to false,
-                        "gyldigFraOgMed" to prøvingsdato,
-                        "gyldigTilOgMed" to prøvingsdato,
+                        "gyldigFraOgMed" to ønsketDato,
+                        "gyldigTilOgMed" to ønsketDato,
                     ).also {
-                        log.info { "Ikke registrert som arbeidssøker på $prøvingsdato" }
+                        log.info { "Ikke registrert som arbeidssøker på $ønsketDato" }
                     }
                 }
 
-            packet["@løsning"] = mapOf(BEHOV to løsning)
+            packet["@løsning"] = mapOf("RegistrertSomArbeidssøker" to løsning)
 
             // Ta med ufiltret respons fra arbeidssøkerregisteret for å sikre bedre sporing
             packet["@kilde"] =
