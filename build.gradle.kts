@@ -22,7 +22,7 @@ dependencies {
     // ktor
     implementation(libs.bundles.ktor.client)
 
-    implementation("no.nav.dagpenger:oauth2-klient:2024.12.19-12.57.9d42f60a1165")
+    implementation("no.nav.dagpenger:oauth2-klient:2025.02.12-15.03.b6caff49b640")
     implementation(libs.bundles.jackson)
 
     // mdc coroutine plugin
