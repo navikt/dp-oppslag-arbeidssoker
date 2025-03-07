@@ -30,6 +30,7 @@ class RiverSpanProcessor(
 
 class FilteringSpanProcessorCustomizer : AutoConfigurationCustomizerProvider {
     override fun customize(customizer: AutoConfigurationCustomizer) {
+        logger.debug { "Legger til custom span processor" }
         customizer.addSpanProcessorCustomizer { spanProcessor, _ -> RiverSpanProcessor(spanProcessor) }
     }
 }
