@@ -39,7 +39,7 @@ dependencies {
 
     implementation("io.opentelemetry:opentelemetry-api:1.47.0")
     implementation("io.opentelemetry:opentelemetry-sdk:1.47.0")
-    implementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:1.47.0")
+    implementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi:1.47.0")
 
     // test
     testImplementation(libs.kotest.assertions.core)

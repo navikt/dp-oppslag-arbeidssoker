@@ -16,7 +16,7 @@ class RiverSpanProcessor(
         val onPreconditionError: Boolean? =
             span.getAttribute(booleanKey("nav.rapid_and_rivers.message.onPreconditionError"))
 
-        logger.debug("onEnd: onPreconditionError=$onPreconditionError")
+        logger.debug { "onEnd: onPreconditionError=$onPreconditionError" }
 
         // Define the condition for a "relevant" span.
         if (onPreconditionError == true) {
