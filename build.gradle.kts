@@ -37,6 +37,10 @@ dependencies {
     // rapid rivers
     implementation(libs.rapids.and.rivers)
 
+    implementation("io.opentelemetry:opentelemetry-api:1.47.0")
+    implementation("io.opentelemetry:opentelemetry-sdk:1.47.0")
+    implementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:1.47.0")
+
     // test
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.rapids.and.rivers.test)

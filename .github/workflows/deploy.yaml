@@ -31,14 +31,10 @@ jobs:
 
       - name: docker-build-push
         uses: nais/docker-build-push@v0
-        if: github.ref == 'refs/heads/main'
         id: docker-build-push
         with:
           team: teamdagpenger
-          push_image: true # optional, default true
           tag: ${{ github.sha }}
-          dockerfile: Dockerfile # optional, default Dockerfile
-          docker_context: . # optional, default .
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
     outputs:
@@ -47,7 +43,7 @@ jobs:
   deploy-dev:
     name: Deploy to dev
     needs: [ build ]
-    if: github.ref == 'refs/heads/main'
+    #if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: dev-gcp
     steps:
