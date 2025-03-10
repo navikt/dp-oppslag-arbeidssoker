@@ -43,7 +43,7 @@ dependencies {
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.mockk)
 
-    testImplementation("io.specmatic:specmatic-core:2.7.1")
+    testImplementation("io.specmatic:specmatic-core:2.7.2")
 }
 
 sourceSets {
