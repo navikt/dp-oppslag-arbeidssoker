@@ -15,10 +15,8 @@ application {
 }
 
 dependencies {
+    implementation(project(":arbeidssoker-hendelser"))
     implementation(kotlin("stdlib-jdk8"))
-
-    implementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:8.3.0")
-
     // ktor
     implementation(libs.bundles.ktor.client)
 

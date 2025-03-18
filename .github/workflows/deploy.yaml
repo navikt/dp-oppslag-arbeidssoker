@@ -38,7 +38,7 @@ jobs:
           push_image: true # optional, default true
           tag: ${{ github.sha }}
           dockerfile: Dockerfile # optional, default Dockerfile
-          docker_context: . # optional, default .
+          docker_context: app # optional, default .
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
     outputs:
@@ -56,9 +56,9 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: .nais/nais.yaml
+          RESOURCE: app/.nais/nais.yaml
           VAR: image=${{ needs.build.outputs.image }}
-          VARS: .nais/vars-dev.yaml
+          VARS: app/.nais/vars-dev.yaml
           PRINT_PAYLOAD: true
 
   deploy-prod:
@@ -72,7 +72,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
-          RESOURCE: .nais/nais.yaml
+          RESOURCE: app/.nais/nais.yaml
           VAR: image=${{ needs.build.outputs.image }}
-          VARS: .nais/vars-prod.yaml
+          VARS: app/.nais/vars-prod.yaml
           PRINT_PAYLOAD: true
