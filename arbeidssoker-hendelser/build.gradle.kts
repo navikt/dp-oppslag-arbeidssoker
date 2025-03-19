@@ -16,7 +16,7 @@ val schema by configurations.creating {
 
 dependencies {
     // Lese hendelser fra arbeidssøkerregistrering
-    implementation("org.apache.avro:avro:1.11.0")
+    api("org.apache.avro:avro:1.11.0")
     schema("no.nav.paw.arbeidssokerregisteret.api:main-avro-schema:1.13764081353.1-2")
 }
 
