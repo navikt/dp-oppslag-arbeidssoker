@@ -9,6 +9,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
@@ -90,7 +91,8 @@ internal class ArbeidssøkerStatusLytter(
             records.forEach { record ->
                 val periode = record.value()
                 val fom = periode.startet.tidspunkt.atZone(ZoneId.systemDefault()).toLocalDateTime()
-                val tom = periode.avsluttet?.tidspunkt?.atZone(ZoneId.systemDefault())?.toLocalDateTime() ?: LocalDateTime.MAX
+                val tom =
+                    periode.avsluttet?.tidspunkt?.atZone(ZoneId.systemDefault())?.toLocalDateTime() ?: LocalDateTime.MAX
 
                 val periodeId = periode.id
                 val data = objectMapper.readTree(periode.toString())
@@ -104,18 +106,23 @@ internal class ArbeidssøkerStatusLytter(
                         "@kilde" to mapOf("data" to objectMapper.convertValue<Map<String, Any>>(data)),
                     )
 
-                logger.info { "Publiserer arbeidssøkerperiode $periodeId" }
-                rapidsConnection.publish(
-                    periode.identitetsnummer,
-                    JsonMessage.newMessage("arbeidssoker_status_endret", detaljer).toJson(),
-                )
-                logger.info { "Har publisert arbeidssøkerperiode $periodeId" }
+                withLoggingContext(
+                    "periodeId" to periodeId.toString(),
+                ) {
+                    logger.info { "Publiserer arbeidssøkerperiode" }
+                    rapidsConnection.publish(
+                        periode.identitetsnummer,
+                        JsonMessage.newMessage("arbeidssoker_status_endret", detaljer).toJson(),
+                    )
+                    logger.info { "Har publisert arbeidssøkerperiode" }
+                }
 
                 currentPositions[TopicPartition(record.topic(), record.partition())] = record.offset() + 1
             }
         } catch (err: Exception) {
             logger.info("Feil ved behandling av meldinger. Tilbakestiller offsets: $currentPositions", err)
             currentPositions.forEach { (partition, offset) -> consumer.seek(partition, offset) }
+            stop()
         } finally {
             consumer.commitSync()
         }
