@@ -1,5 +1,11 @@
 package no.nav.dagpenger.arbeidssoker.lytter
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.convertValue
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import kotlinx.coroutines.CoroutineScope
@@ -13,28 +19,36 @@ import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.errors.WakeupException
 import java.time.Duration
+import java.time.LocalDateTime
 import java.time.ZoneId
 import kotlin.coroutines.CoroutineContext
 
 internal class ArbeidssøkerStatusLytter(
     private val consumer: Consumer<Long, Periode>,
     private val rapidsConnection: RapidsConnection,
-) : CoroutineScope {
+) : CoroutineScope, RapidsConnection.StatusListener {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
     private val job: Job = Job()
 
     private val navn = this::class.java.simpleName
 
-    init {
-        Runtime.getRuntime().addShutdownHook(Thread(::shutdownHook))
+    override fun onReady(rapidsConnection: RapidsConnection) {
+        start()
+    }
+
+    override fun onShutdown(rapidsConnection: RapidsConnection) {
+        stop()
     }
 
     private companion object {
-        private val logger = KotlinLogging.logger {}
+        val logger = KotlinLogging.logger {}
+        val objectMapper: ObjectMapper =
+            jacksonObjectMapper()
+                .registerModule(JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
     }
-
-    fun isAlive(): Boolean = job.isActive
 
     fun start() {
         logger.info("Starter $navn")
@@ -43,19 +57,11 @@ internal class ArbeidssøkerStatusLytter(
         }
     }
 
-    private fun isAlive(check: () -> Any): Boolean =
-        runCatching(check).fold(
-            { true },
-            {
-                logger.error("Alive sjekk feilet", it)
-                false
-            },
-        )
-
     fun stop() {
         logger.info("Stopper $navn")
         consumer.wakeup()
         job.cancel()
+        rapidsConnection.stop()
     }
 
     private fun run() {
@@ -73,7 +79,7 @@ internal class ArbeidssøkerStatusLytter(
         }
     }
 
-    private fun onRecords(records: ConsumerRecords<Long, no.nav.paw.arbeidssokerregisteret.api.v1.Periode>) {
+    private fun onRecords(records: ConsumerRecords<Long, Periode>) {
         if (records.isEmpty) return // poll returns an empty collection in case of rebalancing
         val currentPositions =
             records
@@ -84,27 +90,34 @@ internal class ArbeidssøkerStatusLytter(
             records.onEach { record ->
                 val periode = record.value()
                 val fom = periode.startet.tidspunkt.atZone(ZoneId.systemDefault()).toLocalDateTime()
-                val tom = periode.avsluttet?.tidspunkt?.atZone(ZoneId.systemDefault())?.toLocalDateTime()
+                val tom = periode.avsluttet?.tidspunkt?.atZone(ZoneId.systemDefault())?.toLocalDateTime() ?: LocalDateTime.MAX
 
                 val periodeId = periode.id
+                val data = objectMapper.readTree(periode.toString())
+
                 val detaljer =
-                    mutableMapOf("fom" to fom, "ident" to periode.identitetsnummer, "periodeId" to periodeId)
-                if (tom != null) {
-                    detaljer["tom"] = tom
-                }
+                    mapOf(
+                        "fom" to fom,
+                        "tom" to tom,
+                        "ident" to periode.identitetsnummer,
+                        "periodeId" to periodeId,
+                        "@kilde" to mapOf("data" to objectMapper.convertValue<Map<String, Any>>(data)),
+                    )
 
                 logger.info { "Publiserer arbeidssøkerperiode $periodeId" }
                 rapidsConnection.publish(
                     periode.identitetsnummer,
                     JsonMessage.newMessage(
-                        "arbeidssoker_periode",
-                        detaljer.toMap(),
+                        "arbeidssoker_status_endret",
+                        detaljer,
                     ).toJson(),
                 )
                 logger.info { "Har publisert arbeidssøkerperiode $periodeId" }
 
                 currentPositions[TopicPartition(record.topic(), record.partition())] = record.offset() + 1
             }
+        } catch (err: WakeupException) {
+            logger.info("Exiting consumer after ${if (!job.isCancelled) "receiving shutdown signal" else "being interrupted by someone"}")
         } catch (err: Exception) {
             logger.info(
                 "due to an error during processing, positions are reset to each next message (after each record that was processed OK):" +

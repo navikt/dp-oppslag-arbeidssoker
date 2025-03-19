@@ -16,6 +16,8 @@ private val defaultProperties =
             "KAFKA_CONSUMER_GROUP_ID" to "dp-oppslag-arbeidssoker-v1",
             "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
             "KAFKA_RESET_POLICY" to "latest",
+            "ARBEIDSSOKER_PERIODE_TOPIC" to "paw.arbeidssokerperioder-v1",
+            "ARBEIDSSOKER_PERIODE_GROUP_ID" to "dp-oppslag-arbeidssoker-v1",
             "HTTP_PORT" to "8080",
         ),
     )
@@ -42,6 +44,9 @@ internal val config
             "dev-gcp" -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
             else -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
         }
+
+internal val arbeidssokerperioderTopic = config[Key("ARBEIDSSOKER_PERIODE_TOPIC", stringType)]
+internal val arbeidssokerperioderGroupId = config[Key("ARBEIDSSOKER_PERIODE_GROUP_ID", stringType)]
 
 const val SØKNAD_ID = "søknadId"
 
