@@ -8,10 +8,6 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
 import org.apache.kafka.clients.consumer.Consumer
@@ -21,24 +17,17 @@ import org.apache.kafka.common.errors.WakeupException
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
-import kotlin.coroutines.CoroutineContext
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class ArbeidssøkerStatusLytter(
     private val consumer: Consumer<Long, Periode>,
     private val rapidsConnection: RapidsConnection,
-) : CoroutineScope, RapidsConnection.StatusListener {
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO + job
-    private val job: Job = Job()
+) : RapidsConnection.StatusListener {
+    private val running = AtomicBoolean(true)
+    private val consumerThread: Thread
 
-    private val navn = this::class.java.simpleName
-
-    override fun onReady(rapidsConnection: RapidsConnection) {
-        start()
-    }
-
-    override fun onShutdown(rapidsConnection: RapidsConnection) {
-        stop()
+    init {
+        consumerThread = Thread { consumeLoop() }.apply { isDaemon = true }
     }
 
     private companion object {
@@ -50,44 +39,55 @@ internal class ArbeidssøkerStatusLytter(
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
     }
 
+    override fun onReady(rapidsConnection: RapidsConnection) {
+        start()
+    }
+
+    override fun onShutdown(rapidsConnection: RapidsConnection) {
+        stop()
+    }
+
     fun start() {
-        logger.info("Starter $navn")
-        launch {
-            run()
+        logger.info("Starter ArbeidssøkerStatusLytter")
+        if (!consumerThread.isAlive) {
+            consumerThread.start()
         }
     }
 
     fun stop() {
-        logger.info("Stopper $navn")
-        consumer.wakeup()
-        job.cancel()
+        logger.info("Stopper ArbeidssøkerStatusLytter")
+        running.set(false)
+        consumer.wakeup() // Interrupts poll() safely
+        consumerThread.join() // Ensure thread shutdown
         rapidsConnection.stop()
     }
 
-    private fun run() {
+    private fun consumeLoop() {
         try {
-            while (job.isActive) {
-                onRecords(consumer.poll(Duration.ofSeconds(1)))
+            while (running.get()) {
+                val records = consumer.poll(Duration.ofSeconds(1))
+                processRecords(records)
             }
         } catch (e: WakeupException) {
-            if (job.isActive) throw e
+            if (running.get()) throw e
         } catch (e: Exception) {
             logger.error(e) { "Noe feil skjedde i consumeringen" }
-            throw e
         } finally {
             closeResources()
         }
     }
 
-    private fun onRecords(records: ConsumerRecords<Long, Periode>) {
-        if (records.isEmpty) return // poll returns an empty collection in case of rebalancing
+    private fun processRecords(records: ConsumerRecords<Long, Periode>) {
+        if (records.isEmpty) return
+
         val currentPositions =
             records
                 .groupBy { TopicPartition(it.topic(), it.partition()) }
                 .mapValues { partition -> partition.value.minOf { it.offset() } }
                 .toMutableMap()
+
         try {
-            records.onEach { record ->
+            records.forEach { record ->
                 val periode = record.value()
                 val fom = periode.startet.tidspunkt.atZone(ZoneId.systemDefault()).toLocalDateTime()
                 val tom = periode.avsluttet?.tidspunkt?.atZone(ZoneId.systemDefault())?.toLocalDateTime() ?: LocalDateTime.MAX
@@ -107,26 +107,15 @@ internal class ArbeidssøkerStatusLytter(
                 logger.info { "Publiserer arbeidssøkerperiode $periodeId" }
                 rapidsConnection.publish(
                     periode.identitetsnummer,
-                    JsonMessage.newMessage(
-                        "arbeidssoker_status_endret",
-                        detaljer,
-                    ).toJson(),
+                    JsonMessage.newMessage("arbeidssoker_status_endret", detaljer).toJson(),
                 )
                 logger.info { "Har publisert arbeidssøkerperiode $periodeId" }
 
                 currentPositions[TopicPartition(record.topic(), record.partition())] = record.offset() + 1
             }
-        } catch (err: WakeupException) {
-            logger.info("Exiting consumer after ${if (!job.isCancelled) "receiving shutdown signal" else "being interrupted by someone"}")
         } catch (err: Exception) {
-            logger.info(
-                "due to an error during processing, positions are reset to each next message (after each record that was processed OK):" +
-                    currentPositions.map { "\tpartition=${it.key}, offset=${it.value}" }
-                        .joinToString(separator = "\n", prefix = "\n", postfix = "\n"),
-                err,
-            )
+            logger.info("Feil ved behandling av meldinger. Tilbakestiller offsets: $currentPositions", err)
             currentPositions.forEach { (partition, offset) -> consumer.seek(partition, offset) }
-            throw err
         } finally {
             consumer.commitSync()
         }
@@ -143,10 +132,5 @@ internal class ArbeidssøkerStatusLytter(
         } catch (err: Exception) {
             logger.error(err.message, err)
         }
-    }
-
-    private fun shutdownHook() {
-        logger.info("received shutdown signal, stopping app")
-        stop()
     }
 }
