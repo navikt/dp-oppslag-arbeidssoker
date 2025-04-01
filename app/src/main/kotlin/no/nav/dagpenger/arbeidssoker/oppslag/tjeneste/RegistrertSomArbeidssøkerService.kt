@@ -33,7 +33,7 @@ class RegistrertSomArbeidssøkerService(
                     it.requireAllOrAny("@behov", listOf(BEHOV))
                     it.forbid("@løsning")
                 }
-                validate { it.requireKey("ident", "gjelderDato") }
+                validate { it.requireKey("ident") }
                 validate { it.requireKey(BEHOV) }
                 validate { it.interestedIn("søknadId", "@behovId", "behandlingId") }
             }.register(this)
