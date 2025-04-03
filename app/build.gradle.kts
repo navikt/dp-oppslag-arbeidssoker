@@ -20,7 +20,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     // For arbeidssøkerregisteret sin lytter
-    implementation("com.github.navikt.tbd-libs:kafka:2025.03.30-13.02-f7cb11ef")
+    implementation("com.github.navikt.tbd-libs:kafka:2025.04.02-15.56-d34332c4")
     implementation("io.confluent:kafka-avro-serializer:7.9.0")
     implementation("io.confluent:kafka-schema-registry:7.9.0")
     implementation("io.confluent:kafka-streams-avro-serde:7.9.0")
