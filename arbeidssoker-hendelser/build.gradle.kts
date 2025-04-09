@@ -1,6 +1,6 @@
 plugins {
     id("common")
-    id("io.github.androa.gradle.plugin.avro") version "0.0.10"
+    id("io.github.androa.gradle.plugin.avro") version "0.0.11"
 }
 
 repositories {
