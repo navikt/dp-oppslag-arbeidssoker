@@ -1,8 +1,6 @@
-import com.github.davidmc24.gradle.plugin.avro.GenerateAvroProtocolTask
-
 plugins {
     id("common")
-    id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
+    id("io.github.androa.gradle.plugin.avro") version "0.0.10"
 }
 
 repositories {
@@ -20,10 +18,6 @@ dependencies {
     schema("no.nav.paw.arbeidssokerregisteret.api:main-avro-schema:1.13764081353.1-2")
 }
 
-tasks.named("generateAvroProtocol", GenerateAvroProtocolTask::class.java) {
-    source(zipTree(schema.singleFile))
-}
-
-tasks.compileKotlin {
-    dependsOn("generateAvroProtocol")
+generateAvro {
+    schemas.from(zipTree(schema.singleFile))
 }
