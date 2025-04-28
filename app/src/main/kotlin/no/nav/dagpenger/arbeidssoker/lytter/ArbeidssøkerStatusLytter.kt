@@ -125,7 +125,7 @@ internal class ArbeidssøkerStatusLytter(
                     logger.info { "Publiserer arbeidssøkerperiode" }
                     rapidsConnection.publish(
                         periode.identitetsnummer,
-                        JsonMessage.newMessage("arbeidssoker_status_endret", detaljer).toJson(),
+                        JsonMessage.newMessage("arbeidssøkerstatus_endret", detaljer).toJson(),
                     )
                     logger.info { "Har publisert arbeidssøkerperiode" }
                 }

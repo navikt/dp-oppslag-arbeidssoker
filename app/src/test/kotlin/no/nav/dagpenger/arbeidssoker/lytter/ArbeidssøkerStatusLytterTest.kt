@@ -71,7 +71,7 @@ class ArbeidssøkerStatusLytterTest {
             testRapid.inspektør.size shouldBe 1
             with(testRapid.inspektør) {
                 val message = message(0)
-                message["@event_name"].asText() shouldBe "arbeidssoker_status_endret"
+                message["@event_name"].asText() shouldBe "arbeidssøkerstatus_endret"
                 message["periodeId"].asText() shouldBe periode.id.toString()
                 message["fom"].asLocalDateTime() shouldBe
                     fom.atZone(ZoneId.systemDefault()).toLocalDateTime().truncatedTo(
@@ -100,7 +100,6 @@ class ArbeidssøkerStatusLytterTest {
                 ).also { it.start() }
             val ident = "12345678910"
             val fom = Instant.now()
-            val tom = Instant.now()
             val periode =
                 no.nav.paw.arbeidssokerregisteret.api.v1.Periode().apply {
                     id = UUID.randomUUID()
@@ -122,7 +121,7 @@ class ArbeidssøkerStatusLytterTest {
             testRapid.inspektør.size shouldBe 1
             with(testRapid.inspektør) {
                 val message = message(0)
-                message["@event_name"].asText() shouldBe "arbeidssoker_status_endret"
+                message["@event_name"].asText() shouldBe "arbeidssøkerstatus_endret"
                 message["periodeId"].asText() shouldBe periode.id.toString()
                 message["fom"].asLocalDateTime() shouldBe
                     fom.atZone(ZoneId.systemDefault()).toLocalDateTime().truncatedTo(
