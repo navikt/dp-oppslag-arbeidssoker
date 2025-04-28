@@ -15,7 +15,6 @@ import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.apache.kafka.common.TopicPartition
 import org.junit.jupiter.api.Test
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -83,6 +82,8 @@ class ArbeidssøkerStatusLytterTest {
                         ChronoUnit.MILLIS,
                     )
 
+                message["tomSattAv"].asText() == "sluttbruker"
+
                 message["@kilde"].shouldNotBeNull()
             }
             arbeidssøkerStatusLytter.stop()
@@ -127,7 +128,7 @@ class ArbeidssøkerStatusLytterTest {
                     fom.atZone(ZoneId.systemDefault()).toLocalDateTime().truncatedTo(
                         ChronoUnit.MILLIS,
                     )
-                message["tom"].asLocalDateTime() shouldBe LocalDateTime.MAX
+
                 message["@kilde"].shouldNotBeNull()
             }
             arbeidssøkerStatusLytter.stop()

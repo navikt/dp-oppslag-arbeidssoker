@@ -10,13 +10,13 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import mu.withLoggingContext
+import no.nav.paw.arbeidssokerregisteret.api.v1.BrukerType
 import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.errors.WakeupException
 import java.time.Duration
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -91,20 +91,33 @@ internal class ArbeidssøkerStatusLytter(
             records.forEach { record ->
                 val periode = record.value()
                 val fom = periode.startet.tidspunkt.atZone(ZoneId.systemDefault()).toLocalDateTime()
-                val tom =
-                    periode.avsluttet?.tidspunkt?.atZone(ZoneId.systemDefault())?.toLocalDateTime() ?: LocalDateTime.MAX
 
                 val periodeId = periode.id
                 val data = objectMapper.readTree(periode.toString())
 
                 val detaljer =
-                    mapOf(
+                    mutableMapOf(
                         "fom" to fom,
-                        "tom" to tom,
                         "ident" to periode.identitetsnummer,
                         "periodeId" to periodeId,
                         "@kilde" to mapOf("data" to objectMapper.convertValue<Map<String, Any>>(data)),
                     )
+
+                if (periode.avsluttet != null) {
+                    val tom =
+                        periode.avsluttet?.tidspunkt?.atZone(ZoneId.systemDefault())?.toLocalDateTime()
+                    val avsluttetAv =
+                        when (periode.avsluttet?.utfoertAv?.type) {
+                            BrukerType.UKJENT_VERDI -> "ukjent"
+                            BrukerType.UDEFINERT -> "udefinert"
+                            BrukerType.VEILEDER -> "veileder"
+                            BrukerType.SYSTEM -> "system"
+                            BrukerType.SLUTTBRUKER -> "sluttbruker"
+                            null -> "udefinert"
+                        }
+                    detaljer["tom"] = tom
+                    detaljer["tomSattAv"] = avsluttetAv
+                }
 
                 withLoggingContext(
                     "periodeId" to periodeId.toString(),
