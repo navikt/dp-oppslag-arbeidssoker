@@ -116,7 +116,7 @@ internal class ArbeidssøkerStatusLytter(
                             null -> "udefinert"
                         }
                     detaljer["tom"] = tom
-                    detaljer["tomSattAv"] = avsluttetAv
+                    detaljer["avsluttetAv"] = avsluttetAv
                 }
 
                 withLoggingContext(

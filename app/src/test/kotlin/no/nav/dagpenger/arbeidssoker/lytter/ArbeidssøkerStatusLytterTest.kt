@@ -82,7 +82,7 @@ class ArbeidssøkerStatusLytterTest {
                         ChronoUnit.MILLIS,
                     )
 
-                message["tomSattAv"].asText() == "sluttbruker"
+                message["avsluttetAv"].asText() == "sluttbruker"
 
                 message["@kilde"].shouldNotBeNull()
             }
