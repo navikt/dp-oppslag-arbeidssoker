@@ -7,7 +7,7 @@ metadata:
   name: dp-oppslag-arbeidssoker
   namespace: teamdagpenger
 spec:
-  image: {{ image }}
+  image: "{{ image }}"
   liveness:
     path: /isalive
   readiness:
@@ -28,7 +28,7 @@ spec:
   secureLogs:
     enabled: true
   kafka:
-    pool: {{kafka_pool}}
+    pool: "{{kafka_pool}}"
   webproxy: true
   observability:
     autoInstrumentation:
