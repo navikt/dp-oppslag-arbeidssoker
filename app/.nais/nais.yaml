@@ -31,6 +31,10 @@ spec:
     pool: "{{kafka_pool}}"
   webproxy: true
   observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
     autoInstrumentation:
       enabled: true
       runtime: java
