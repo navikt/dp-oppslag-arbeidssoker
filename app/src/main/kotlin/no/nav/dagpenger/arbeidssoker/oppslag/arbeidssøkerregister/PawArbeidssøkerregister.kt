@@ -2,6 +2,7 @@ package no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
@@ -23,7 +24,6 @@ import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mu.KotlinLogging
 import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
 import no.nav.paw.arbeidssøkerregister.api.models.ArbeidssoekerperiodeResponseDTO
 import org.slf4j.MDC

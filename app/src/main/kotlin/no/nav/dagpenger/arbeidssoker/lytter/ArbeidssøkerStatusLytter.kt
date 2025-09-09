@@ -8,8 +8,8 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import mu.KotlinLogging
-import mu.withLoggingContext
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.oshai.kotlinlogging.withLoggingContext
 import no.nav.paw.arbeidssokerregisteret.api.v1.BrukerType
 import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
 import org.apache.kafka.clients.consumer.Consumer
@@ -49,14 +49,14 @@ internal class ArbeidssøkerStatusLytter(
     }
 
     fun start() {
-        logger.info("Starter ArbeidssøkerStatusLytter")
+        logger.info { "Starter ArbeidssøkerStatusLytter" }
         if (!consumerThread.isAlive) {
             consumerThread.start()
         }
     }
 
     fun stop() {
-        logger.info("Stopper ArbeidssøkerStatusLytter")
+        logger.info { "Stopper ArbeidssøkerStatusLytter" }
         running.set(false)
         consumer.wakeup() // Interrupts poll() safely
         consumerThread.join() // Ensure thread shutdown
@@ -90,7 +90,10 @@ internal class ArbeidssøkerStatusLytter(
         try {
             records.forEach { record ->
                 val periode = record.value()
-                val fom = periode.startet.tidspunkt.atZone(ZoneId.systemDefault()).toLocalDateTime()
+                val fom =
+                    periode.startet.tidspunkt
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime()
 
                 val periodeId = periode.id
                 val data = objectMapper.readTree(periode.toString())
@@ -105,7 +108,10 @@ internal class ArbeidssøkerStatusLytter(
 
                 if (periode.avsluttet != null) {
                     val tom =
-                        periode.avsluttet?.tidspunkt?.atZone(ZoneId.systemDefault())?.toLocalDateTime()
+                        periode.avsluttet
+                            ?.tidspunkt
+                            ?.atZone(ZoneId.systemDefault())
+                            ?.toLocalDateTime()
                     val avsluttetAv =
                         when (periode.avsluttet?.utfoertAv?.type) {
                             BrukerType.UKJENT_VERDI -> "ukjent"
@@ -133,7 +139,7 @@ internal class ArbeidssøkerStatusLytter(
                 currentPositions[TopicPartition(record.topic(), record.partition())] = record.offset() + 1
             }
         } catch (err: Exception) {
-            logger.info("Feil ved behandling av meldinger. Tilbakestiller offsets: $currentPositions", err)
+            logger.info(err) { "Feil ved behandling av meldinger. Tilbakestiller offsets: $currentPositions" }
             currentPositions.forEach { (partition, offset) -> consumer.seek(partition, offset) }
             stop()
         } finally {
@@ -150,7 +156,7 @@ internal class ArbeidssøkerStatusLytter(
         try {
             block()
         } catch (err: Exception) {
-            logger.error(err.message, err)
+            logger.error(err) { err.message }
         }
     }
 }

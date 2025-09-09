@@ -7,11 +7,11 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
-import mu.KotlinLogging
-import mu.withLoggingContext
 import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
 
