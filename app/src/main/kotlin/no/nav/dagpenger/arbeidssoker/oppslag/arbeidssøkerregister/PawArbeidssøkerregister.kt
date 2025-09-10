@@ -67,7 +67,7 @@ class PawArbeidssøkerregister(
 
     override suspend fun hentRegistreringsperiode(fnr: String): List<Periode> =
         withContext(Dispatchers.IO) {
-            val token = tokenProvider.invoke()!!
+            val token = tokenProvider.invoke() ?: throw RuntimeException("Fikk ikke hentet token for å kalle paw-arbeidssøkerregister")
             try {
                 client
                     .post("$baseUrl/api/v1/veileder/arbeidssoekerperioder") {

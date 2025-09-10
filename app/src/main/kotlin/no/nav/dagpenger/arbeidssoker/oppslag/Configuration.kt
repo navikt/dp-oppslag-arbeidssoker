@@ -6,10 +6,12 @@ import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 
+private val logger = KotlinLogging.logger { }
 private val defaultProperties =
     ConfigurationMap(
         mapOf(
@@ -25,7 +27,7 @@ private val defaultProperties =
 private val devProperties =
     ConfigurationMap(
         mapOf(
-            "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag-v2",
+            "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag-v2.paw",
             "paw-arbeidssoekerregisteret.scope" to "api://dev-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag-v2/.default",
         ),
     )
@@ -58,7 +60,10 @@ private val azureAdClient: CachedOauth2Client by lazy {
     )
 }
 
-val pawArbeidssøkerregisterBaseurl: String = config[Key("paw-arbeidssoekerregisteret.url", stringType)]
+val pawArbeidssøkerregisterBaseurl: String =
+    config[Key("paw-arbeidssoekerregisteret.url", stringType)].also {
+        logger.info { "paw-arbeidssoekerregisteret.url = $it" }
+    }
 
 val pawArbeidssøkerregisterTokenSupplier by lazy {
     {
