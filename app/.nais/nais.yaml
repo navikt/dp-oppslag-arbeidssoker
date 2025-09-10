@@ -53,9 +53,9 @@ spec:
       enabled: true
   env:
     - name: ARBEIDSSOKERREGISTERET_API_URL
-      value: "{{arbeidssokerregisteret.url}}"
+      value: "{{arbeidssokerregisteret_url}}"
     - name: ARBEIDSSOKERREGISTERET_API_SCOPE
-      value: "{{arbeidssokerregisteret.scope}}"
+      value: "{{arbeidssokerregisteret_scope}}"
   accessPolicy:
     outbound:
       rules:
