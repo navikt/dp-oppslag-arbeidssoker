@@ -53,12 +53,12 @@ spec:
       enabled: true
   env:
     - name: ARBEIDSSOKERREGISTERET_API_URL
-      value: "{{ arbeidssokerregisteret.url }}"
+      value: "{{arbeidssokerregisteret.url}}"
     - name: ARBEIDSSOKERREGISTERET_API_SCOPE
-      value: "{{ arbeidssokerregisteret.scope }}"
+      value: "{{arbeidssokerregisteret.scope}}"
   accessPolicy:
     outbound:
       rules:
-        - application: "{{ arbeidssoekerregisteret.url }}"
+        - application: "{{arbeidssoekerregisteret.url}}"
           namespace: paw
 
