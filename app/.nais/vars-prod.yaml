@@ -1,4 +1,4 @@
 kafka_pool: nav-prod
 arbeidssoekerregisteret:
-  url: http://paw-arbeidssoekerregisteret-api-oppslag
+  url: paw-arbeidssoekerregisteret-api-oppslag
   scope: api://prod-gcp.nav.no/paw-arbeidssoekerregisteret-api/.default

@@ -43,7 +43,7 @@ private val azureAdClient: CachedOauth2Client by lazy {
     )
 }
 
-val pawArbeidssøkerregisterBaseurl: String = config[Key("ARBEIDSSOKERREGISTERET_API_URL", stringType)]
+val pawArbeidssøkerregisterBaseurl: String = "http://" + config[Key("ARBEIDSSOKERREGISTERET_API_URL", stringType)]
 
 val pawArbeidssøkerregisterTokenSupplier by lazy {
     {
