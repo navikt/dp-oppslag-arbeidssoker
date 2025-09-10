@@ -59,6 +59,6 @@ spec:
   accessPolicy:
     outbound:
       rules:
-        - application: "{{arbeidssoekerregisteret.url}}"
+        - application: "{{arbeidssoekerregisteret_url}}"
           namespace: paw
 
