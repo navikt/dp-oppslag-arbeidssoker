@@ -22,12 +22,27 @@ private val defaultProperties =
         ),
     )
 
+private val devProperties =
+    ConfigurationMap(
+        mapOf(
+            "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag-v2",
+            "paw-arbeidssoekerregisteret.scope" to "api://dev-gcp.nav.no/paw-arbeidssoekerregisteret-api-oppslag-v2/.default",
+        ),
+    )
+private val prodProperties =
+    ConfigurationMap(
+        mapOf(
+            "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag.paw",
+            "paw-arbeidssoekerregisteret.scope" to "api://prod-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
+        ),
+    )
+
 internal val config
     get() =
         when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
-            "prod-gcp" -> systemProperties() overriding EnvironmentVariables overriding defaultProperties
-            "dev-gcp" -> systemProperties() overriding EnvironmentVariables overriding defaultProperties
-            else -> systemProperties() overriding EnvironmentVariables overriding defaultProperties
+            "prod-gcp" -> systemProperties() overriding EnvironmentVariables overriding prodProperties overriding defaultProperties
+            "dev-gcp" -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
+            else -> systemProperties() overriding EnvironmentVariables overriding devProperties overriding defaultProperties
         }
 
 internal val arbeidssokerperioderTopic = config[Key("ARBEIDSSOKER_PERIODE_TOPIC", stringType)]
@@ -43,14 +58,14 @@ private val azureAdClient: CachedOauth2Client by lazy {
     )
 }
 
-val pawArbeidssøkerregisterBaseurl: String = "http://" + config[Key("ARBEIDSSOKERREGISTERET_API_URL", stringType)]
+val pawArbeidssøkerregisterBaseurl: String = config[Key("paw-arbeidssoekerregisteret.url", stringType)]
 
 val pawArbeidssøkerregisterTokenSupplier by lazy {
     {
         runBlocking {
             azureAdClient
                 .clientCredentials(
-                    config[Key("ARBEIDSSOKERREGISTERET_API_SCOPE", stringType)],
+                    config[Key("paw-arbeidssoekerregisteret.scope", stringType)],
                 ).access_token
         }
     }

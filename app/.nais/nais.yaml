@@ -51,14 +51,9 @@ spec:
   azure:
     application:
       enabled: true
-  env:
-    - name: ARBEIDSSOKERREGISTERET_API_URL
-      value: "{{arbeidssokerregisteret_url}}"
-    - name: ARBEIDSSOKERREGISTERET_API_SCOPE
-      value: "{{arbeidssokerregisteret_scope}}"
   accessPolicy:
     outbound:
       rules:
-        - application: "{{arbeidssoekerregisteret_url}}"
+        - application: "{{arbeidssoekerregisteret}}"
           namespace: paw
 
