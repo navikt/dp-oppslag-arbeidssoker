@@ -34,8 +34,8 @@ private val devProperties =
 private val prodProperties =
     ConfigurationMap(
         mapOf(
-            "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag.paw",
-            "paw-arbeidssoekerregisteret.scope" to "api://prod-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag/.default",
+            "paw-arbeidssoekerregisteret.url" to "http://paw-arbeidssoekerregisteret-api-oppslag-v2.paw",
+            "paw-arbeidssoekerregisteret.scope" to "api://prod-gcp.paw.paw-arbeidssoekerregisteret-api-oppslag-v2/.default",
         ),
     )
 

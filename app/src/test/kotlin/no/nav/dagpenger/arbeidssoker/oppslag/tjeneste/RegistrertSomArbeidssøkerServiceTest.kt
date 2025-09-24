@@ -6,7 +6,6 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Periode
-import no.nav.dagpenger.arbeidssoker.oppslag.pawArbeidssøkerregisterBaseurl
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -17,13 +16,7 @@ class RegistrertSomArbeidssøkerServiceTest {
     private val prøvingsdato = LocalDate.of(2020, 1, 1)
 
     init {
-
         RegistrertSomArbeidssøkerService(rapid, arbeidsøkerRegister)
-    }
-
-    @Test
-    fun ss() {
-        println(pawArbeidssøkerregisterBaseurl)
     }
 
     @Test
