@@ -33,6 +33,7 @@ internal class ArbeidssøkerStatusLytter(
 
     private companion object {
         val logger = KotlinLogging.logger {}
+        val sikkerLogg = KotlinLogging.logger("tjenestekall.ArbeidssøkerStatusLytter")
         val objectMapper: ObjectMapper =
             jacksonObjectMapper()
                 .registerModule(JavaTimeModule())
@@ -129,10 +130,12 @@ internal class ArbeidssøkerStatusLytter(
                     "periodeId" to periodeId.toString(),
                 ) {
                     logger.info { "Publiserer arbeidssøkerperiode" }
+                    val message = JsonMessage.newMessage("arbeidssøkerstatus_endret", detaljer).toJson()
                     rapidsConnection.publish(
                         periode.identitetsnummer,
-                        JsonMessage.newMessage("arbeidssøkerstatus_endret", detaljer).toJson(),
+                        message,
                     )
+                    sikkerLogg.info { "Har publisert: $message" }
                     logger.info { "Har publisert arbeidssøkerperiode" }
                 }
 

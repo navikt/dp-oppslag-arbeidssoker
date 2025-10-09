@@ -56,4 +56,6 @@ spec:
       rules:
         - application: "{{arbeidssoekerregisteret}}"
           namespace: paw
+        - application: logging
+          namespace: nais-system
 
