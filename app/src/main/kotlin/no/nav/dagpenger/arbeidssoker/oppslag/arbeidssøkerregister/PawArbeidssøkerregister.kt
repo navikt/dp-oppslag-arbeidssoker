@@ -36,7 +36,7 @@ class PawArbeidssøkerregister(
 ) : Arbeidssøkerregister {
     private companion object {
         private val log = KotlinLogging.logger {}
-        private val sikkerlogg = KotlinLogging.logger("tjenestekall")
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.PawArbeidssøkerregister")
     }
 
     private val client: HttpClient =
@@ -52,7 +52,7 @@ class PawArbeidssøkerregister(
                 logger =
                     object : Logger {
                         override fun log(message: String) {
-                            sikkerlogg.info { message }
+                            sikkerlogg.trace { message }
                         }
                     }
 
