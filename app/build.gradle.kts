@@ -1,7 +1,7 @@
 plugins {
     id("common")
     application
-    id("org.openapi.generator") version "7.15.0"
+    id("org.openapi.generator") version "7.17.0"
 }
 
 repositories {
