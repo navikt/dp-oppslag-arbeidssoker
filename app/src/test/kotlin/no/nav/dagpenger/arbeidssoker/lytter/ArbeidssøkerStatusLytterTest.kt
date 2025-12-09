@@ -11,7 +11,7 @@ import no.nav.paw.arbeidssokerregisteret.api.v1.BrukerType
 import no.nav.paw.arbeidssokerregisteret.api.v1.Metadata
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.MockConsumer
-import org.apache.kafka.clients.consumer.OffsetResetStrategy
+import org.apache.kafka.clients.consumer.internals.AutoOffsetResetStrategy
 import org.apache.kafka.common.TopicPartition
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -24,7 +24,7 @@ class ArbeidssøkerStatusLytterTest {
     private val topic = "arbeidssøkerstatus"
     private val testPartition = TopicPartition(topic, 0)
     private val mockConsumer =
-        MockConsumer<Long, no.nav.paw.arbeidssokerregisteret.api.v1.Periode>(OffsetResetStrategy.EARLIEST).also {
+        MockConsumer<Long, no.nav.paw.arbeidssokerregisteret.api.v1.Periode>(AutoOffsetResetStrategy.EARLIEST.name()).also {
             it.assign(listOf(testPartition))
             it.updateBeginningOffsets(
                 mapOf(
@@ -50,17 +50,21 @@ class ArbeidssøkerStatusLytterTest {
                     ident,
                     Metadata(
                         fom,
-                        no.nav.paw.arbeidssokerregisteret.api.v1.Bruker(BrukerType.SLUTTBRUKER, ident, "vely sikker"),
+                        no.nav.paw.arbeidssokerregisteret.api.v1
+                            .Bruker(BrukerType.SLUTTBRUKER, ident, "vely sikker"),
                         "arbeidssøkerstatus",
                         "1.0",
-                        no.nav.paw.arbeidssokerregisteret.api.v1.TidspunktFraKilde(Instant.now(), AvviksType.RETTING),
+                        no.nav.paw.arbeidssokerregisteret.api.v1
+                            .TidspunktFraKilde(Instant.now(), AvviksType.RETTING),
                     ),
                     Metadata(
                         tom,
-                        no.nav.paw.arbeidssokerregisteret.api.v1.Bruker(BrukerType.SLUTTBRUKER, ident, "vely sikker"),
+                        no.nav.paw.arbeidssokerregisteret.api.v1
+                            .Bruker(BrukerType.SLUTTBRUKER, ident, "vely sikker"),
                         "arbeidssøkerstatus",
                         "1.0",
-                        no.nav.paw.arbeidssokerregisteret.api.v1.TidspunktFraKilde(Instant.now(), AvviksType.RETTING),
+                        no.nav.paw.arbeidssokerregisteret.api.v1
+                            .TidspunktFraKilde(Instant.now(), AvviksType.RETTING),
                     ),
                 )
 
@@ -107,10 +111,17 @@ class ArbeidssøkerStatusLytterTest {
                     startet =
                         Metadata(
                             fom,
-                            no.nav.paw.arbeidssokerregisteret.api.v1.Bruker(BrukerType.SLUTTBRUKER, ident, "vely sikker"),
+                            no.nav.paw.arbeidssokerregisteret.api.v1.Bruker(
+                                BrukerType.SLUTTBRUKER,
+                                ident,
+                                "vely sikker",
+                            ),
                             "arbeidssøkerstatus",
                             "1.0",
-                            no.nav.paw.arbeidssokerregisteret.api.v1.TidspunktFraKilde(Instant.now(), AvviksType.RETTING),
+                            no.nav.paw.arbeidssokerregisteret.api.v1.TidspunktFraKilde(
+                                Instant.now(),
+                                AvviksType.RETTING,
+                            ),
                         )
                 }
 
