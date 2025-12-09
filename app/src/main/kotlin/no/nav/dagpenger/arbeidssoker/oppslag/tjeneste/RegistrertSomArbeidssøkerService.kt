@@ -67,7 +67,7 @@ class RegistrertSomArbeidssøkerService(
                 if (periode != null) {
                     mapOf(
                         "verdi" to true,
-                        "gyldigFraOgMed" to periode.fom,
+                        "gyldigFraOgMed" to maxOf(periode.fom, prøvingsdato),
                     ).also {
                         log.info { "Registrert som arbeidssøker: $periode på $prøvingsdato" }
                     }

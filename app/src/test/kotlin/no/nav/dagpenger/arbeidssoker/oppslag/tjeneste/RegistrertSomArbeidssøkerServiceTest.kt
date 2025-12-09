@@ -40,7 +40,7 @@ class RegistrertSomArbeidssøkerServiceTest {
             val løsning = field(0, "@løsning")
             val verdi = løsning["RegistrertSomArbeidssøker"]
             assertEquals(true, verdi["verdi"].asBoolean())
-            assertEquals(startDatoPeriode1, verdi["gyldigFraOgMed"].asLocalDate())
+            assertEquals(prøvingsdato, verdi["gyldigFraOgMed"].asLocalDate())
         }
     }
 
