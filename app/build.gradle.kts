@@ -22,9 +22,9 @@ dependencies {
     // For arbeidssøkerregisteret sin lytter
     val confluentVersion = "8.1.1"
     implementation("com.github.navikt.tbd-libs:kafka:2025.11.04-10.54-c831038e")
-    implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
-    implementation("io.confluent:kafka-schema-registry:$confluentVersion")
-    implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
+    // implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
+    // implementation("io.confluent:kafka-schema-registry:$confluentVersion")
+    // implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
 
     // ktor
     implementation(libs.bundles.ktor.client)
