@@ -86,8 +86,14 @@ class PawArbeidssøkerregister(
                                 tom = arbeidssøkerperiode.avsluttet?.tidspunkt?.toLocalDate() ?: LocalDate.MAX,
                             )
                         }
-                    }.also {
-                        log.info { "Fant ${it.size} arbeidssøkerperioder" }
+                    }.also { perioder ->
+                        log.info {
+                            """
+                            Fant ${perioder.size} arbeidssøkerperioder, perioder: ${perioder.joinToString("\n") { periode ->
+                                "${periode.fom}-${periode.tom}"
+                            }}
+                            """.trimIndent()
+                        }
                     }
             } catch (e: ClientRequestException) {
                 val responseBody = e.response.bodyAsText()
