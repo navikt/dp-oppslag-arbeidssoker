@@ -78,7 +78,7 @@ tasks.runKtlintCheckOverMainSourceSet {
 openApiGenerate {
     generatorName.set("kotlin")
     remoteInputSpec.set(
-        "https://raw.githubusercontent.com/navikt/paw-arbeidssoekerregisteret-monorepo-ekstern/refs/heads/main/apps/oppslag-api/src/main/resources/openapi/documentation.yaml",
+        "https://raw.githubusercontent.com/navikt/paw-arbeidssoekerregisteret-monorepo-ekstern/4305487aa6d784629f39199a83e4b9875ca857b9/apps/oppslag-api-v2/src/main/resources/openapi/v1-spec.yaml",
     )
     outputDir.set("${layout.buildDirectory.get()}/generated/")
     packageName.set("no.nav.paw.arbeidssøkerregister.api")
