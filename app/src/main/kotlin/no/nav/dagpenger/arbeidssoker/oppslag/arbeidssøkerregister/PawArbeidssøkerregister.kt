@@ -100,7 +100,7 @@ class PawArbeidssøkerregister(
                 log.error(e) { "Kunne ikke hente arbeidssøkerperiode. ${e.message} - Body: $responseBody" }
                 throw e
             } catch (e: Exception) {
-                log.error("Kunne ikke hente arbeidssøkerperiode.", e)
+                log.error(e) { "Kunne ikke hente arbeidssøkerperiode." }
                 throw e
             }
         }
