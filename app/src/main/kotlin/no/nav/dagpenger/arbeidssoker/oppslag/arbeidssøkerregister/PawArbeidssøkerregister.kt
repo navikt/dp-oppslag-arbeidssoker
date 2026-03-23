@@ -90,7 +90,7 @@ class PawArbeidssøkerregister(
                         log.info {
                             """
                             Fant ${perioder.size} arbeidssøkerperioder, perioder: ${perioder.joinToString("\n") { periode ->
-                                "${periode.fom}-${periode.tom}"
+                                "${periode.fom} - ${if (periode.tom == LocalDate.MAX) "" else periode.tom}"
                             }}
                             """.trimIndent()
                         }
