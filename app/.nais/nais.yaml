@@ -33,7 +33,7 @@ spec:
     limits:
       memory: 512Mi
     requests:
-      cpu: 30m
+      cpu: 112m
       memory: 448Mi
   kafka:
     pool: "{{kafka_pool}}"
