@@ -15,7 +15,7 @@ import kotlinx.coroutines.slf4j.MDCContext
 import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
 
-class RegistrertSomArbeidssøkerService(
+class RegistrertSomArbeidssøkerperioderService(
     rapidsConnection: RapidsConnection,
     private val arbeidssøkerRegister: Arbeidssøkerregister,
 ) : River.PacketListener {
@@ -32,11 +32,10 @@ class RegistrertSomArbeidssøkerService(
                     it.requireValue("@event_name", "behov")
                     it.requireAllOrAny("@behov", listOf(BEHOV))
                     it.forbid("@løsning")
-                    it.forbid("$BEHOV.InnhentFraOgMed")
                 }
                 validate { it.requireKey("ident") }
                 validate { it.requireKey(BEHOV) }
-                validate { it.requireKey("$BEHOV.Prøvingsdato") }
+                validate { it.requireKey("$BEHOV.InnhentFraOgMed") }
                 validate { it.interestedIn("søknadId", "@behovId", "behandlingId") }
             }.register(this)
     }
@@ -55,7 +54,7 @@ class RegistrertSomArbeidssøkerService(
             "behandlingId" to packet["behandlingId"].asText(),
             "behovId" to packet["@behovId"].asText(),
         ) {
-            val prøvingsdato = packet[BEHOV]["Prøvingsdato"].asLocalDate()
+            val innhentFraOgMed = packet[BEHOV]["InnhentFraOgMed"].asLocalDate()
             val registreringsperioder =
                 runBlocking(MDCContext()) {
                     arbeidssøkerRegister.hentRegistreringsperiode(
@@ -63,23 +62,30 @@ class RegistrertSomArbeidssøkerService(
                     )
                 }
             // Finn den siste perioden som inneholder ønsketDato
-            val periode = registreringsperioder.lastOrNull { prøvingsdato in it }
+            val perioder =
+                registreringsperioder.filter {
+                    listOf(it.fom, it.tom).any { dato -> dato.isAfter(innhentFraOgMed) || dato.isEqual(innhentFraOgMed) }
+                }
 
             val løsning =
-                if (periode != null) {
-                    mapOf(
-                        "verdi" to true,
-                        "gyldigFraOgMed" to maxOf(periode.fom, prøvingsdato),
-                    ).also {
-                        log.info { "Registrert som arbeidssøker: $periode på $prøvingsdato" }
-                    }
+                if (perioder.isEmpty()) {
+                    listOf(
+                        mapOf(
+                            "verdi" to false,
+                            "gyldigFraOgMed" to innhentFraOgMed,
+                        ).also {
+                            log.info { "Ikke registrert som arbeidssøker fra og med $innhentFraOgMed" }
+                        },
+                    )
                 } else {
-                    mapOf(
-                        "verdi" to false,
-                        "gyldigFraOgMed" to prøvingsdato,
-                        "gyldigTilOgMed" to prøvingsdato,
-                    ).also {
-                        log.info { "Ikke registrert som arbeidssøker på $prøvingsdato" }
+                    perioder.map { periode ->
+                        mapOf(
+                            "verdi" to true,
+                            "gyldigFraOgMed" to periode.fom,
+                            "gyldigTilOgMed" to periode.tom,
+                        ).also {
+                            log.info { "Registrert som arbeidssøker med ${perioder.size} perioder fra og med $innhentFraOgMed" }
+                        }
                     }
                 }
 

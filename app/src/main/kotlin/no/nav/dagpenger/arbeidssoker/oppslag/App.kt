@@ -3,6 +3,7 @@ package no.nav.dagpenger.arbeidssoker.oppslag
 import no.nav.dagpenger.arbeidssoker.lytter.ArbeidssøkerStatusLytter
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.PawArbeidssøkerregister
 import no.nav.dagpenger.arbeidssoker.oppslag.tjeneste.RegistrertSomArbeidssøkerService
+import no.nav.dagpenger.arbeidssoker.oppslag.tjeneste.RegistrertSomArbeidssøkerperioderService
 import no.nav.helse.rapids_rivers.RapidApplication
 
 fun main() {
@@ -14,6 +15,10 @@ fun main() {
                     tokenProvider = pawArbeidssøkerregisterTokenSupplier,
                 )
             RegistrertSomArbeidssøkerService(
+                this,
+                arbeidssøkerRegister,
+            )
+            RegistrertSomArbeidssøkerperioderService(
                 this,
                 arbeidssøkerRegister,
             )
