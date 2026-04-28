@@ -31,10 +31,10 @@ spec:
     min: 2
   resources:
     limits:
-      memory: 512Mi
+      memory: 768Mi
     requests:
       cpu: 50m
-      memory: 448Mi
+      memory: 512Mi
   kafka:
     pool: "{{kafka_pool}}"
   webproxy: true
@@ -48,7 +48,7 @@ spec:
       runtime: java
   env:
     - name: JDK_JAVA_OPTIONS
-      value: -XX:+UseParallelGC -XX:ActiveProcessorCount=4
+      value: -XX:+UseParallelGC -XX:ActiveProcessorCount=4 -XX:MaxRAMPercentage=75.0
   azure:
     application:
       enabled: true
