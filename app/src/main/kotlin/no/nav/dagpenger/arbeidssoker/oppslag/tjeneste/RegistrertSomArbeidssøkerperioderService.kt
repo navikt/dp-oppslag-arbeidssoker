@@ -102,13 +102,4 @@ class RegistrertSomArbeidssøkerperioderService(
             context.publish(packet.toJson())
         }
     }
-
-    override fun onError(
-        problems: MessageProblems,
-        context: MessageContext,
-        metadata: MessageMetadata,
-    ) {
-        log.error { problems.toString() }
-        sikkerlogg.error { problems.toExtendedReport() }
-    }
 }
