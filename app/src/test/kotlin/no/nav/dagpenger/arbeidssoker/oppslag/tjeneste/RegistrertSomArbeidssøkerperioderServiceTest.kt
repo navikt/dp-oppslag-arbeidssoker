@@ -27,21 +27,23 @@ class RegistrertSomArbeidssøkerperioderServiceTest {
         val sluttDatoPeriode1 = startDatoPeriode1.plusDays(5)
         val startDatoPeriode2 = startDatoPeriode1.plusDays(2)
 
-        coEvery {
-            arbeidsøkerRegister.hentRegistreringsperiode(any())
-        } returns
+        val perioderFraArbeidsøker =
             listOf(
                 Periode(fom = innhentFraOgMed.minusDays(10), tom = innhentFraOgMed.minusDays(5)),
                 Periode(fom = startDatoPeriode1, tom = sluttDatoPeriode1),
                 Periode(fom = startDatoPeriode2, tom = LocalDate.MAX),
             )
+        coEvery {
+            arbeidsøkerRegister.hentRegistreringsperiode(any())
+        } returns
+            perioderFraArbeidsøker
         rapid.sendTestMessage(json)
 
         with(rapid.inspektør) {
             assertEquals(1, size)
             val løsning = field(0, "@løsning")
             val perioder = løsning["RegistrertSomArbeidssøker"]
-            perioder.size() shouldBe 2
+ ct            perioder.size() shouldBe 2
             perioder.map { it["verdi"].asBoolean() } shouldContainExactly listOf(true, true)
             perioder.map { it["gyldigFraOgMed"].asLocalDate() } shouldContainExactly
                 listOf(

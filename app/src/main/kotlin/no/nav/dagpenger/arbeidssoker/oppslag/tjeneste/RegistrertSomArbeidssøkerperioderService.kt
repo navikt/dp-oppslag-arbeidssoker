@@ -5,7 +5,6 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
@@ -14,6 +13,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
 import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Arbeidssøkerregister
+import no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister.Periode
+import no.nav.dagpenger.arbeidssoker.oppslag.tjeneste.ArbeidsøkerPeriode.Companion.slåSammen
+import java.time.LocalDate
 
 class RegistrertSomArbeidssøkerperioderService(
     rapidsConnection: RapidsConnection,
@@ -61,31 +63,18 @@ class RegistrertSomArbeidssøkerperioderService(
                         fnr,
                     )
                 }
-            // Finn den siste perioden som inneholder ønsketDato
-            val perioder =
-                registreringsperioder.filter {
-                    listOf(it.fom, it.tom).any { dato -> dato.isAfter(innhentFraOgMed) || dato.isEqual(innhentFraOgMed) }
-                }
+
+            val utgangspunkt = Periode(innhentFraOgMed, LocalDate.MAX)
+            val arbeidsøkerPerioder = registreringsperioder.slåSammen(utgangspunkt)
 
             val løsning =
-                if (perioder.isEmpty()) {
-                    listOf(
-                        mapOf(
-                            "verdi" to false,
-                            "gyldigFraOgMed" to innhentFraOgMed,
-                        ).also {
-                            log.info { "Ikke registrert som arbeidssøker fra og med $innhentFraOgMed" }
-                        },
-                    )
-                } else {
-                    perioder.map { periode ->
-                        mapOf(
-                            "verdi" to true,
-                            "gyldigFraOgMed" to periode.fom,
-                            "gyldigTilOgMed" to periode.tom,
-                        ).also {
-                            log.info { "Registrert som arbeidssøker med ${perioder.size} perioder fra og med $innhentFraOgMed" }
-                        }
+                arbeidsøkerPerioder.map { periode ->
+                    mapOf(
+                        "verdi" to true,
+                        "gyldigFraOgMed" to periode.fom,
+                        "gyldigTilOgMed" to periode.tom,
+                    ).also {
+                        log.info { "Registrert som arbeidssøker med ${arbeidsøkerPerioder.size} perioder fra og med $innhentFraOgMed" }
                     }
                 }
 
