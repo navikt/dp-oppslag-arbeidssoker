@@ -39,4 +39,34 @@ class ArbeidsøkerPeriodeTest {
         resultat[3].tom shouldBe LocalDate.MAX
         resultat[3].registert shouldBe true
     }
+
+    @Test
+    fun ` Slå sammen perioder som skal dekkes `() {
+        val datoViSpørOm = LocalDate.parse("2020-01-01")
+        val startDatoPeriode1 = datoViSpørOm.minusDays(1)
+        val sluttDatoPeriode1 = startDatoPeriode1.plusDays(5)
+        val startDatoPeriode2 = startDatoPeriode1.plusDays(2)
+        val arbeidsøkerPerioder =
+            listOf(
+                Periode(fom = datoViSpørOm.minusDays(10), tom = datoViSpørOm.minusDays(5)),
+                // TODO: datoViSpørOm skal dekke innenfor her...
+                Periode(
+                    fom = startDatoPeriode1,
+                    tom = sluttDatoPeriode1,
+                ),
+                Periode(fom = startDatoPeriode2, tom = LocalDate.MAX),
+            )
+        val utgangspunkt = Periode(datoViSpørOm, LocalDate.MAX)
+        val resultat = arbeidsøkerPerioder.slåSammen(utgangspunkt)
+
+        resultat.shouldHaveSize(2)
+
+        resultat[0].fom shouldBe LocalDate.parse("2019-12-31")
+        resultat[0].tom shouldBe LocalDate.parse("2020-01-05")
+        resultat[0].registert shouldBe true
+
+        resultat[1].fom shouldBe LocalDate.parse("2020-01-02")
+        resultat[1].tom shouldBe LocalDate.MAX
+        resultat[1].registert shouldBe true
+    }
 }

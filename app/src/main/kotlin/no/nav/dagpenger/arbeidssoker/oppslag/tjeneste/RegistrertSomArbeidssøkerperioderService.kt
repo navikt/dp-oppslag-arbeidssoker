@@ -70,7 +70,7 @@ class RegistrertSomArbeidssøkerperioderService(
             val løsning =
                 arbeidsøkerPerioder.map { periode ->
                     mapOf(
-                        "verdi" to true,
+                        "verdi" to periode.registert,
                         "gyldigFraOgMed" to periode.fom,
                         "gyldigTilOgMed" to periode.tom,
                     ).also {

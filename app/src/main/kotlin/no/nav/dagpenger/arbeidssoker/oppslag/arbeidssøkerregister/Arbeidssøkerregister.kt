@@ -12,20 +12,15 @@ data class Periode(
     val tom: LocalDate,
 ) : ClosedRange<LocalDate> by (fom..tom) {
     companion object {
-        fun List<Periode>.filtrerFør(utgangspunkt: Periode) = this.filter { it.fom >= utgangspunkt.fom }
+        fun List<Periode>.filtrerFør(utgangspunkt: Periode) = this.filter { it.tom >= utgangspunkt.fom }
     }
 
-    /**
-     * Trekk fra flere perioder. Returnerer segmentene som IKKE dekkes av noen av periodene.
-     */
     operator fun minus(andre: Collection<Periode>): List<Periode> =
         andre.sortedBy { it.fom }.fold(listOf(this)) { result, nyPeriode ->
             val tidligere = result.dropLast(1)
             val siste = result.lastOrNull()
             tidligere + (siste?.minus(nyPeriode) ?: emptyList())
         }
-
-    fun overlapper(periode: Periode) = this.contains(periode.fom) || periode.contains(this.fom)
 
     operator fun minus(other: Periode): List<Periode> =
         when {
