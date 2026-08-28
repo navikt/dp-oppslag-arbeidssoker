@@ -47,13 +47,13 @@ class RegistrertSomArbeidssøkerService(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val fnr = packet["ident"].asText()
-        val søknadId = packet["søknadId"].asText()
+        val fnr = packet["ident"].asString()
+        val søknadId = packet["søknadId"].asString()
 
         withLoggingContext(
             SØKNAD_ID to søknadId,
-            "behandlingId" to packet["behandlingId"].asText(),
-            "behovId" to packet["@behovId"].asText(),
+            "behandlingId" to packet["behandlingId"].asString(),
+            "behovId" to packet["@behovId"].asString(),
         ) {
             val prøvingsdato = packet[BEHOV]["Prøvingsdato"].asLocalDate()
             val registreringsperioder =

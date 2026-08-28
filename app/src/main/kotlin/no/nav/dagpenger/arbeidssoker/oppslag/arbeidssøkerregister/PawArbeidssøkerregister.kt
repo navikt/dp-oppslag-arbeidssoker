@@ -1,7 +1,5 @@
 package no.nav.dagpenger.arbeidssoker.oppslag.arbeidssøkerregister
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -21,12 +19,13 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
-import io.ktor.serialization.jackson.jackson
+import io.ktor.serialization.jackson3.jackson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import no.nav.dagpenger.arbeidssoker.oppslag.SØKNAD_ID
 import no.nav.paw.arbeidssøkerregister.api.models.ArbeidssoekerperiodeResponseDTO
 import org.slf4j.MDC
+import tools.jackson.databind.DeserializationFeature
 import java.time.LocalDate
 
 class PawArbeidssøkerregister(
@@ -44,7 +43,6 @@ class PawArbeidssøkerregister(
             expectSuccess = true
             install(ContentNegotiation) {
                 jackson {
-                    registerModule(JavaTimeModule())
                     disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 }
             }
@@ -89,9 +87,11 @@ class PawArbeidssøkerregister(
                     }.also { perioder ->
                         log.info {
                             """
-                            Fant ${perioder.size} arbeidssøkerperioder, perioder: ${perioder.joinToString("\n") { periode ->
-                                "${periode.fom} - ${if (periode.tom == LocalDate.MAX) "" else periode.tom}"
-                            }}
+                            Fant ${perioder.size} arbeidssøkerperioder, perioder: ${
+                                perioder.joinToString("\n") { periode ->
+                                    "${periode.fom} - ${if (periode.tom == LocalDate.MAX) "" else periode.tom}"
+                                }
+                            }
                             """.trimIndent()
                         }
                     }

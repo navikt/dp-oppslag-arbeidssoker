@@ -42,8 +42,8 @@ class RegistrertSomArbeidssøkerperioderServiceTest {
         with(rapid.inspektør) {
             assertEquals(1, size)
             val løsning = field(0, "@løsning")
-            val perioder = løsning["RegistrertSomArbeidssøker"]
-            perioder.size() shouldBe 2
+            val perioder = løsning["RegistrertSomArbeidssøker"].toList()
+            perioder.size shouldBe 2
             perioder.map { it["verdi"].asBoolean() } shouldContainExactly listOf(true, true)
             perioder.map { it["gyldigFraOgMed"].asLocalDate() } shouldContainExactly
                 listOf(
@@ -69,7 +69,7 @@ class RegistrertSomArbeidssøkerperioderServiceTest {
         with(rapid.inspektør) {
             assertEquals(1, size)
             val løsning = field(0, "@løsning")
-            val perioder = løsning["RegistrertSomArbeidssøker"]
+            val perioder = løsning["RegistrertSomArbeidssøker"].toList()
             perioder.map { it["verdi"].asBoolean() } shouldContainExactly listOf(false)
             perioder.map { it["gyldigFraOgMed"].asLocalDate() } shouldContainExactly listOf(innhentFraOgMed)
         }
