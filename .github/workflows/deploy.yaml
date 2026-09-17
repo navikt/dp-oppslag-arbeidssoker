@@ -32,7 +32,6 @@ jobs:
 
       - name: docker-build-push
         uses: nais/docker-build-push@v0
-        if: github.ref == 'refs/heads/main'
         id: docker-build-push
         with:
           team: teamdagpenger
@@ -44,6 +43,7 @@ jobs:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
+      digest: ${{ steps.docker-build-push.outputs.digest }}
 
   deploy-dev:
     name: Deploy to dev
