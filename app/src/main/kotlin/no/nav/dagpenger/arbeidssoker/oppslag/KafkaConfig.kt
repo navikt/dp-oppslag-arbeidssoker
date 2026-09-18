@@ -13,8 +13,8 @@ import java.util.Properties
 
 object KafkaConfig {
     init {
-        // Avro 1.12+ krever eksplisitt tillit til klasser/pakker som skal deserialiseres til SpecificRecord
-        System.setProperty("org.apache.avro.SERIALIZABLE_PACKAGES", "no.nav.paw.arbeidssokerregisteret.api.v1")
+        // Avro 1.12+ krever eksplisitt tillit til klasser som skal deserialiseres til SpecificRecord
+        System.setProperty("org.apache.avro.SERIALIZABLE_CLASSES", Periode::class.java.name)
     }
 
     private val config = AivenConfig.default
