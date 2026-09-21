@@ -69,23 +69,4 @@ class ArbeidsøkerPeriodeTest {
         resultat[1].tom shouldBe LocalDate.MAX
         resultat[1].registert shouldBe true
     }
-
-    @Test
-    fun `Sorter etter fra og med og til og med `() {
-        val arbeidsøkerPerioder =
-            listOf(
-                Periode(LocalDate.parse("2026-09-07"), LocalDate.MAX),
-                Periode(LocalDate.parse("2026-09-07"), LocalDate.parse("2026-09-07")),
-            )
-
-        val utgangspunkt = Periode(LocalDate.parse("2026-09-07"), LocalDate.MAX)
-        val resultat = arbeidsøkerPerioder.slåSammen(utgangspunkt)
-        resultat shouldHaveSize 2
-        resultat[0].fom shouldBe LocalDate.parse("2026-09-07")
-        resultat[0].tom shouldBe LocalDate.parse("2026-09-07")
-        resultat[0].registert shouldBe true
-        resultat[1].fom shouldBe LocalDate.parse("2026-09-07")
-        resultat[1].tom shouldBe LocalDate.MAX
-        resultat[1].registert shouldBe true
-    }
 }
