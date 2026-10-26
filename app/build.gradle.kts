@@ -21,7 +21,7 @@ dependencies {
 
     // For arbeidssøkerregisteret sin lytter
     implementation("com.github.navikt.tbd-libs:kafka:2026.04.14-17.02-3f7000fd")
-    implementation("io.confluent:kafka-avro-serializer:8.3.2")
+    implementation("io.confluent:kafka-avro-serializer:8.4.0")
 
     // ktor
     implementation(libs.bundles.ktor.client)
