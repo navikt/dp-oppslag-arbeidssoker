@@ -3,13 +3,18 @@
     "path": "/api/v1/veileder/arbeidssoekerperioder",
     "method": "POST",
     "headers": {
-      "Authorization": "Bearer 123"
+      "Content-Type": "application/json",
+      "Authorization": "Bearer token"
     },
     "body": {
-      "identitetsnummer": "010987654321"
+      "identitetsnummer": "01987654321"
     }
   },
   "http-response": {
-    "status": 500
+    "status": 500,
+    "headers": {
+      "Content-Type": "text/plain"
+    },
+    "body": "Internal Server Error"
   }
 }

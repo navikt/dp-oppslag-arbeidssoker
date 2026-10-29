@@ -15,6 +15,12 @@ application {
     mainClass.set("no.nav.dagpenger.arbeidssoker.oppslag.AppKt")
 }
 
+@Suppress("ktlint:standard:max-line-length")
+val pawOpenApiSpec =
+    resources.text.fromUri(
+        "https://raw.githubusercontent.com/navikt/paw-arbeidssoekerregisteret-monorepo-ekstern/refs/heads/main/apps/oppslag-api-v2/src/main/resources/openapi/v1-spec.yaml",
+    )
+
 dependencies {
     implementation(project(":arbeidssoker-hendelser"))
     implementation(kotlin("stdlib-jdk8"))
@@ -47,7 +53,8 @@ dependencies {
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.mockk)
 
-    testImplementation("io.specmatic:specmatic-core:2.55.3")
+    testImplementation(libs.testcontainer)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 sourceSets {
@@ -74,12 +81,15 @@ tasks.runKtlintCheckOverMainSourceSet {
     dependsOn("openApiGenerate")
 }
 
-@Suppress("ktlint:standard:max-line-length")
+tasks.processTestResources {
+    from(provider { pawOpenApiSpec.asFile() }) {
+        rename { "paw-openapi.yaml" }
+    }
+}
+
 openApiGenerate {
     generatorName.set("kotlin")
-    remoteInputSpec.set(
-        "https://raw.githubusercontent.com/navikt/paw-arbeidssoekerregisteret-monorepo-ekstern/4305487aa6d784629f39199a83e4b9875ca857b9/apps/oppslag-api-v2/src/main/resources/openapi/v1-spec.yaml",
-    )
+    inputSpec.fileProvider(provider { pawOpenApiSpec.asFile() })
     outputDir.set("${layout.buildDirectory.get()}/generated/")
     packageName.set("no.nav.paw.arbeidssøkerregister.api")
     globalProperties.set(mapOf("models" to ""))

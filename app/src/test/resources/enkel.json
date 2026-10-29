@@ -3,7 +3,8 @@
     "path": "/api/v1/veileder/arbeidssoekerperioder",
     "method": "POST",
     "headers": {
-      "Authorization": "Bearer 123"
+      "Content-Type": "application/json",
+      "Authorization": "Bearer token"
     },
     "body": {
       "identitetsnummer": "12345678910"
@@ -11,6 +12,9 @@
   },
   "http-response": {
     "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
     "body": [
       {
         "periodeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
