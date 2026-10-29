@@ -75,8 +75,8 @@ class ArbeidssøkerStatusLytterTest {
             testRapid.inspektør.size shouldBe 1
             with(testRapid.inspektør) {
                 val message = message(0)
-                message["@event_name"].asText() shouldBe "arbeidssøkerstatus_endret"
-                message["periodeId"].asText() shouldBe periode.id.toString()
+                message["@event_name"].asString() shouldBe "arbeidssøkerstatus_endret"
+                message["periodeId"].asString() shouldBe periode.id.toString()
                 message["fom"].asLocalDateTime() shouldBe
                     fom.atZone(ZoneId.systemDefault()).toLocalDateTime().truncatedTo(
                         ChronoUnit.MILLIS,
@@ -86,7 +86,7 @@ class ArbeidssøkerStatusLytterTest {
                         ChronoUnit.MILLIS,
                     )
 
-                message["avsluttetAv"].asText() == "sluttbruker"
+                message["avsluttetAv"].asString() == "sluttbruker"
 
                 message["@kilde"].shouldNotBeNull()
             }
@@ -132,8 +132,8 @@ class ArbeidssøkerStatusLytterTest {
             testRapid.inspektør.size shouldBe 1
             with(testRapid.inspektør) {
                 val message = message(0)
-                message["@event_name"].asText() shouldBe "arbeidssøkerstatus_endret"
-                message["periodeId"].asText() shouldBe periode.id.toString()
+                message["@event_name"].asString() shouldBe "arbeidssøkerstatus_endret"
+                message["periodeId"].asString() shouldBe periode.id.toString()
                 message["fom"].asLocalDateTime() shouldBe
                     fom.atZone(ZoneId.systemDefault()).toLocalDateTime().truncatedTo(
                         ChronoUnit.MILLIS,
