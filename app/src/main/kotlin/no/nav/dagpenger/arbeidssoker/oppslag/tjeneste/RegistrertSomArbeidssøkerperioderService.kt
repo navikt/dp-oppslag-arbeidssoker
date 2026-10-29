@@ -67,15 +67,21 @@ class RegistrertSomArbeidssøkerperioderService(
             val utgangspunkt = Periode(innhentFraOgMed, LocalDate.MAX)
             val arbeidsøkerPerioder = registreringsperioder.slåSammen(utgangspunkt)
 
+            val perioder =
+                arbeidsøkerPerioder.joinToString { periode ->
+                    "${if (periode.registert) "Ja" else "Nei" } : ${periode.fom} - ${if (periode.tom == LocalDate.MAX) "<ingen sluttdato>" else periode.tom}"
+                }
+            log.info {
+                "Fant ${arbeidsøkerPerioder.size} arbeidssøkerperioder etter sammenslåing. (Inntentet fra: $innhentFraOgMed) \nPerioder: $perioder"
+            }
+
             val løsning =
                 arbeidsøkerPerioder.map { periode ->
                     mapOf(
                         "verdi" to periode.registert,
                         "gyldigFraOgMed" to periode.fom,
                         "gyldigTilOgMed" to periode.tom,
-                    ).also {
-                        log.info { "Registrert som arbeidssøker med ${arbeidsøkerPerioder.size} perioder fra og med $innhentFraOgMed" }
-                    }
+                    )
                 }
 
             packet["@løsning"] = mapOf(BEHOV to løsning)

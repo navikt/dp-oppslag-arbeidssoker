@@ -85,15 +85,11 @@ class PawArbeidssøkerregister(
                             )
                         }
                     }.also { perioder ->
-                        log.info {
-                            """
-                            Fant ${perioder.size} arbeidssøkerperioder, perioder: ${
-                                perioder.joinToString("\n") { periode ->
-                                    "${periode.fom} - ${if (periode.tom == LocalDate.MAX) "<EVIG>" else periode.tom}"
-                                }
+                        val formattertePerioder =
+                            perioder.joinToString("\n") { periode ->
+                                "${periode.fom} - ${if (periode.tom == LocalDate.MAX) "<ingen sluttdato>" else periode.tom}"
                             }
-                            """.trimIndent()
-                        }
+                        log.info { "Fant ${perioder.size} arbeidssøkerperioder. \nPerioder: $formattertePerioder" }
                     }
             } catch (e: ClientRequestException) {
                 val responseBody = e.response.bodyAsText()
