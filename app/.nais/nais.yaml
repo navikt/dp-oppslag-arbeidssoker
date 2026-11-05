@@ -4,6 +4,9 @@ metadata:
   labels:
     app: dp-oppslag-arbeidssoker
     team: teamdagpenger
+    subteam: paragrafjegerene
+    okonomisystem: "false"
+    fagsystem: dagpenger
   name: dp-oppslag-arbeidssoker
   namespace: teamdagpenger
 spec:
