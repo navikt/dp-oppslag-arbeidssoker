@@ -58,6 +58,7 @@ class ArbeidssøkerStatusLytterTest {
         val records =
             ConsumerRecords(
                 mapOf(testPartition to listOf(ConsumerRecord(topic, 0, 0, 0L, periode))),
+                mapOf(testPartition to OffsetAndMetadata(1L)),
             )
 
         val consumer = assertStopsAfterFailure { records }
@@ -90,6 +91,7 @@ class ArbeidssøkerStatusLytterTest {
                         ),
                     otherPartition to listOf(ConsumerRecord(topic, 1, 7, 0L, periode)),
                 ),
+                mapOf(testPartition to OffsetAndMetadata(5L), otherPartition to OffsetAndMetadata(8L)),
             )
 
         val consumer = assertStopsAfterFailure { records }
@@ -111,6 +113,7 @@ class ArbeidssøkerStatusLytterTest {
         val records =
             ConsumerRecords(
                 mapOf(testPartition to listOf(ConsumerRecord(topic, 0, 5, 0L, periode))),
+                mapOf(testPartition to OffsetAndMetadata(6L)),
             )
 
         val consumer =
@@ -192,9 +195,10 @@ class ArbeidssøkerStatusLytterTest {
                 every { wakeup() } answers { wakeupSignal.countDown() }
             }
         val rapid = mockk<RapidsConnection>(relaxed = true)
-        val lytter = ArbeidssøkerStatusLytter(consumer, rapid)
-
-        lytter.start()
+        val lytter =
+            ArbeidssøkerStatusLytter(consumer, rapid).also {
+                it.start()
+            }
         try {
             polling.await(2, TimeUnit.SECONDS) shouldBe true
             assertTimeoutPreemptively(Duration.ofSeconds(2)) {
@@ -223,9 +227,11 @@ class ArbeidssøkerStatusLytterTest {
                 }
             }
         val rapid = mockk<RapidsConnection>(relaxed = true)
-        val lytter = ArbeidssøkerStatusLytter(consumer, rapid)
+        val lytter =
+            ArbeidssøkerStatusLytter(consumer, rapid).also {
+                it.start()
+            }
 
-        lytter.start()
         try {
             polling.await(2, TimeUnit.SECONDS) shouldBe true
             assertTimeoutPreemptively(Duration.ofSeconds(7)) {
@@ -289,7 +295,9 @@ class ArbeidssøkerStatusLytterTest {
                 ArbeidssøkerStatusLytter(
                     consumer = mockConsumer,
                     rapidsConnection = testRapid,
-                ).also { it.start() }
+                ).also {
+                    it.start()
+                }
             val ident = "12345678910"
             val fom = Instant.now()
             val tom = Instant.now()
@@ -339,7 +347,7 @@ class ArbeidssøkerStatusLytterTest {
 
                 message["@kilde"].shouldNotBeNull()
             }
-            arbeidssøkerStatusLytter.stop()
+            arbeidssøkerStatusLytter.onShutdown(testRapid)
         }
     }
 
@@ -350,7 +358,9 @@ class ArbeidssøkerStatusLytterTest {
                 ArbeidssøkerStatusLytter(
                     consumer = mockConsumer,
                     rapidsConnection = testRapid,
-                ).also { it.start() }
+                ).also {
+                    it.start()
+                }
             val ident = "12345678910"
             val fom = Instant.now()
             val periode =
@@ -390,7 +400,7 @@ class ArbeidssøkerStatusLytterTest {
 
                 message["@kilde"].shouldNotBeNull()
             }
-            arbeidssøkerStatusLytter.stop()
+            arbeidssøkerStatusLytter.onShutdown(testRapid)
         }
     }
 }

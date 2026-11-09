@@ -59,11 +59,6 @@ internal class ArbeidssøkerStatusLytter(
         }
     }
 
-    fun stop() {
-        stopConsumer()
-        stopApplication()
-    }
-
     private fun stopConsumer() {
         logger.info { "Stopper ArbeidssøkerStatusLytter" }
         if (running.getAndSet(false)) {
