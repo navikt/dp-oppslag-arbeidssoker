@@ -59,30 +59,28 @@ class ArbeidsøkerPeriodeTest {
         val utgangspunkt = Periode(datoViSpørOm, LocalDate.MAX)
         val resultat = arbeidsøkerPerioder.slåSammen(utgangspunkt)
 
-        resultat.shouldHaveSize(2)
+        resultat.shouldHaveSize(1)
 
         resultat[0].fom shouldBe LocalDate.parse("2019-12-31")
-        resultat[0].tom shouldBe LocalDate.parse("2020-01-05")
+        resultat[0].tom shouldBe LocalDate.MAX
         resultat[0].registert shouldBe true
-
-        resultat[1].fom shouldBe LocalDate.parse("2020-01-02")
-        resultat[1].tom shouldBe LocalDate.MAX
-        resultat[1].registert shouldBe true
     }
 
     @Test
     fun `Slå sammen perioder som overlapper `() {
         val dato = LocalDate.parse("2026-11-17")
+        val opprinneligRegistrert = LocalDate.parse("2026-09-17")
         val arbeidsøkerPerioder =
             listOf(
                 Periode(dato, LocalDate.MAX),
-                Periode(dato, dato),
+                Periode(opprinneligRegistrert, dato),
             )
+
         val utgangspunkt = Periode(dato, LocalDate.MAX)
         val resultat = arbeidsøkerPerioder.slåSammen(utgangspunkt)
 
         resultat shouldHaveSize 1
-        resultat[0].fom shouldBe dato
+        resultat[0].fom shouldBe opprinneligRegistrert
         resultat[0].tom shouldBe LocalDate.MAX
         resultat[0].registert shouldBe true
     }

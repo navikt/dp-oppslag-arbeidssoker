@@ -18,9 +18,21 @@ data class ArbeidsøkerPeriode(
             val jaPerioder =
                 this
                     .filtrerFør(neiPeriode)
-                    .groupBy { it.fom }
-                    .map { (fom, perioder) -> ArbeidsøkerPeriode(registert = true, fom = fom, tom = perioder.maxOf { it.tom }) }
+                    .map { ArbeidsøkerPeriode(registert = true, fom = it.fom, tom = it.tom) }
+                    .sorted()
+                    .slåSammenOverlappende()
             return (hullrommene + jaPerioder).sorted()
         }
+
+        private fun List<ArbeidsøkerPeriode>.slåSammenOverlappende(): List<ArbeidsøkerPeriode> =
+            fold(emptyList()) { slått, neste ->
+                val forrige = slått.lastOrNull()
+                when {
+                    forrige != null && neste.fom <= forrige.tom ->
+                        slått.dropLast(1) + forrige.copy(tom = maxOf(forrige.tom, neste.tom))
+
+                    else -> slått + neste
+                }
+            }
     }
 }
