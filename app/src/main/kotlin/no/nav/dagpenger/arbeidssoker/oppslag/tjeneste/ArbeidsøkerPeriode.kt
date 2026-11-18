@@ -15,7 +15,11 @@ data class ArbeidsøkerPeriode(
     companion object {
         fun List<Periode>.slåSammen(neiPeriode: Periode): List<ArbeidsøkerPeriode> {
             val hullrommene = (neiPeriode - this).map { ArbeidsøkerPeriode(registert = false, fom = it.fom, tom = it.tom) }
-            val jaPerioder = this.filtrerFør(neiPeriode).map { ArbeidsøkerPeriode(registert = true, fom = it.fom, tom = it.tom) }
+            val jaPerioder =
+                this
+                    .filtrerFør(neiPeriode)
+                    .groupBy { it.fom }
+                    .map { (fom, perioder) -> ArbeidsøkerPeriode(registert = true, fom = fom, tom = perioder.maxOf { it.tom }) }
             return (hullrommene + jaPerioder).sorted()
         }
     }
